@@ -21,14 +21,23 @@ public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEven
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.defaultClient();
+    private final AmazonDynamoDB dynamoDB = DynamoDBUtil.GetAmazonDynamoDB();
 
     @SneakyThrows
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
-        var unit = request.getQueryStringParameters().getOrDefault("unit", "");
+        String unit = "";
+        if (request.getQueryStringParameters() != null) {
+            unit = request.getQueryStringParameters().getOrDefault("unit", "");
+        }
+
         var words = getWordsByUnit(unit);
-        return new APIGatewayProxyResponseEvent().withBody(objectMapper.writeValueAsString(words));
+
+        return new APIGatewayProxyResponseEvent()
+                .withHeaders(new HashMap<>() {{
+                    put("Access-Control-Allow-Origin", "*");
+                }})
+                .withBody(objectMapper.writeValueAsString(words));
     }
 
     private List<Word> getWordsByUnit(String unit) {

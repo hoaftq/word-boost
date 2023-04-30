@@ -1,6 +1,5 @@
 package wordboost;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -16,7 +15,7 @@ import java.util.UUID;
 public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final String wordsTableName = System.getenv("WORDS_TABLE");
 
-    private final DynamoDB dynamoDB = new DynamoDB(AmazonDynamoDBClientBuilder.defaultClient());
+    private final DynamoDB dynamoDB = new DynamoDB(DynamoDBUtil.GetAmazonDynamoDB());
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -27,8 +26,7 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
 
         return new APIGatewayProxyResponseEvent()
                 .withHeaders(new HashMap<>() {{
-                    put("Content-Type", "application/json");
-                    put("X-Custom-Header", "application/json");
+                    put("Access-Control-Allow-Origin", "*");
                 }})
                 .withStatusCode(200)
                 .withBody(wordId);

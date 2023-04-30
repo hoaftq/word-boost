@@ -52,7 +52,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
-        AddWord:
+        GetWordsByUnit:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /words
@@ -74,7 +74,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
-        AddWord:
+        GetUnits:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /units

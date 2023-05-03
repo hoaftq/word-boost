@@ -1,5 +1,5 @@
+import { WordList } from '@wb/components/word-list'
 import Head from 'next/head'
-import { WordList } from './word-list';
 
 export default function Home() {
   return (

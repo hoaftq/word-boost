@@ -1,7 +1,7 @@
 import { Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import getConfig from "next/config";
 import { useEffect, useState } from "react";
 
-const API_BASE_URL = "http://127.0.0.1:3000";
 
 interface Word {
     id: string;
@@ -11,22 +11,23 @@ interface Word {
 }
 
 export function WordList() {
+    const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
     const [units, setUnits] = useState([] as string[]);
     const [selectedUnit, setSelectedUnit] = useState('');
     const [words, setWords] = useState([] as Word[]);
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/units`)
+        fetch(`${apiUrl}/units`)
             .then(rsp => rsp.json())
             .then((units: string[]) => { setUnits(units); })
-    }, []);
+    }, [apiUrl]);
 
     const handleUnitChange = (e: SelectChangeEvent) => {
         const unit = e.target.value;
         setSelectedUnit(unit);
 
-        fetch(`${API_BASE_URL}/words?unit=${unit}`)
+        fetch(`${apiUrl}/words?unit=${unit}`)
             .then(rsp => rsp.json())
             .then((words: Word[]) => { setWords(words); });
     }

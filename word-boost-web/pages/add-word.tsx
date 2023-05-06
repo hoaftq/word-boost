@@ -2,6 +2,7 @@ import { Button, Container, FormControl, Stack, TextField, Typography } from "@m
 import { Controller, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import getConfig from "next/config";
+import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 
 interface WordForm {
     value: string;
@@ -17,10 +18,11 @@ export default function AddWord() {
             course: ''
         }
     });
+    const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
     const onSubmit = (data: WordForm) => {
         const { publicRuntimeConfig: { apiUrl } } = getConfig();
-        fetch(`${apiUrl}/add`, {
+        blockingFetch(`${apiUrl}/add`, {
             method: "post",
             body: JSON.stringify(data)
         })
@@ -72,6 +74,7 @@ export default function AddWord() {
                         type="submit">Add</Button>
                 </Stack>
             </form>
+            <FetchingBackdrop />
         </Container>
     )
 }

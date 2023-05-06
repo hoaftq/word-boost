@@ -16,4 +16,6 @@ public class Word {
     private String unit;
 
     private String course;
+
+    private String imageUrl;
 }

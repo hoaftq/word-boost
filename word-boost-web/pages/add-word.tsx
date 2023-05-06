@@ -8,6 +8,7 @@ interface WordForm {
     value: string;
     unit: string;
     course: string;
+    imageUrl: string;
 }
 
 export default function AddWord() {
@@ -15,8 +16,9 @@ export default function AddWord() {
         defaultValues: {
             value: '',
             unit: '',
-            course: ''
-        }
+            course: '',
+            imageUrl: ''
+        } as WordForm
     });
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
@@ -66,6 +68,13 @@ export default function AddWord() {
                             size="small"
                             error={!!errors.course}
                             helperText={errors?.course?.message}
+                        />}
+                    />
+                    <Controller name="imageUrl"
+                        control={control}
+                        render={({ field }) => <TextField {...field}
+                            label="Image Url"
+                            size="small"
                         />}
                     />
                     <Button variant="contained"

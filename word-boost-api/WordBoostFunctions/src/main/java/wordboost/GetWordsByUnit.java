@@ -1,7 +1,6 @@
 package wordboost;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -55,9 +54,10 @@ public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEven
                 .stream()
                 .map(i -> Word.builder()
                         .id(i.get("id").getS())
-                        .value(i.getOrDefault("value", new AttributeValue()).getS())
+                        .value(i.get("value").getS())
                         .unit(i.get("unit").getS())
                         .course(i.get("course").getS())
+                        .imageUrl(i.getOrDefault("imageUrl", new AttributeValue()).getS())
                         .build()
                 ).collect(Collectors.toList());
     }

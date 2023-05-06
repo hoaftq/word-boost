@@ -1,15 +1,17 @@
-import { Badge, Button, Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import { Button, Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import getConfig from "next/config";
 import { useEffect, useState } from "react";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import Image from "next/image";
 
 interface Word {
     id: string;
     value: string;
     unit: string;
     course: string;
+    imageUrl: string;
 }
 
 export function WordList() {
@@ -46,7 +48,7 @@ export function WordList() {
 
     return (
         <>
-            <FormControl sx={{ minWidth: 200, marginBottom: 5, marginRight: 5 }} size="small">
+            <FormControl sx={{ minWidth: 200, marginBottom: 3, marginRight: 5 }} size="small">
                 <InputLabel id="unit">Unit</InputLabel>
                 <Select labelId="unit"
                     value={selectedUnit}
@@ -122,24 +124,33 @@ function OneWord({ words }: { words: Word[] }) {
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
+            <Image src={currentWord?.imageUrl ?? ""}
+                alt={`Image for ${currentWord?.value}`}
+                width={500}
+                height={500}
+                unoptimized
+            />
             <Chip key={currentWord?.id}
                 label={currentWord?.value}
                 clickable
-                sx={{ marginBottom: 5 }}
+                color="primary"
+                sx={{ marginTop: 1, marginBottom: 3 }}
             />
             <div style={{ marginBottom: 10, fontWeight: 'bold' }}>{currentIndex + 1}/{words.length}
             </div>
             <div>
                 <Button onClick={handlePrevious}
-                    variant="contained"
+                    variant="outlined"
                     disabled={isFirstWord}
                     sx={{ marginRight: 5 }}
                     startIcon={<SkipPreviousIcon />}
+                    color="secondary"
                 >Previous</Button>
                 <Button onClick={handleNext}
-                    variant="contained"
+                    variant="outlined"
                     disabled={isLastWord}
                     endIcon={<SkipNextIcon />}
+                    color="secondary"
                 >Next</Button>
             </div>
         </Stack>

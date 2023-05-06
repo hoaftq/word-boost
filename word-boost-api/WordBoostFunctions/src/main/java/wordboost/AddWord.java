@@ -41,7 +41,8 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
                 .with("id", id)
                 .with("value", newWord.getValue())
                 .with("unit", newWord.getUnit())
-                .with("course", newWord.getCourse()));
+                .with("course", newWord.getCourse())
+                .with("imageUrl", newWord.getImageUrl()));
 
         return id;
     }

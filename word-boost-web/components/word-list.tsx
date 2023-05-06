@@ -1,4 +1,4 @@
-import { Button, Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import getConfig from "next/config";
 import { useEffect, useState } from "react";
@@ -83,13 +83,15 @@ export function WordList() {
 
 function AllWords({ words }: { words: Word[] }) {
     return (
-        <Stack direction={"row"} spacing={5} flexWrap={"wrap"}>
+        <Stack direction={"row"} flexWrap={"wrap"}>
             {words.map((w, i) => (
-                <Chip key={w.id}
-                    label={`${i + 1}. ${w.value}`}
-                    clickable
-                    sx={{ marginBottom: 5 }}
-                />
+                <Box key={w.id} padding={2}>
+                    <Chip label={`${i + 1}. ${w.value}`}
+                        clickable
+                        sx={{ fontSize: 30, p: 4 }}
+                        color="primary"
+                    />
+                </Box>
             ))}
         </Stack>
     );
@@ -134,7 +136,7 @@ function OneWord({ words }: { words: Word[] }) {
                 label={currentWord?.value}
                 clickable
                 color="primary"
-                sx={{ marginTop: 1, marginBottom: 3 }}
+                sx={{ marginTop: 1, marginBottom: 3, fontSize: 30, p: 3 }}
             />
             <div style={{ marginBottom: 10, fontWeight: 'bold' }}>{currentIndex + 1}/{words.length}
             </div>

@@ -1,4 +1,4 @@
-import { Button, Container, FormControl, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import getConfig from "next/config";
@@ -34,7 +34,7 @@ export default function AddWord() {
     }
 
     return (
-        <Container maxWidth="sm">
+        <>
             <Typography variant="h5" mb={3}>Add a new word</Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack direction={"column"} spacing={2} >
@@ -75,6 +75,6 @@ export default function AddWord() {
                 </Stack>
             </form>
             <FetchingBackdrop />
-        </Container>
+        </>
     )
 }

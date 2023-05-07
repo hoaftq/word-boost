@@ -4,7 +4,10 @@ const nextConfig = {
   publicRuntimeConfig: {
     apiUrl: process.env.API_URL || 'http://127.0.0.1:3000'
   },
-  output: 'export'
+  output: 'export',
+  images: {
+    unoptimized: true
+  }
 }
 
 module.exports = nextConfig

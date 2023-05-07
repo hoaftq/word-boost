@@ -48,7 +48,7 @@ export function WordList() {
 
     return (
         <>
-            <FormControl sx={{ minWidth: 200, marginBottom: 3, marginRight: 5 }} size="small">
+            <FormControl sx={{ minWidth: 150, marginRight: 3, marginTop: 2 }} size="small">
                 <InputLabel id="unit">Unit</InputLabel>
                 <Select labelId="unit"
                     value={selectedUnit}
@@ -62,7 +62,7 @@ export function WordList() {
 
                 </Select>
             </FormControl>
-            <FormControl sx={{ minWidth: 200 }} size="small">
+            <FormControl sx={{ minWidth: 200, marginTop: 2 }} size="small">
                 <InputLabel id="displayMode">Display mode</InputLabel>
                 <Select labelId="displayMode"
                     value={displayMode}
@@ -73,8 +73,10 @@ export function WordList() {
                 </Select>
             </FormControl>
 
-            {displayMode == DISPLAY_ALL_WORDS && !!words.length && <AllWords words={words} />}
-            {displayMode == DISPLAY_ONE_WORD && !!words.length && <OneWord words={words} />}
+            <div style={{ marginTop: 16 }}>
+                {displayMode == DISPLAY_ALL_WORDS && !!words.length && <AllWords words={words} />}
+                {displayMode == DISPLAY_ONE_WORD && !!words.length && <OneWord words={words} />}
+            </div>
 
             <FetchingBackdrop />
         </>
@@ -128,9 +130,8 @@ function OneWord({ words }: { words: Word[] }) {
         <Stack direction={"column"} alignItems={"center"}>
             <Image src={currentWord?.imageUrl ?? ""}
                 alt={`Image for ${currentWord?.value}`}
-                width={500}
-                height={500}
-                unoptimized
+                width={300}
+                height={300}
             />
             <Chip key={currentWord?.id}
                 label={currentWord?.value}
@@ -147,7 +148,7 @@ function OneWord({ words }: { words: Word[] }) {
                     sx={{ marginRight: 5 }}
                     startIcon={<SkipPreviousIcon />}
                     color="secondary"
-                >Previous</Button>
+                >Prev</Button>
                 <Button onClick={handleNext}
                     variant="outlined"
                     disabled={isLastWord}

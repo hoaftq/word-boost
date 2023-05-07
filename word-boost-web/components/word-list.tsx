@@ -1,7 +1,7 @@
-import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import { Box, Button, Chip, FormControl, FormControlLabel, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, Switch } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import getConfig from "next/config";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import Image from "next/image";
@@ -19,12 +19,16 @@ export function WordList() {
 
     const [units, setUnits] = useState([] as string[]);
     const [selectedUnit, setSelectedUnit] = useState('');
-    const [words, setWords] = useState([] as Word[]);
-    const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
     const DISPLAY_ALL_WORDS = "0";
     const DISPLAY_ONE_WORD = "1";
     const [displayMode, setDisplayMode] = useState(DISPLAY_ALL_WORDS);
+
+    const [imageVisible, setImageVisible] = useState(false);
+
+    const [words, setWords] = useState([] as Word[]);
+
+    const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
     useEffect(() => {
         blockingFetch(`${apiUrl}/units`)
@@ -46,6 +50,10 @@ export function WordList() {
         setDisplayMode(e.target.value);
     }
 
+    const handleImageVisibleChange = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        setImageVisible(checked);
+    }
+
     return (
         <>
             <FormControl sx={{ minWidth: 150, marginRight: 3, marginTop: 2 }} size="small">
@@ -62,7 +70,7 @@ export function WordList() {
 
                 </Select>
             </FormControl>
-            <FormControl sx={{ minWidth: 200, marginTop: 2 }} size="small">
+            <FormControl sx={{ minWidth: 200, marginRight: 3, marginTop: 2 }} size="small">
                 <InputLabel id="displayMode">Display mode</InputLabel>
                 <Select labelId="displayMode"
                     value={displayMode}
@@ -72,10 +80,14 @@ export function WordList() {
                     <MenuItem value={DISPLAY_ONE_WORD}>One word at a time</MenuItem>
                 </Select>
             </FormControl>
+            <FormControlLabel control={<Switch checked={imageVisible} onChange={handleImageVisibleChange} />}
+                label="Show image"
+                sx={{ marginTop: 2 }}
+                disabled={displayMode !== DISPLAY_ONE_WORD} />
 
             <div style={{ marginTop: 16 }}>
-                {displayMode == DISPLAY_ALL_WORDS && !!words.length && <AllWords words={words} />}
-                {displayMode == DISPLAY_ONE_WORD && !!words.length && <OneWord words={words} />}
+                {displayMode === DISPLAY_ALL_WORDS && !!words.length && <AllWords words={words} />}
+                {displayMode === DISPLAY_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
             </div>
 
             <FetchingBackdrop />
@@ -99,8 +111,9 @@ function AllWords({ words }: { words: Word[] }) {
     );
 }
 
-function OneWord({ words }: { words: Word[] }) {
+function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [imageVisible, setImageVisible] = useState(initialImageVisible);
 
     const isFirstWord = currentIndex == 0;
     const isLastWord = currentIndex == words.length - 1;
@@ -111,7 +124,7 @@ function OneWord({ words }: { words: Word[] }) {
             return;
         }
 
-        setCurrentIndex(currentIndex + 1);
+        updateCurrentIndex(currentIndex + 1);
     }
 
     const handlePrevious = () => {
@@ -119,25 +132,37 @@ function OneWord({ words }: { words: Word[] }) {
             return;
         }
 
-        setCurrentIndex(currentIndex - 1);
+        updateCurrentIndex(currentIndex - 1);
     }
 
+    const handleWordClick = () => {
+        setImageVisible(!imageVisible);
+    }
+
+    const updateCurrentIndex = useCallback((index: number) => {
+        setCurrentIndex(index);
+        setImageVisible(initialImageVisible);
+    }, [initialImageVisible]);
+
     useEffect(() => {
-        setCurrentIndex(0);
-    }, [words]);
+        updateCurrentIndex(0);
+    }, [updateCurrentIndex, words]);
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
-            <Image src={currentWord?.imageUrl ?? ""}
-                alt={`Image for ${currentWord?.value}`}
-                width={300}
-                height={300}
-            />
+            <div style={{ width: "100%", height: 300, position: "relative" }}>
+                {imageVisible && <Image src={currentWord?.imageUrl ?? ""}
+                    alt=""
+                    style={{ objectFit: 'contain' }}
+                    fill={true}
+                />}
+            </div>
             <Chip key={currentWord?.id}
                 label={currentWord?.value}
                 clickable
                 color="primary"
                 sx={{ marginTop: 1, marginBottom: 3, fontSize: 30, p: 3 }}
+                onClick={handleWordClick}
             />
             <div style={{ marginBottom: 10, fontWeight: 'bold' }}>{currentIndex + 1}/{words.length}
             </div>

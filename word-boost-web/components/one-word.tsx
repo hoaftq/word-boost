@@ -53,11 +53,6 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
                 justifyContent: "center",
                 alignItems: "center"
             }}>
-                {imageVisible && <Image src={currentWord?.imageUrl ?? ""}
-                    alt=""
-                    style={{ objectFit: 'contain' }}
-                    fill={true}
-                />}
                 {imageVisible && <LoadingImage imageUrl={currentWord?.imageUrl} />}
             </div>
             <Chip key={currentWord?.id}
@@ -90,16 +85,21 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
 
 function LoadingImage({ imageUrl }: { imageUrl: string }) {
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setLoading(true);
+    }, [imageUrl])
+
     if (imageUrl) {
         return (
             <>
                 {loading && <CircularProgress />}
-                {<Image src={imageUrl}
+                <Image src={imageUrl}
                     alt=""
-                    style={{ objectFit: 'contain' }}
+                    style={{ objectFit: 'contain', opacity: loading ? 0 : 1 }}
                     fill={true}
-                    onLoad={() => { setLoading(false) }}
-                />}
+                    onLoadingComplete={() => { setLoading(false); }}
+                />
             </>
         );
     }

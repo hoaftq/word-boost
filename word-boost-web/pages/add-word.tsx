@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import getConfig from "next/config";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
+import { useSnackbar } from "notistack";
 
 interface WordForm {
     value: string;
@@ -12,7 +13,7 @@ interface WordForm {
 }
 
 export default function AddWord() {
-    const { control, formState: { errors }, handleSubmit, reset } = useForm({
+    const { control, formState: { errors }, handleSubmit, resetField, setFocus } = useForm({
         defaultValues: {
             value: '',
             unit: '',
@@ -21,6 +22,7 @@ export default function AddWord() {
         } as WordForm
     });
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
+    const { enqueueSnackbar } = useSnackbar();
 
     const onSubmit = (data: WordForm) => {
         const { publicRuntimeConfig: { apiUrl } } = getConfig();
@@ -30,8 +32,10 @@ export default function AddWord() {
         })
             .then(resp => resp.text())
             .then((wordId: string) => {
-                alert(`Added a new word with id of ${wordId}`);
-                reset();
+                enqueueSnackbar(`Added a new word with id of ${wordId}`, { variant: 'success' });
+                resetField("value");
+                resetField("imageUrl");
+                setFocus("value");
             });
     }
 
@@ -40,16 +44,6 @@ export default function AddWord() {
             <Typography variant="h5" mb={3}>Add a new word</Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack direction={"column"} spacing={2} >
-                    <Controller name="value"
-                        control={control}
-                        rules={{ required: { value: true, message: 'Word is required.' } }}
-                        render={({ field }) => <TextField {...field}
-                            label="Word"
-                            size="small"
-                            error={!!errors?.value}
-                            helperText={errors?.value?.message}
-                        />}
-                    />
                     <Controller name="unit"
                         control={control}
                         rules={{ required: { value: true, message: 'Unit is required.' } }}
@@ -70,6 +64,17 @@ export default function AddWord() {
                             helperText={errors?.course?.message}
                         />}
                     />
+                    <Controller name="value"
+                        control={control}
+                        rules={{ required: { value: true, message: 'Word is required.' } }}
+                        render={({ field: { ref, ...field } }) => <TextField {...field}
+                            inputRef={ref}
+                            label="Word"
+                            size="small"
+                            error={!!errors?.value}
+                            helperText={errors?.value?.message}
+                        />}
+                    />
                     <Controller name="imageUrl"
                         control={control}
                         render={({ field }) => <TextField {...field}
@@ -80,7 +85,8 @@ export default function AddWord() {
                     <Button variant="contained"
                         sx={{ width: 100, alignSelf: "flex-end" }}
                         startIcon={<AddCircleIcon />}
-                        type="submit">Add</Button>
+                        type="submit"
+                    >Add</Button>
                 </Stack>
             </form>
             <FetchingBackdrop />

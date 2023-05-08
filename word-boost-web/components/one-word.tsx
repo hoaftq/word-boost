@@ -1,4 +1,4 @@
-import { Stack, Chip, Button } from "@mui/material";
+import { Stack, Chip, Button, CircularProgress, Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -45,12 +45,20 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
-            <div style={{ width: "100%", height: 300, position: "relative" }}>
+            <div style={{
+                width: "100%",
+                height: 300,
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+            }}>
                 {imageVisible && <Image src={currentWord?.imageUrl ?? ""}
                     alt=""
                     style={{ objectFit: 'contain' }}
                     fill={true}
                 />}
+                {imageVisible && <LoadingImage imageUrl={currentWord?.imageUrl} />}
             </div>
             <Chip key={currentWord?.id}
                 label={currentWord?.value}
@@ -78,4 +86,23 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
             </div>
         </Stack>
     );
+}
+
+function LoadingImage({ imageUrl }: { imageUrl: string }) {
+    const [loading, setLoading] = useState(true);
+    if (imageUrl) {
+        return (
+            <>
+                {loading && <CircularProgress />}
+                {<Image src={imageUrl}
+                    alt=""
+                    style={{ objectFit: 'contain' }}
+                    fill={true}
+                    onLoad={() => { setLoading(false) }}
+                />}
+            </>
+        );
+    }
+
+    return <></>;
 }

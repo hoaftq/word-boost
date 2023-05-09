@@ -1,9 +1,10 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField, TextFieldProps, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import getConfig from "next/config";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { useSnackbar } from "notistack";
+import { ChangeEvent, FocusEvent, useState } from "react";
 
 interface WordForm {
     value: string;
@@ -28,7 +29,12 @@ export default function AddWord() {
         const { publicRuntimeConfig: { apiUrl } } = getConfig();
         blockingFetch(`${apiUrl}/add`, {
             method: "post",
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                value: data.value?.trim(),
+                unit: data.unit?.trim(),
+                course: data.course?.trim(),
+                imageUrl: data.imageUrl?.trim()
+            })
         })
             .then(resp => resp.text())
             .then((wordId: string) => {
@@ -37,6 +43,12 @@ export default function AddWord() {
                 resetField("imageUrl");
                 setFocus("value");
             });
+    }
+
+    const handleTraditionalChange = (event: FocusEvent<HTMLInputElement>) => {
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(event.target.value?.trim())}&tbm=isch`,
+            "word_boost_search_image",
+            "popup");
     }
 
     return (
@@ -67,12 +79,13 @@ export default function AddWord() {
                     <Controller name="value"
                         control={control}
                         rules={{ required: { value: true, message: 'Word is required.' } }}
-                        render={({ field: { ref, ...field } }) => <TextField {...field}
+                        render={({ field: { ref, ...field } }) => <TraditionalChangeTextField {...field}
                             inputRef={ref}
                             label="Word"
                             size="small"
                             error={!!errors?.value}
                             helperText={errors?.value?.message}
+                            onTraditionalChange={handleTraditionalChange}
                         />}
                     />
                     <Controller name="imageUrl"
@@ -92,4 +105,27 @@ export default function AddWord() {
             <FetchingBackdrop />
         </>
     )
+}
+
+type TraditionalChangeTextFieldProps = TextFieldProps & { onTraditionalChange: (event: FocusEvent<HTMLInputElement>) => void };
+
+function TraditionalChangeTextField(props: TraditionalChangeTextFieldProps) {
+    const { defaultValue, onTraditionalChange } = props;
+
+    const [prevValue, setPrevValue] = useState(defaultValue);
+    const [value, setValue] = useState(defaultValue);
+
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+        if (prevValue !== value) {
+            onTraditionalChange(event);
+            setPrevValue(value);
+        }
+    }
+
+    return <TextField {...props}
+        value={value}
+        onBlur={handleBlur}
+        onChange={(event) => setValue(event.target.value)}
+    />
+
 }

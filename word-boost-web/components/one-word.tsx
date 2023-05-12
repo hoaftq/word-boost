@@ -1,4 +1,4 @@
-import { Stack, Chip, Button, Box } from "@mui/material";
+import { Stack, Chip, Button } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';

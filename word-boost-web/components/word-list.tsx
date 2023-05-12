@@ -19,9 +19,9 @@ export function WordList() {
     const [units, setUnits] = useState([] as string[]);
     const [selectedUnit, setSelectedUnit] = useState('');
 
-    const DISPLAY_ALL_WORDS = "0";
-    const DISPLAY_ONE_WORD = "1";
-    const [displayMode, setDisplayMode] = useState(DISPLAY_ALL_WORDS);
+    const DISPLAY_ONE_WORD = "0";
+    const DISPLAY_ALL_WORDS = "1";
+    const [displayMode, setDisplayMode] = useState(DISPLAY_ONE_WORD);
 
     const [imageVisible, setImageVisible] = useState(false);
 
@@ -75,8 +75,8 @@ export function WordList() {
                     value={displayMode}
                     label="Display mode"
                     onChange={handleDisplayModeChange}>
-                    <MenuItem value={DISPLAY_ALL_WORDS}>All words</MenuItem>
                     <MenuItem value={DISPLAY_ONE_WORD}>One word at a time</MenuItem>
+                    <MenuItem value={DISPLAY_ALL_WORDS}>All words</MenuItem>
                 </Select>
             </FormControl>
             <FormControlLabel control={<Switch checked={imageVisible} onChange={handleImageVisibleChange} />}

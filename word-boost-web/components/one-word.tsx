@@ -1,9 +1,10 @@
-import { Stack, Chip, Button, CircularProgress, Box } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Stack, Chip, Button, Box } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
-import Image from "next/image";
+import { ProgressTimer, ProgressTimerRef } from "./progress-timer";
+import { LoadingImage } from "./loading-image";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,6 +13,8 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
     const isFirstWord = currentIndex == 0;
     const isLastWord = currentIndex == words.length - 1;
     const currentWord = words[currentIndex];
+
+    const timer = useRef<ProgressTimerRef>(null);
 
     const handleNext = () => {
         if (isLastWord) {
@@ -36,7 +39,14 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
     const updateCurrentIndex = (index: number) => {
         setCurrentIndex(index);
         setImageVisible(initialImageVisible);
+        timer.current?.resetTimer();
     };
+
+    const handleTimeup = () => {
+        setTimeout(() => {
+            setImageVisible(true);
+        });
+    }
 
     useEffect(() => {
         updateCurrentIndex(0);
@@ -54,6 +64,7 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
                 alignItems: "center"
             }}>
                 {imageVisible && <LoadingImage imageUrl={currentWord?.imageUrl} />}
+                {!imageVisible && <ProgressTimer ref={timer} maxValue={10} onTimeup={handleTimeup} />}
             </div>
             <Chip key={currentWord?.id}
                 label={currentWord?.value}
@@ -81,28 +92,4 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
             </div>
         </Stack>
     );
-}
-
-function LoadingImage({ imageUrl }: { imageUrl: string }) {
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        setLoading(true);
-    }, [imageUrl])
-
-    if (imageUrl) {
-        return (
-            <>
-                {loading && <CircularProgress />}
-                <Image src={imageUrl}
-                    alt=""
-                    style={{ objectFit: 'contain', opacity: loading ? 0 : 1 }}
-                    fill={true}
-                    onLoadingComplete={() => { setLoading(false); }}
-                />
-            </>
-        );
-    }
-
-    return <></>;
 }

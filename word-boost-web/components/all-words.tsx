@@ -45,8 +45,9 @@ export function AllWords({ words }: { words: Word[] }) {
                 onClick={handleClose}
             >
                 <Box sx={{
-                    width: 600,
+                    width: "min(450px, 100vw)",
                     height: 300,
+                    paddingY: 1
                 }}>
                     <LoadingImage imageUrl={selectedWord.imageUrl} />
                 </Box>

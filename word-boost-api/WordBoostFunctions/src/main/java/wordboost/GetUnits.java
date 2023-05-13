@@ -24,7 +24,11 @@ public class GetUnits implements RequestHandler<APIGatewayProxyRequestEvent, API
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         var result = dynamoDB.scan(new ScanRequest().withTableName(wordsTableName));
-        var words = result.getItems().stream().map(i -> i.get("unit").getS()).collect(Collectors.toSet());
+        var words = result.getItems().stream()
+                .map(i -> i.get("unit").getS())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
         return new APIGatewayProxyResponseEvent()
                 .withHeaders(new HashMap<>() {{
                     put("Access-Control-Allow-Origin", "*");

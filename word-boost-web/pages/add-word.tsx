@@ -46,9 +46,11 @@ export default function AddWord() {
     }
 
     const handleTraditionalChange = (event: FocusEvent<HTMLInputElement>) => {
-        window.open(`https://www.google.com/search?q=${encodeURIComponent(event.target.value?.trim())}&tbm=isch`,
-            "word_boost_search_image",
-            "popup");
+        const word = event.target.value?.trim();
+        if (word) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`,
+                "word_boost_search_image");
+        }
     }
 
     return (
@@ -113,19 +115,14 @@ function TraditionalChangeTextField(props: TraditionalChangeTextFieldProps) {
     const { defaultValue, onTraditionalChange } = props;
 
     const [prevValue, setPrevValue] = useState(defaultValue);
-    const [value, setValue] = useState(defaultValue);
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
-        if (prevValue !== value) {
+        const currentValue = event.target.value;
+        if (prevValue !== currentValue) {
             onTraditionalChange(event);
-            setPrevValue(value);
+            setPrevValue(currentValue);
         }
     }
 
-    return <TextField {...props}
-        value={value}
-        onBlur={handleBlur}
-        onChange={(event) => setValue(event.target.value)}
-    />
-
+    return <TextField {...props} onBlur={handleBlur} />
 }

@@ -60,11 +60,10 @@ export default function AddWord() {
             });
     }
 
-    const handleTraditionalChange = (event: FocusEvent<HTMLInputElement>) => {
+    const handleWordChange = (event: FocusEvent<HTMLInputElement>) => {
         const word = event.target.value?.trim();
         if (word) {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`,
-                "word_boost_search_image");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`, "word_boost_search");
         }
     }
 
@@ -77,6 +76,13 @@ export default function AddWord() {
             value: "",
             mediaUrl: ""
         });
+    }
+
+    const handleSentenceChange = (event: FocusEvent<HTMLInputElement>) => {
+        const word = event.target.value?.trim();
+        if (word) {
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(word)}`, "word_boost_search");
+        }
     }
 
     return (
@@ -113,7 +119,7 @@ export default function AddWord() {
                             size="small"
                             error={!!errors?.value}
                             helperText={errors?.value?.message}
-                            onTraditionalChange={handleTraditionalChange}
+                            onTraditionalChange={handleWordChange}
                         />}
                     />
                     <Controller name="imageUrl"
@@ -130,20 +136,20 @@ export default function AddWord() {
                         <Grid item xs={12}>
                             <Controller name={`sentences.${i}.value`}
                                 control={control}
-                                render={({ field }) => <TextField {...field}
+                                render={({ field }) => <TraditionalChangeTextField {...field}
                                     size="small"
                                     label="Sentence"
-                                    fullWidth />}
+                                    fullWidth
+                                    onTraditionalChange={handleSentenceChange} />}
                             />
                         </Grid>
                         <Grid item xs>
                             <Controller name={`sentences.${i}.mediaUrl`}
                                 control={control}
-                                render={({ field }) => <TraditionalChangeTextField {...field}
+                                render={({ field }) => <TextField {...field}
                                     size="small"
                                     label="Demo Media Url"
-                                    fullWidth
-                                    onTraditionalChange={handleTraditionalChange} />}
+                                    fullWidth />}
                             />
                         </Grid>
                         <Grid item xs="auto">

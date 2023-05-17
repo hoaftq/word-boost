@@ -4,6 +4,7 @@ import getConfig from "next/config";
 import { ChangeEvent, useEffect, useState } from "react";
 import { AllWords } from "@wb/components/all-words";
 import { OneWord } from "@wb/components/one-word";
+import { Sentence } from "@wb/pages/add-word"; // TODO
 
 export interface Word {
     id: string;
@@ -11,6 +12,7 @@ export interface Word {
     unit: string;
     course: string;
     imageUrl: string;
+    sentences: Sentence[]
 }
 
 export function WordList() {

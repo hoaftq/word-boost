@@ -2,6 +2,8 @@ package wordboost;
 
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +20,6 @@ public class Word {
     private String course;
 
     private String imageUrl;
+
+    private List<Sentence> sentences;
 }

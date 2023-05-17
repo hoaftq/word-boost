@@ -1,27 +1,28 @@
-import { Stack, Chip, Button } from "@mui/material";
+import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import { ProgressTimer, ProgressTimerRef } from "./progress-timer";
 import { LoadingImage } from "./loading-image";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AbcIcon from '@mui/icons-material/Abc';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [imageVisible, setImageVisible] = useState(initialImageVisible);
+    const [selectedTab, setSelectedTab] = useState(0);
 
     const isFirstWord = currentIndex == 0;
     const isLastWord = currentIndex == words.length - 1;
     const currentWord = words[currentIndex];
-
-    const timer = useRef<ProgressTimerRef>(null);
 
     const handleNext = () => {
         if (isLastWord) {
             return;
         }
 
-        updateCurrentIndex(currentIndex + 1);
+        setCurrentIndex(currentIndex + 1);
     }
 
     const handlePrevious = () => {
@@ -29,52 +30,27 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
             return;
         }
 
-        updateCurrentIndex(currentIndex - 1);
-    }
-
-    const handleWordClick = () => {
-        setImageVisible(!imageVisible);
-    }
-
-    const updateCurrentIndex = (index: number) => {
-        setCurrentIndex(index);
-        setImageVisible(initialImageVisible);
-        timer.current?.resetTimer();
-    };
-
-    const handleTimeup = () => {
-        setTimeout(() => {
-            setImageVisible(true);
-        });
+        setCurrentIndex(currentIndex - 1);
     }
 
     useEffect(() => {
-        updateCurrentIndex(0);
+        setCurrentIndex(0);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [words]);
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
-            <div style={{
-                width: "100%",
-                height: 300,
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-            }}>
-                {imageVisible && <LoadingImage imageUrl={currentWord?.imageUrl} />}
-                {!imageVisible && <ProgressTimer ref={timer} maxValue={10} onTimeup={handleTimeup} />}
+            <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+                <Tab icon={<AbcIcon />} />
+                <Tab icon={<FormatListBulletedIcon />} />
+            </Tabs>
+            {selectedTab === 0 && <WordCard word={currentWord} initialImageVisible={initialImageVisible} />}
+            {selectedTab === 1 && <SentenceCard word={currentWord} />}
+
+            <div style={{ marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>
+                {currentIndex + 1}/{words.length}
             </div>
-            <Chip key={currentWord?.id}
-                label={currentWord?.value}
-                clickable
-                color="primary"
-                sx={{ marginTop: 1, marginBottom: 3, fontSize: 30, p: 3 }}
-                onClick={handleWordClick}
-            />
-            <div style={{ marginBottom: 10, fontWeight: 'bold' }}>{currentIndex + 1}/{words.length}
-            </div>
+
             <div>
                 <Button onClick={handlePrevious}
                     variant="outlined"
@@ -91,5 +67,91 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
                 >Next</Button>
             </div>
         </Stack>
+    );
+}
+
+function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisible: boolean }) {
+    const [imageVisible, setImageVisible] = useState(initialImageVisible);
+    const timer = useRef<ProgressTimerRef>(null);
+
+    const handleWordClick = () => {
+        setImageVisible(!imageVisible);
+    }
+
+    const handleTimeup = () => {
+        setTimeout(() => {
+            setImageVisible(true);
+        });
+    }
+
+    useEffect(() => {
+        timer.current?.resetTimer();
+    }, [word]);
+
+    return (
+        <>
+            <div style={{
+                width: "100%",
+                height: 300,
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                {imageVisible ?
+                    <LoadingImage imageUrl={word?.imageUrl} /> :
+                    <ProgressTimer ref={timer} maxValue={10} onTimeup={handleTimeup} />}
+            </div>
+            <Chip key={word?.id}
+                label={word?.value}
+                clickable
+                color="primary"
+                sx={{ marginTop: 1, fontSize: 30, p: 3 }}
+                onClick={handleWordClick}
+            />
+        </>
+    );
+}
+
+const Accordion = styled((props: AccordionProps) => (
+    <MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+    border: `1px solid ${theme.palette.divider}`,
+    '&:not(:last-child)': {
+        borderBottom: 0,
+    },
+    '&:before': {
+        display: 'none',
+    },
+}));
+
+function SentenceCard({ word }: { word: Word }) {
+    const [expandedIndex, setExpandedIndex] = useState(-1);
+
+    const handleChange = (index: number, isExpanded: boolean) => {
+        setExpandedIndex(isExpanded ? index : -1);
+    };
+
+    const highlightWord = (sentence: string) => {
+        const regex = new RegExp(`(${word.value})`, "gi")
+        const styledSentence = sentence.replace(regex, (match, group) => `<span style="background-color: yellow">${group}</span>`);
+        return styledSentence;
+    }
+
+    return (
+        <div style={{ width: "100%" }}>
+            {word.sentences.map((s, i) => (
+                <Accordion key={s.value} expanded={expandedIndex == i} onChange={(_, isExpanded) => handleChange(i, isExpanded)}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h5" component="div" color="primary" fontWeight="bold" dangerouslySetInnerHTML={{ __html: highlightWord(s.value) }}></Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <div style={{ width: "100%", height: 300 }}>
+                            <LoadingImage imageUrl={s.mediaUrl} />
+                        </div>
+                    </AccordionDetails>
+                </Accordion>
+            ))}
+        </div>
     );
 }

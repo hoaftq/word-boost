@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final String wordsTableName = System.getenv("WORDS_TABLE");
@@ -35,15 +36,20 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
     @SneakyThrows
     private String addWord(String requestBody) {
         var newWord = objectMapper.readValue(requestBody, Word.class);
+        var wordId = UUID.randomUUID().toString();
+        var sentences = newWord.getSentences().stream()
+                .collect(Collectors.toMap(Sentence::getValue, Sentence::getMediaUrl));
+
         var table = dynamoDB.getTable(wordsTableName);
-        var id = UUID.randomUUID().toString();
         table.putItem(new Item()
-                .with("id", id)
+                .with("id", wordId)
                 .with("value", newWord.getValue())
                 .with("unit", newWord.getUnit())
                 .with("course", newWord.getCourse())
-                .with("imageUrl", newWord.getImageUrl()));
+                .with("imageUrl", newWord.getImageUrl())
+                .withMap("sentences", sentences)
+        );
 
-        return id;
+        return wordId;
     }
 }

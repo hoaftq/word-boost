@@ -1,16 +1,24 @@
-import { Button, Stack, TextField, TextFieldProps, Typography } from "@mui/material";
-import { Controller, useForm } from "react-hook-form"
+import { Button, Divider, Grid, IconButton, Stack, TextField, TextFieldProps, Typography } from "@mui/material";
+import { Controller, useFieldArray, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import getConfig from "next/config";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { useSnackbar } from "notistack";
-import { ChangeEvent, FocusEvent, useState } from "react";
+import { FocusEvent, useState } from "react";
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+export interface Sentence {
+    value: string;
+    mediaUrl: string;
+}
 
 interface WordForm {
     value: string;
     unit: string;
     course: string;
     imageUrl: string;
+    sentences: Sentence[]
 }
 
 export default function AddWord() {
@@ -19,9 +27,14 @@ export default function AddWord() {
             value: '',
             unit: '',
             course: '',
-            imageUrl: ''
+            imageUrl: '',
+            sentences: [{
+                value: '',
+                mediaUrl: ''
+            }]
         } as WordForm
     });
+    const { fields, append, remove } = useFieldArray({ control, name: "sentences" })
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -33,7 +46,8 @@ export default function AddWord() {
                 value: data.value?.trim(),
                 unit: data.unit?.trim(),
                 course: data.course?.trim(),
-                imageUrl: data.imageUrl?.trim()
+                imageUrl: data.imageUrl?.trim(),
+                sentences: data.sentences
             })
         })
             .then(resp => resp.text())
@@ -41,6 +55,7 @@ export default function AddWord() {
                 enqueueSnackbar(`Added a new word with id of ${wordId}`, { variant: 'success' });
                 resetField("value");
                 resetField("imageUrl");
+                resetField("sentences");
                 setFocus("value");
             });
     }
@@ -51,6 +66,17 @@ export default function AddWord() {
             window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`,
                 "word_boost_search_image");
         }
+    }
+
+    const handleRemoveSentenceClick = (index: number) => {
+        remove(index);
+    }
+
+    const handleAddSentenceClick = () => {
+        append({
+            value: "",
+            mediaUrl: ""
+        });
     }
 
     return (
@@ -97,6 +123,41 @@ export default function AddWord() {
                             size="small"
                         />}
                     />
+
+                    <Divider textAlign="left" >Example sentences</Divider>
+
+                    {fields.map((f, i) => (<Grid key={f.id} container rowSpacing={2}>
+                        <Grid item xs={12}>
+                            <Controller name={`sentences.${i}.value`}
+                                control={control}
+                                render={({ field }) => <TextField {...field}
+                                    size="small"
+                                    label="Sentence"
+                                    fullWidth />}
+                            />
+                        </Grid>
+                        <Grid item xs>
+                            <Controller name={`sentences.${i}.mediaUrl`}
+                                control={control}
+                                render={({ field }) => <TraditionalChangeTextField {...field}
+                                    size="small"
+                                    label="Demo Media Url"
+                                    fullWidth
+                                    onTraditionalChange={handleTraditionalChange} />}
+                            />
+                        </Grid>
+                        <Grid item xs="auto">
+                            <IconButton color="error" onClick={() => handleRemoveSentenceClick(i)}>
+                                <RemoveCircleOutlineIcon />
+                            </IconButton>
+                        </Grid>
+                        <Divider />
+                    </Grid>))}
+
+                    <IconButton color="info" sx={{ alignSelf: "flex-end" }} onClick={handleAddSentenceClick}>
+                        <AddCircleOutlineIcon />
+                    </IconButton>
+
                     <Button variant="contained"
                         sx={{ width: 100, alignSelf: "flex-end" }}
                         startIcon={<AddCircleIcon />}

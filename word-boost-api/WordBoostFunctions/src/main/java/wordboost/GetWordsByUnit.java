@@ -52,13 +52,20 @@ public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEven
         }
         return dynamoDB.scan(scanRequest).getItems()
                 .stream()
-                .map(i -> Word.builder()
-                        .id(i.get("id").getS())
-                        .value(i.get("value").getS())
-                        .unit(i.get("unit").getS())
-                        .course(i.get("course").getS())
-                        .imageUrl(i.getOrDefault("imageUrl", new AttributeValue()).getS())
-                        .build()
+                .map(i -> {
+                            var sentenceMap = i.getOrDefault("sentences", new AttributeValue().withM(new HashMap<>())).getM();
+                            var sentences = sentenceMap.keySet().stream()
+                                    .map(k -> new Sentence(k, sentenceMap.getOrDefault(k, new AttributeValue()).getS()))
+                                    .collect(Collectors.toList());
+                            return Word.builder()
+                                    .id(i.get("id").getS())
+                                    .value(i.get("value").getS())
+                                    .unit(i.get("unit").getS())
+                                    .course(i.get("course").getS())
+                                    .imageUrl(i.getOrDefault("imageUrl", new AttributeValue()).getS())
+                                    .sentences(sentences)
+                                    .build();
+                        }
                 ).collect(Collectors.toList());
     }
 }

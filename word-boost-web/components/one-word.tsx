@@ -24,6 +24,7 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
         }
 
         setCurrentIndex(currentIndex + 1);
+        setSelectedTab(0);
     }
 
     const handlePrevious = () => {
@@ -32,6 +33,7 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
         }
 
         setCurrentIndex(currentIndex - 1);
+        setSelectedTab(0);
     }
 
     useEffect(() => {
@@ -87,6 +89,8 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
 
     useEffect(() => {
         timer.current?.resetTimer();
+        setImageVisible(initialImageVisible);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [word]);
 
     return (

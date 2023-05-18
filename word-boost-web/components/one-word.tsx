@@ -144,16 +144,17 @@ function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
 
     return (
         <>
-            <iframe ref={iframeRef} width="800"
-                height="450"
-                src={videoUrl}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-                allowFullScreen></iframe>
-            <IconButton onClick={handleReplayClick}>
-                <ReplayCircleFilledIcon />
-            </IconButton>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <iframe ref={iframeRef}
+                    src={videoUrl}
+                    title="YouTube video player"
+                    style={{ border: 0, width: "min(560px, 100vw - 4px)", height: 315 }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                    allowFullScreen></iframe>
+                <IconButton onClick={handleReplayClick}>
+                    <ReplayCircleFilledIcon />
+                </IconButton>
+            </div>
         </>
     )
 }

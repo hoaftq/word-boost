@@ -1,0 +1,8 @@
+.word:hover {
+    color: #00c853;
+    background-color: #f9fbe7 !important;
+}
+
+.exact-word {
+    background-color: yellow;
+}

@@ -1,4 +1,4 @@
-import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton } from "@mui/material";
+import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton, Tooltip } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -9,6 +9,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AbcIcon from '@mui/icons-material/Abc';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import styles from "../styles/OneWord.module.css";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -43,12 +45,19 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
-            <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+            {selectedTab === 0 && <WordCard word={currentWord} initialImageVisible={initialImageVisible} />}
+            {selectedTab === 1 && <SentenceCard word={currentWord} />}
+            <Tabs value={selectedTab}
+                TabIndicatorProps={{
+                    sx: {
+                        top: 0
+                    }
+                }}
+                sx={{ marginTop: 1 }}
+                onChange={(e, newValue) => setSelectedTab(newValue)}>
                 <Tab icon={<AbcIcon />} />
                 <Tab icon={<FormatListBulletedIcon />} />
             </Tabs>
-            {selectedTab === 0 && <WordCard word={currentWord} initialImageVisible={initialImageVisible} />}
-            {selectedTab === 1 && <SentenceCard word={currentWord} />}
 
             <div style={{ marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>
                 {currentIndex + 1}/{words.length}
@@ -105,7 +114,7 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
             }}>
                 {imageVisible ?
                     <LoadingImage imageUrl={word?.imageUrl} /> :
-                    <ProgressTimer ref={timer} maxValue={10} onTimeup={handleTimeup} />}
+                    <ProgressTimer ref={timer} maxValue={15} onTimeup={handleTimeup} />}
             </div>
             <Chip key={word?.id}
                 label={word?.value}
@@ -134,16 +143,29 @@ function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
     const iframeRef = useRef(null);
     const autoplayQueryString = "autoplay=1";
 
-    const handleReplayClick = () => {
-        if (videoUrl.indexOf(autoplayQueryString) < 0) {
-            if (videoUrl.indexOf(".") > 0) {
-                videoUrl = `${videoUrl}&${autoplayQueryString}`;
-            } else {
-                videoUrl = `${videoUrl}?${autoplayQueryString}`
-            }
+    const makeAutoPlayVideoUrl = (url: string) => {
+        if (url.indexOf(autoplayQueryString) >= 0) {
+            return url;
         }
 
-        (iframeRef.current as any).src = videoUrl;
+        if (url.indexOf("?") > 0) {
+            return `${url}&${autoplayQueryString}`;
+        }
+
+        return `${url}?${autoplayQueryString}`
+    }
+
+    const makeVideoUrlWithoutTimeRange = (url: string) => {
+        const startOrEndRegex = new RegExp("(&*start=[\\w\\d]+)|(&*end=[\\w\\d]+)", "gi");
+        return url.replace(startOrEndRegex, "");
+    }
+
+    const handleReplayClick = () => {
+        (iframeRef.current as any).src = makeAutoPlayVideoUrl(videoUrl);
+    }
+
+    const handlePlayAllClick = () => {
+        (iframeRef.current as any).src = makeAutoPlayVideoUrl(makeVideoUrlWithoutTimeRange(videoUrl));
     }
 
     return (
@@ -155,9 +177,18 @@ function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
                     style={{ border: 0, width: "min(560px, 100vw - 4px)", height: 315 }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
                     allowFullScreen></iframe>
-                <IconButton onClick={handleReplayClick}>
-                    <ReplayCircleFilledIcon />
-                </IconButton>
+                <div>
+                    <Tooltip title="Replay with time range">
+                        <IconButton sx={{ marginRight: 1 }} onClick={handleReplayClick}>
+                            <ReplayCircleFilledIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Play the whole video">
+                        <IconButton onClick={handlePlayAllClick}>
+                            <RestartAltIcon />
+                        </IconButton>
+                    </Tooltip>
+                </div>
             </div>
         </>
     )
@@ -171,34 +202,40 @@ function SentenceCard({ word }: { word: Word }) {
     };
 
     const highlightWord = (sentence: string) => {
-        const regex = new RegExp(`(${word.value})`, "gi")
-        const styledSentence = sentence.replace(regex, (match, group) => `<span style="background-color: yellow">${group}</span>`);
-        return styledSentence;
+        const wordRegex = new RegExp(`(\\w*${word.value}\\w*|\\w+)`, "gi")
+        return sentence.replace(wordRegex, (match, group: string) => {
+            const exactWordRegex = new RegExp(`(${word.value})`, "gi");
+            const styledExactWord = group.replace(exactWordRegex, (m, g) => `<span class="${styles['exact-word']}">${g}</span>`)
+            return `<span class="${styles.word}">${styledExactWord}</span>`
+        });
     }
 
-    const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://youtu.be") || medialUrl.startsWith("https://www.youtube");
+    const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
-        <div style={{ width: "100%" }}>
-            {word.sentences.map((s, i) => (
-                <Accordion key={s.value} expanded={expandedIndex == i} onChange={(_, isExpanded) => handleChange(i, isExpanded)}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h5"
-                            component="div"
-                            color={expandedIndex === i || expandedIndex === -1 ? "primary" : "gray"}
-                            fontWeight="bold"
-                            dangerouslySetInnerHTML={{ __html: highlightWord(s.value) }} />
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        {isYoutubeLink(s.mediaUrl) ?
-                            <EmbbebedYoutube videoUrl={s.mediaUrl} /> :
-                            <div style={{ width: "100%", height: 300 }}>
-                                <LoadingImage imageUrl={s.mediaUrl} />
-                            </div>
-                        }
-                    </AccordionDetails>
-                </Accordion>
-            ))}
+        <div style={{ width: "100%", minHeight: 356 }}>
+            {word.sentences.map((s, i) => {
+                const isTabExpandedOrNoTabExpanded = expandedIndex === i || expandedIndex === -1;
+                return (
+                    <Accordion key={s.value} expanded={expandedIndex == i} onChange={(_, isExpanded) => handleChange(i, isExpanded)}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography variant={isTabExpandedOrNoTabExpanded ? "h4" : "h5"}
+                                component="div"
+                                color={isTabExpandedOrNoTabExpanded ? "primary" : "gray"}
+                                fontWeight="bold"
+                                dangerouslySetInnerHTML={{ __html: highlightWord(s.value) }} />
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {isYoutubeLink(s.mediaUrl) ?
+                                <EmbbebedYoutube videoUrl={s.mediaUrl} /> :
+                                <div style={{ width: "100%", height: 300 }}>
+                                    <LoadingImage imageUrl={s.mediaUrl} />
+                                </div>
+                            }
+                        </AccordionDetails>
+                    </Accordion>
+                )
+            })}
         </div>
     );
 }

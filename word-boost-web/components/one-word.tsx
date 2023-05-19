@@ -1,4 +1,4 @@
-import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton, Tooltip } from "@mui/material";
+import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Word } from "./word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -10,6 +10,7 @@ import AbcIcon from '@mui/icons-material/Abc';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import styles from "../styles/OneWord.module.css";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
@@ -194,12 +195,37 @@ function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
     )
 }
 
+interface ExpandMoreProps extends IconButtonProps {
+    expand: boolean;
+}
+
+const ExpandMore = styled((props: ExpandMoreProps) => {
+    const { expand, ...other } = props;
+    return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+    transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+    transition: theme.transitions.create("transform", {
+        duration: theme.transitions.duration.shortest,
+    }),
+}));
+
 function SentenceCard({ word }: { word: Word }) {
     const [expandedIndex, setExpandedIndex] = useState(-1);
+    const [focusIndex, setFocusIndex] = useState(0);
 
-    const handleChange = (index: number, isExpanded: boolean) => {
-        setExpandedIndex(isExpanded ? index : -1);
+    const handleExpandedChange = (index: number) => {
+        setExpandedIndex(expandedIndex === index ? -1 : index)
+        if (focusIndex !== index) {
+            setFocusIndex(index);
+        }
     };
+
+    const handleFocusChange = (index: number) => {
+        setFocusIndex(index);
+        if (index !== expandedIndex) {
+            setExpandedIndex(-1);
+        }
+    }
 
     const highlightWord = (sentence: string) => {
         const wordRegex = new RegExp(`(\\w*${word.value}\\w*|\\w+)`, "gi")
@@ -215,25 +241,33 @@ function SentenceCard({ word }: { word: Word }) {
     return (
         <div style={{ width: "100%", minHeight: 356 }}>
             {word.sentences.map((s, i) => {
-                const isTabExpandedOrNoTabExpanded = expandedIndex === i || expandedIndex === -1;
+                const isCardExpanded = expandedIndex === i;
+                const isCardFocused = focusIndex == i;
                 return (
-                    <Accordion key={s.value} expanded={expandedIndex == i} onChange={(_, isExpanded) => handleChange(i, isExpanded)}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant={isTabExpandedOrNoTabExpanded ? "h4" : "h5"}
+                    <Card key={s.value} variant="outlined" sx={{ marginBottom: 1, border: 0 }}>
+                        <CardActions sx={{ justifyContent: "space-between" }}>
+                            <IconButton sx={{ marginRight: 1 }} onClick={() => handleFocusChange(i)}>
+                                <ArrowRightIcon />
+                            </IconButton>
+                            <Typography variant={isCardFocused ? "h4" : "h5"}
                                 component="div"
-                                color={isTabExpandedOrNoTabExpanded ? "primary" : "gray"}
-                                fontWeight="bold"
+                                color={isCardFocused ? "primary" : "gray"}
+                                fontWeight={isCardFocused ? "bold" : "normal"}
+                                sx={{ flexGrow: 1 }}
                                 dangerouslySetInnerHTML={{ __html: highlightWord(s.value) }} />
-                        </AccordionSummary>
-                        <AccordionDetails>
+                            <ExpandMore expand={isCardExpanded} onClick={() => handleExpandedChange(i)}>
+                                <ExpandMoreIcon />
+                            </ExpandMore>
+                        </CardActions>
+                        <Collapse in={isCardExpanded}>
                             {isYoutubeLink(s.mediaUrl) ?
                                 <EmbbebedYoutube videoUrl={s.mediaUrl} /> :
                                 <div style={{ width: "100%", height: 300 }}>
                                     <LoadingImage imageUrl={s.mediaUrl} />
                                 </div>
                             }
-                        </AccordionDetails>
-                    </Accordion>
+                        </Collapse>
+                    </Card>
                 )
             })}
         </div>

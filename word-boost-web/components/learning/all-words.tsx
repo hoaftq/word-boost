@@ -1,7 +1,7 @@
 import { Box, Chip, Popover, Stack } from "@mui/material";
 import { Word } from "@wb/components/word-list";
 import { useState, MouseEvent } from "react";
-import { LoadingImage } from "./loading-image";
+import { LoadingImage } from "../loading-image";
 
 export function AllWords({ words }: { words: Word[] }) {
     const [anchorEl, setAnchorEl] = useState<HTMLElement>();

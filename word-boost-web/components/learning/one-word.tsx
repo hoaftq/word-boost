@@ -1,17 +1,17 @@
 import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import { Word } from "./word-list";
+import { Word } from "../word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
-import { ProgressTimer, ProgressTimerRef } from "./progress-timer";
-import { LoadingImage } from "./loading-image";
+import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
+import { LoadingImage } from "../loading-image";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AbcIcon from '@mui/icons-material/Abc';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import styles from "../styles/OneWord.module.css";
+import styles from "../../styles/OneWord.module.css";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);

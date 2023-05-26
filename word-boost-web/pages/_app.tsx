@@ -3,12 +3,12 @@ import '@wb/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { SnackbarProvider } from 'notistack';
 import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <SnackbarProvider>
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
         <Container maxWidth="md">
           <Component {...pageProps} />
         </Container>

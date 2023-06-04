@@ -178,7 +178,7 @@ export default function AddWord() {
 
 type TraditionalChangeTextFieldProps = TextFieldProps & { onTraditionalChange: (event: FocusEvent<HTMLInputElement>) => void };
 
-function TraditionalChangeTextField(props: TraditionalChangeTextFieldProps) {
+export function TraditionalChangeTextField(props: TraditionalChangeTextFieldProps) {
     const { defaultValue, onTraditionalChange } = props;
 
     const [prevValue, setPrevValue] = useState(defaultValue);

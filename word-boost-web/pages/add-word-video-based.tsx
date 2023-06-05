@@ -1,4 +1,4 @@
-import { FocusEvent } from "react";
+import { FocusEvent, useState } from "react";
 import { Button, Divider, FormControl, Grid, IconButton, Stack, TextField } from "@mui/material";
 import { UrlEditingYouTubePlayer } from "@wb/components/url-editing-youtube-player";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -36,6 +36,7 @@ export default function AddWordVideoBased() {
     });
     const { fields, append, remove } = useFieldArray({ control, name: "words" });
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
+    const [rangeIndex, setRangeIndex] = useState(0);
 
     const handleRemoveSentenceClick = (index: number) => {
         remove(index);
@@ -81,6 +82,7 @@ export default function AddWordVideoBased() {
         resetField("sentence");
         resetField("words");
         setFocus("sentence");
+        setRangeIndex(rangeIndex + 1);
     }
 
     return (
@@ -109,7 +111,7 @@ export default function AddWordVideoBased() {
                 <Controller control={control}
                     name="videoUrl"
                     render={({ field: { onChange } }) => <FormControl>
-                        <UrlEditingYouTubePlayer onChange={onChange} />
+                        <UrlEditingYouTubePlayer onChange={onChange} rangeIndex={rangeIndex} />
                     </FormControl>}
                 />
 

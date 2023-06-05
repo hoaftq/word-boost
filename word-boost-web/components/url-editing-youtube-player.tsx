@@ -1,16 +1,18 @@
 import { Button, IconButton, Stack, TextField, Tooltip } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import dynamic from 'next/dynamic'
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactPlayer, { Config } from "react-player";
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 const YoutubePlayer = dynamic(() => import("./youtube-player"), { ssr: false });
 
 type UrlEditingYouTubePlayerProps = {
-    onChange: (event: { target: { value: string } }) => void
+    onChange: (event: { target: { value: string } }) => void,
+    rangeIndex: number
+
 };
 
-export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerProps) {
+export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouTubePlayerProps) {
     const { control, watch, setValue } = useForm({
         defaultValues: {
             videoUrl: '',
@@ -25,23 +27,37 @@ export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerPro
         }
     });
     const videoUrl = watch("videoUrl", "");
+    const end = watch("end");
 
-    let playerRef = useRef<ReactPlayer>(null);
+    const playerRef = useRef<ReactPlayer>(null);
+    const [timeFocus, setTimeFocus] = useState<"start" | "end" | "none">("none");
 
     const handleStartCurrentTimeClick = () => {
         const currentTime = Math.floor(playerRef.current!.getCurrentTime());
-        setValue('start', currentTime.toString());
+        playerRef.current!.getInternalPlayer().pauseVideo();
+        setValue("start", currentTime.toString());
+        setTimeFocus("start");
     }
 
     const handleEndCurrentTimeClick = () => {
         const currentTime = Math.round(playerRef.current!.getCurrentTime());
-        setValue('end', currentTime.toString());
+        playerRef.current!.getInternalPlayer().pauseVideo();
+        setValue("end", currentTime.toString());
+        setTimeFocus("end");
     }
 
     const handleSeekButtonClick = (value: number) => {
         const seekToValue = value + playerRef.current!.getCurrentTime();
         if (seekToValue < 0) {
             return;
+        }
+
+        switch (timeFocus) {
+            case "start":
+                setValue("start", Math.floor(seekToValue).toString());
+                break;
+            case "end":
+                setValue("end", Math.round(seekToValue).toString());
         }
 
         playerRef.current?.seekTo(seekToValue, "seconds");
@@ -77,16 +93,20 @@ export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerPro
                 const finalVideoUrl = `https://www.youtube.com/embed/${videoUrl}${queries.length ? "?" : ""}${queries.join("&")}`
                 setValue("finalVideoUrl", finalVideoUrl);
                 onChange({ target: { value: finalVideoUrl } });
-
             }
         });
     }, [onChange, setValue, watch])
 
-    const config: Config = {
-        youtube: {
-            playerVars: { controls: 1 }
+    useEffect(() => {
+        if (rangeIndex == 0) {
+            return;
         }
-    };
+
+        setValue("start", (Number.parseInt(end) + 1).toString());
+        setValue("end", "");
+        setTimeFocus("none");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rangeIndex, setValue]);
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
@@ -98,7 +118,14 @@ export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerPro
                     fullWidth
                     sx={{ marginBottom: 1 }} />}
             />
-            <YoutubePlayer playerRef={playerRef} config={config} url={videoUrl} />
+            <YoutubePlayer playerRef={playerRef}
+                config={{
+                    youtube: {
+                        playerVars: { controls: 1 }
+                    }
+                }}
+                url={videoUrl}
+                onPlay={() => setTimeFocus("none")} />
             <div style={{ marginTop: 10 }}>
                 <Controller control={control}
                     name="start"
@@ -108,7 +135,11 @@ export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerPro
                         InputProps={{
                             readOnly: true
                         }}
-                        sx={{ width: 100 }} />} />
+                        sx={{
+                            width: 100,
+                            backgroundColor: timeFocus == "start" ? "lightblue" : ""
+                        }} />}
+                />
                 <Tooltip title="Current time">
                     <IconButton onClick={handleStartCurrentTimeClick}>
                         <AccessAlarmIcon />
@@ -122,7 +153,11 @@ export function UrlEditingYouTubePlayer({ onChange }: UrlEditingYouTubePlayerPro
                         InputProps={{
                             readOnly: true
                         }}
-                        sx={{ width: 100, marginLeft: 2 }} />} />
+                        sx={{
+                            width: 100,
+                            marginLeft: 2,
+                            backgroundColor: timeFocus == "end" ? "lightblue" : ""
+                        }} />} />
                 <Tooltip title="Current time">
                     <IconButton onClick={handleEndCurrentTimeClick}>
                         <AccessAlarmIcon />

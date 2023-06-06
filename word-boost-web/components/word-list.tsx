@@ -6,6 +6,7 @@ import { AllWords } from "@wb/components/learning/all-words";
 import { OneWord } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
+import { Sentences } from "./learning/sentences";
 
 export interface Word {
     id: string;
@@ -18,6 +19,7 @@ export interface Word {
 
 const MODE_LEARN_ONE_WORD = "0";
 const MODE_LEARN_ALL_WORDS = "1";
+const MODE_LEARN_SENTENCES = "2";
 const MODE_TEST = "3";
 
 export function WordList() {
@@ -86,6 +88,7 @@ export function WordList() {
                     onChange={handleModeChange}>
                     <MenuItem value={MODE_LEARN_ONE_WORD}>Learn one word at a time</MenuItem>
                     <MenuItem value={MODE_LEARN_ALL_WORDS}>Learn all words</MenuItem>
+                    <MenuItem value={MODE_LEARN_SENTENCES}>Read sentences</MenuItem>
                     <MenuItem value={MODE_TEST}>Test</MenuItem>
                 </Select>
             </FormControl>
@@ -103,6 +106,7 @@ export function WordList() {
             <div style={{ marginTop: 16 }}>
                 {mode === MODE_LEARN_ALL_WORDS && !!words.length && <AllWords words={words} />}
                 {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
+                {mode === MODE_LEARN_SENTENCES && !!words.length && <Sentences words={words} />}
                 {mode == MODE_TEST && selectedUnit && <WordTest unit={selectedUnit} key={`${selectedUnit}_${testComponentKey}`} />}
             </div>
 

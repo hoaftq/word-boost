@@ -2,7 +2,7 @@ import { Typography, TypographyProps } from "@mui/material";
 import { Word } from "../word-list";
 import styles from "../../styles/SentenceTypography.module.css";
 
-type SentenceTypographyProps = TypographyProps & {
+type SentenceTypographyProps = TypographyProps<'div', { component: 'div' }> & {
     word: Word;
     sentenceIndex: number;
 }

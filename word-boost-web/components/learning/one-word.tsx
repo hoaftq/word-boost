@@ -11,7 +11,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import styles from "../../styles/OneWord.module.css";
+import { SentenceTypography } from "./sentence-typography";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -128,18 +128,6 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
     );
 }
 
-const Accordion = styled((props: AccordionProps) => (
-    <MuiAccordion disableGutters elevation={0} square {...props} />
-))(({ theme }) => ({
-    border: `1px solid ${theme.palette.divider}`,
-    '&:not(:last-child)': {
-        borderBottom: 0,
-    },
-    '&:before': {
-        display: 'none',
-    },
-}));
-
 function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
     const iframeRef = useRef(null);
     const autoplayQueryString = "autoplay=1";
@@ -227,15 +215,6 @@ function SentenceCard({ word }: { word: Word }) {
         }
     }
 
-    const highlightWord = (sentence: string) => {
-        const wordRegex = new RegExp(`(\\w*${word.value}\\w*|\\w+)`, "gi")
-        return sentence.replace(wordRegex, (match, group: string) => {
-            const exactWordRegex = new RegExp(`(${word.value})`, "gi");
-            const styledExactWord = group.replace(exactWordRegex, (m, g) => `<span class="${styles['exact-word']}">${g}</span>`)
-            return `<span class="${styles.word}">${styledExactWord}</span>`
-        });
-    }
-
     const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
@@ -249,12 +228,13 @@ function SentenceCard({ word }: { word: Word }) {
                             <IconButton sx={{ marginRight: 1 }} onClick={() => handleFocusChange(i)}>
                                 <ArrowRightIcon />
                             </IconButton>
-                            <Typography variant={isCardFocused ? "h4" : "h5"}
+                            <SentenceTypography variant={isCardFocused ? "h4" : "h5"}
                                 component="div"
                                 color={isCardFocused ? "primary" : "gray"}
                                 fontWeight={isCardFocused ? "bold" : "normal"}
                                 sx={{ flexGrow: 1 }}
-                                dangerouslySetInnerHTML={{ __html: highlightWord(s.value) }} />
+                                word={word}
+                                sentenceIndex={i} />
                             <ExpandMore expand={isCardExpanded} onClick={() => handleExpandedChange(i)}>
                                 <ExpandMoreIcon />
                             </ExpandMore>

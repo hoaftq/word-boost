@@ -15,10 +15,10 @@ export function Sentences({ words }: { words: Word[] }) {
                 word={w}
                 sentenceIndex={i}
                 variant="h4"
+                component="div"
                 color="primary"
                 fontWeight="bold"
-                sx={{ marginBottom: 1 }}
-            />)}
+                sx={{ marginBottom: 1 }} />)}
         </Paper>)}
     </>);
 }

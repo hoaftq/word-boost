@@ -102,7 +102,9 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
             return;
         }
 
-        setValue("start", (Number.parseInt(end) + 1).toString());
+        const startTime = Number.parseInt(end) + 1;
+        setValue("start", startTime.toString());
+        playerRef.current?.seekTo(startTime, "seconds");
         setValue("end", "");
         setTimeFocus("none");
         // eslint-disable-next-line react-hooks/exhaustive-deps

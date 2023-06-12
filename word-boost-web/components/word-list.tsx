@@ -7,6 +7,7 @@ import { OneWord } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
+import { FillBlankTest } from "./testing/fill-blank-test";
 
 export interface Word {
     id: string;
@@ -20,7 +21,8 @@ export interface Word {
 const MODE_LEARN_ONE_WORD = "0";
 const MODE_LEARN_ALL_WORDS = "1";
 const MODE_LEARN_SENTENCES = "2";
-const MODE_TEST = "3";
+const MODE_WORDS_TEST = "3";
+const MODE_FILLBLANK_TEST = "4";
 
 export function WordList() {
     const { publicRuntimeConfig: { apiUrl } } = getConfig();
@@ -89,7 +91,8 @@ export function WordList() {
                     <MenuItem value={MODE_LEARN_ONE_WORD}>Learn one word at a time</MenuItem>
                     <MenuItem value={MODE_LEARN_ALL_WORDS}>Learn all words</MenuItem>
                     <MenuItem value={MODE_LEARN_SENTENCES}>Read sentences</MenuItem>
-                    <MenuItem value={MODE_TEST}>Test</MenuItem>
+                    <MenuItem value={MODE_WORDS_TEST}>Test</MenuItem>
+                    <MenuItem value={MODE_FILLBLANK_TEST}>Fill in the blank</MenuItem>
                 </Select>
             </FormControl>
 
@@ -98,7 +101,7 @@ export function WordList() {
                 label="Always show image"
                 sx={{ marginTop: 2 }} />}
 
-            {mode == MODE_TEST && <Button sx={{ marginTop: 2 }}
+            {mode == MODE_WORDS_TEST && <Button sx={{ marginTop: 2 }}
                 variant="outlined"
                 color="secondary"
                 onClick={handleNewTestClick}>New test</Button>}
@@ -107,7 +110,8 @@ export function WordList() {
                 {mode === MODE_LEARN_ALL_WORDS && !!words.length && <AllWords words={words} />}
                 {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
                 {mode === MODE_LEARN_SENTENCES && !!words.length && <Sentences words={words} />}
-                {mode == MODE_TEST && selectedUnit && <WordTest unit={selectedUnit} key={`${selectedUnit}_${testComponentKey}`} />}
+                {mode == MODE_WORDS_TEST && selectedUnit && <WordTest unit={selectedUnit} key={`${selectedUnit}_${testComponentKey}`} />}
+                {mode == MODE_FILLBLANK_TEST && selectedUnit && <FillBlankTest words={words} />}
             </div>
 
             <FetchingBackdrop />

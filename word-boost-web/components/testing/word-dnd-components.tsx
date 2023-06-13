@@ -25,8 +25,8 @@ export function DraggableWordChip({ word }: { word: Word }) {
             color="info"
             variant={isDragging ? "outlined" : "filled"}
             sx={{
-                fontSize: 25,
-                padding: 2,
+                fontSize: 27,
+                padding: 2.5,
                 cursor: "move",
                 userSelect: "none"
             }}
@@ -54,9 +54,10 @@ export function DroppableBlank({ position, word, onDrop }: DroppableBlankProps) 
     return <div ref={dropRef}
         style={{
             width: "100%",
-            height: 41,
-            lineHeight: "41px",
-            textAlign: "center",
+            height: 45,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             borderRadius: 10,
             backgroundColor: canDrop ? "lightblue" : "whitesmoke"
         }}>
@@ -111,8 +112,8 @@ export function DraggingWordLayer() {
             color="info"
             variant="filled"
             sx={{
-                fontSize: 25,
-                padding: 2,
+                fontSize: 27,
+                padding: 2.5,
                 cursor: "move",
                 userSelect: "none",
                 pointerEvents: "none",

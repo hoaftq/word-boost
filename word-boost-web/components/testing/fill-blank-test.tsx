@@ -1,7 +1,7 @@
 import { Word } from "../word-list";
 import { Button, IconButton, Popover, TextField, Typography, useTheme } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { useRef, useState, KeyboardEvent } from "react";
+import { useRef, useState, KeyboardEvent, useEffect } from "react";
 import ReactPlayer from "react-player";
 import YoutubePlayer from "../youtube-player";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -40,14 +40,18 @@ export function FillBlankTest({ words }: { words: Word[] }) {
         setSentenceIndex(sentenceIndex + 1);
     }
 
-    const handleRestartClick = () => {
+    const restart = () => {
         setRandomSentences(null);
         setSentenceIndex(0);
     }
 
-    return randomSentences &&
+    useEffect(() => {
+        restart();
+    }, [words]);
+
+    return randomSentences && randomSentences[sentenceIndex] &&
         <>
-            <FillBlank combinedSentence={randomSentences[sentenceIndex]} />
+            <FillBlank key={sentenceIndex} combinedSentence={randomSentences[sentenceIndex]} />
             <div style={{ marginTop: 30 }}>
                 <Button variant="outlined"
                     sx={{ marginRight: 1 }}
@@ -59,7 +63,7 @@ export function FillBlankTest({ words }: { words: Word[] }) {
                 </Button>
                 <span style={{ fontWeight: "bold", marginRight: 6 }}>{sentenceIndex + 1}/{randomSentences.length}</span>
                 <IconButton color="secondary"
-                    onClick={handleRestartClick}>
+                    onClick={restart}>
                     <RestartAltIcon />
                 </IconButton>
             </div>
@@ -76,7 +80,7 @@ function FillBlank({ combinedSentence: { words, sentence } }: { combinedSentence
         <div style={{
             fontSize: 30,
             lineHeight: "75px",
-            marginTop: 10,
+            marginTop: 40,
             color: theme.palette.primary.main
         }}>
             {splittedParts.map((p, i) => {
@@ -128,7 +132,7 @@ function Blank({ word }: { word: string }) {
         return "";
     }
 
-    const isSpecialLetter = (c: string) => c === " " || c === "-";
+    const isSpecialLetter = (c: string) => c === " " || c === "-" || c === "'";
 
     return (
         <form style={{ display: "inline-block" }}>
@@ -144,6 +148,9 @@ function Blank({ word }: { word: string }) {
                             inputRef={ref}
                             {...f}
                             autoComplete="off"
+                            autoCorrect="off"
+                            autoCapitalize="off"
+                            spellCheck="false"
                             inputProps={{
                                 maxLength: 1,
                                 style: {
@@ -151,7 +158,7 @@ function Blank({ word }: { word: string }) {
                                     caretColor: "transparent",
                                     cursor: "pointer",
                                     backgroundColor: getBackgroundAt(i),
-                                    color: theme.palette.primary.main
+                                    color: theme.palette.primary.main,
                                 }
                             }}
                             style={{
@@ -171,8 +178,12 @@ function Blank({ word }: { word: string }) {
                     anchorEl={anchorEl}
                     onClose={() => setAnchorEl(null)}
                     anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
+                        vertical: "top",
+                        horizontal: "left",
+                    }}
+                    transformOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right"
                     }}
                 >
                     <Typography sx={{
@@ -211,19 +222,25 @@ function AudioPlayer({ mediaUrl }: { mediaUrl: string }) {
         }
     }
 
-    return (<>
+    return (<div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 3
+    }}>
+        <div>Listen:</div>
         <YoutubePlayer playerRef={playerRef}
             url={mediaUrl}
-            width={0}
-            height={0}
+            width={50}
+            height={40}
+            style={{ display: "inline-block", }}
             onPlay={handlePlay}
             onPause={handlePause}
             onEnded={handleEnded}
         />
-        Listen: <IconButton color="error"
+        <IconButton color="error"
             size="large"
             onClick={handlePlayPauseButtonClick}>
             {isPlaying ? <PauseCircleIcon /> : <SmartDisplayIcon />}
         </IconButton>
-    </>);
+    </div>);
 }

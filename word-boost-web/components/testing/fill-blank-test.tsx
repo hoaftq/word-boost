@@ -12,7 +12,7 @@ import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import InfoIcon from '@mui/icons-material/Info';
 
-type CombinedSentence = {
+export type CombinedSentence = {
     sentence: Sentence;
     words: Word[]
 }

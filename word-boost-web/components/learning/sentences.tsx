@@ -1,24 +1,43 @@
 import { Paper } from "@mui/material";
 import { Word } from "../word-list";
-import { SentenceTypography } from "./sentence-typography";
+import { SentenceTypography2 } from "./sentence-typography";
+import { CombinedSentence } from "../testing/fill-blank-test";
 
 export function Sentences({ words }: { words: Word[] }) {
-    return (<>
-        {words.filter(w => w.sentences.length).map(w => <Paper key={w.id}
-            elevation={3}
+    const sentences = words.flatMap(w => w.sentences.map(s => ({
+        sentence: s,
+        word: w
+    })));
+
+    const combineSentenceMap = new Map<string, CombinedSentence>();
+    for (const s of sentences) {
+        if (combineSentenceMap.has(s.sentence.value)) {
+            combineSentenceMap.get(s.sentence.value)?.words.push(s.word);
+        } else {
+            combineSentenceMap.set(s.sentence.value, {
+                sentence: s.sentence,
+                words: [s.word]
+            })
+        }
+    }
+
+    const combinedSentences = Array.from(combineSentenceMap.values());
+
+    return (
+        <Paper elevation={3}
             sx={{
-                marginBottom: 2,
                 padding: 1
-            }}
-        >
-            {w.sentences.map((s, i) => <SentenceTypography key={s.value}
-                word={w}
-                sentenceIndex={i}
+            }}>
+            {combinedSentences.map((s, i) => <SentenceTypography2 key={s.sentence.value}
+                combinedSentence={s}
                 variant="h4"
                 component="div"
                 color="primary"
                 fontWeight="bold"
-                sx={{ marginBottom: 1 }} />)}
-        </Paper>)}
-    </>);
+                sx={{
+                    marginX: 1,
+                    marginY: 3
+                }} />)}
+        </Paper>
+    );
 }

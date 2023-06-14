@@ -158,7 +158,7 @@ function Blank({ word, onChange }: BlankProps) {
     // Override the current letter without caring about the cursor position or whether the text is selected
     const handleLetterKeyDown = (e: KeyboardEvent<HTMLDivElement>, i: number) => {
         if (e.key.length === 1) {
-            setValue(`letters.${i}.letter`, e.key);
+            setValue(`letters.${i}.letter`, i === 0 ? e.key : e.key.toLocaleLowerCase());
         } else if (e.key == "Backspace") {
             setValue(`letters.${i}.letter`, "");
         }

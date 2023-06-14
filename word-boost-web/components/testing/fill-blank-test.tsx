@@ -11,6 +11,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import InfoIcon from '@mui/icons-material/Info';
+import { Cheerleader, CheerleaderStatus } from "./cheerleader";
 
 export type CombinedSentence = {
     sentence: Sentence;
@@ -20,6 +21,7 @@ export type CombinedSentence = {
 export function FillBlankTest({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const [randomSentences, setRandomSentences] = useState<CombinedSentence[] | null>(null);
+    const [cheerleaderStatus, setCheerleaderStatus] = useState<CheerleaderStatus>("doing");
 
     if (!randomSentences) {
         const sentences = words.flatMap(w => w.sentences.map(s => ({
@@ -38,11 +40,26 @@ export function FillBlankTest({ words }: { words: Word[] }) {
         }
 
         setSentenceIndex(sentenceIndex + 1);
+        setCheerleaderStatus("doing");
     }
 
     const restart = () => {
         setRandomSentences(null);
         setSentenceIndex(0);
+        setCheerleaderStatus("doing");
+    }
+
+    const handleBlankChange = (isAllCorrect: boolean, isCurrentCorrect?: boolean) => {
+        let status: CheerleaderStatus = "doing";
+        if (isAllCorrect) {
+            status = "success"
+        } else if (isCurrentCorrect) {
+            status = "correct";
+        } else if (isCurrentCorrect === false) {
+            status = "wrong"
+        }
+
+        setCheerleaderStatus(status);
     }
 
     useEffect(() => {
@@ -51,26 +68,47 @@ export function FillBlankTest({ words }: { words: Word[] }) {
 
     return randomSentences && randomSentences[sentenceIndex] &&
         <>
-            <FillBlank key={sentenceIndex} combinedSentence={randomSentences[sentenceIndex]} />
-            <div style={{ marginTop: 30 }}>
-                <Button variant="outlined"
-                    sx={{ marginRight: 1 }}
-                    startIcon={<ArrowRightIcon />}
-                    color="secondary"
-                    disabled={isLastSentence()}
-                    onClick={handleNextSentenceClick}>
-                    Next
-                </Button>
-                <span style={{ fontWeight: "bold", marginRight: 6 }}>{sentenceIndex + 1}/{randomSentences.length}</span>
-                <IconButton color="secondary"
-                    onClick={restart}>
-                    <RestartAltIcon />
-                </IconButton>
+            <FillBlank key={sentenceIndex}
+                combinedSentence={randomSentences[sentenceIndex]}
+                onBlankChange={handleBlankChange}
+            />
+            <div style={{
+                marginTop: 20,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end"
+            }}>
+                <div>
+                    <Button variant="outlined"
+                        sx={{ marginRight: 1 }}
+                        startIcon={<ArrowRightIcon />}
+                        color="secondary"
+                        disabled={isLastSentence()}
+                        onClick={handleNextSentenceClick}>
+                        Next
+                    </Button>
+                    <span style={{
+                        fontWeight: "bold",
+                        marginRight: 6
+                    }}>
+                        {sentenceIndex + 1}/{randomSentences.length}
+                    </span>
+                    <IconButton color="secondary"
+                        onClick={restart}>
+                        <RestartAltIcon />
+                    </IconButton>
+                </div>
+                <Cheerleader status={cheerleaderStatus} />
             </div>
         </>;
 }
 
-function FillBlank({ combinedSentence: { words, sentence } }: { combinedSentence: CombinedSentence }) {
+type FillBlankProps = {
+    combinedSentence: CombinedSentence;
+    onBlankChange: (isAllCorrect: boolean, isCurrentCorrect?: boolean) => void;
+}
+
+function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: FillBlankProps) {
     const theme = useTheme();
 
     const wordsRegex = new RegExp(`(${words.map(w => w.value).join("|")})`, "gi");
@@ -85,17 +123,26 @@ function FillBlank({ combinedSentence: { words, sentence } }: { combinedSentence
         }}>
             {splittedParts.map((p, i) => {
                 if (words.some(w => w.value.toLowerCase() === p.toLowerCase())) {
-                    return <Blank key={p + i} word={p} />
+                    return <Blank key={p + i}
+                        word={p}
+                        onChange={(isAllCorrect, isCurrentCorrect) => onBlankChange(isAllCorrect, isCurrentCorrect)}
+                    />
                 }
 
                 return <span key={p + i}>{p}</span>
             })}
         </div>
+        <Cheerleader status="not_started" />
     </div>
     );
 }
 
-function Blank({ word }: { word: string }) {
+type BlankProps = {
+    word: string;
+    onChange: (isAllCorrect: boolean, isCurrentCorrect?: boolean) => void
+}
+
+function Blank({ word, onChange }: BlankProps) {
     const theme = useTheme();
     const { control, setValue, setFocus, watch } = useForm({
         defaultValues: {
@@ -108,19 +155,24 @@ function Blank({ word }: { word: string }) {
 
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
+    // Override the current letter without caring about the cursor position or whether the text is selected
+    const handleLetterKeyDown = (e: KeyboardEvent<HTMLDivElement>, i: number) => {
+        if (e.key.length === 1) {
+            setValue(`letters.${i}.letter`, e.key);
+        } else if (e.key == "Backspace") {
+            setValue(`letters.${i}.letter`, "");
+        }
+    }
 
     const handleLetterKeyUp = (e: KeyboardEvent<HTMLDivElement>, i: number) => {
-        if (i >= word.length || e.key.length > 1) {
-            return;
-        }
+        onChange(letters.map(l => l.letter).join("") === word,
+            !letters[i].letter ? undefined : letters[i].letter === word[i]);
 
-        setValue(`letters.${i}.letter`, e.key)
-
-        while (++i < word.length && isSpecialLetter(word[i])) {
-        }
-
-        if (i < word.length) {
-            setFocus(`letters.${i}.letter`, { shouldSelect: false });
+        if (e.key.length === 1) {
+            while (++i < word.length && isSpecialLetter(word[i])) { }
+            if (i < word.length) {
+                setFocus(`letters.${i}.letter`, { shouldSelect: false });
+            }
         }
     }
 
@@ -164,6 +216,7 @@ function Blank({ word }: { word: string }) {
                             style={{
                                 width: 53
                             }}
+                            onKeyDown={(e) => handleLetterKeyDown(e, i)}
                             onKeyUp={(e) => handleLetterKeyUp(e, i)}
                         ></TextField>}
                     />

@@ -8,6 +8,8 @@ import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
 import { FillBlankTest } from "./testing/fill-blank-test";
+import { TracingSentences } from "./learning/tracing-sentences";
+import { TracingLetter } from "./learning/tracing-letter";
 
 export interface Word {
     id: string;
@@ -20,9 +22,10 @@ export interface Word {
 
 const MODE_LEARN_ONE_WORD = "0";
 const MODE_LEARN_ALL_WORDS = "1";
-const MODE_LEARN_SENTENCES = "2";
-const MODE_WORDS_TEST = "3";
-const MODE_FILLBLANK_TEST = "4";
+const MODE_READ_SENTENCES = "2";
+const MODE_WRITE_SENTENCES = "3";
+const MODE_WORDS_TEST = "4";
+const MODE_FILLBLANK_TEST = "5";
 
 export function WordList() {
     const { publicRuntimeConfig: { apiUrl } } = getConfig();
@@ -90,7 +93,8 @@ export function WordList() {
                     onChange={handleModeChange}>
                     <MenuItem value={MODE_LEARN_ONE_WORD}>Learn one word at a time</MenuItem>
                     <MenuItem value={MODE_LEARN_ALL_WORDS}>Learn all words</MenuItem>
-                    <MenuItem value={MODE_LEARN_SENTENCES}>Read sentences</MenuItem>
+                    <MenuItem value={MODE_READ_SENTENCES}>Read sentences</MenuItem>
+                    <MenuItem value={MODE_WRITE_SENTENCES}>Write sentences</MenuItem>
                     <MenuItem value={MODE_WORDS_TEST}>Test</MenuItem>
                     <MenuItem value={MODE_FILLBLANK_TEST}>Fill in the blank</MenuItem>
                 </Select>
@@ -109,11 +113,11 @@ export function WordList() {
             <div style={{ marginTop: 16 }}>
                 {mode === MODE_LEARN_ALL_WORDS && !!words.length && <AllWords words={words} />}
                 {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
-                {mode === MODE_LEARN_SENTENCES && !!words.length && <Sentences words={words} />}
+                {mode === MODE_READ_SENTENCES && !!words.length && <Sentences words={words} />}
+                {mode === MODE_WRITE_SENTENCES && !!words.length && <TracingSentences words={words} />}
                 {mode == MODE_WORDS_TEST && selectedUnit && <WordTest unit={selectedUnit} key={`${selectedUnit}_${testComponentKey}`} />}
                 {mode == MODE_FILLBLANK_TEST && selectedUnit && <FillBlankTest words={words} />}
             </div>
-
             <FetchingBackdrop />
         </>
     );

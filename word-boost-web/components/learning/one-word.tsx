@@ -1,4 +1,4 @@
-import { Stack, Chip, Button, Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Typography, Tabs, Tab, styled, AccordionProps, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
+import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Word } from "../word-list";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -115,7 +115,10 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
             }}>
                 {imageVisible ?
                     <LoadingImage imageUrl={word?.imageUrl} /> :
-                    <ProgressTimer ref={timer} maxValue={15} onTimeup={handleTimeup} />}
+                    <ProgressTimer ref={timer}
+                        mode="seconds"
+                        maxValue={15}
+                        onTimeup={handleTimeup} />}
             </div>
             <Chip key={word?.id}
                 label={word?.value}

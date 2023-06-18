@@ -16,10 +16,15 @@ export type ProgressTimerRef = {
 export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((props, ref) => {
     const { mode, maxValue, onTimeup, ...circularProgressProps } = props;
     const [currentValue, setCurrentValue] = useState(maxValue);
+    const [isCountingStopped, setIsCountingStopped] = useState(false);
 
     useEffect(() => {
         const timerId = setTimeout(() => {
             setCurrentValue((prevValue) => {
+                if (isCountingStopped) {
+                    return prevValue;
+                }
+
                 const newValue = prevValue - 1;
 
                 if (newValue < 0) {
@@ -38,12 +43,16 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
             clearTimeout(timerId);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentValue]);
+    }, [currentValue, isCountingStopped]);
 
     const formatCurrentTime = () => {
         const minutes = Math.floor(currentValue / 60);
         const seconds = currentValue % 60;
         return `${minutes.toString()} : ${seconds.toString().padStart(2, "0")}`;
+    }
+
+    const handleTimerClick = () => {
+        setIsCountingStopped((v) => !v);
     }
 
     useImperativeHandle(ref, () => ({
@@ -52,7 +61,8 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
 
     return (
         mode === "seconds"
-            ? <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            ? <Box sx={{ position: 'relative', display: 'inline-flex', cursor: "pointer" }}
+                onClick={handleTimerClick}>
                 <CircularProgress {...circularProgressProps}
                     variant="determinate"
                     size="4rem"

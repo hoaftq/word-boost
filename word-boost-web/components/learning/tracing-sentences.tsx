@@ -92,7 +92,10 @@ function TracingSentence({ sentence }: { sentence: string }) {
         <div>
             {sentence.split(" ").map((s, i) => (
                 <div key={i} style={{ display: "inline-block" }}>
-                    {s.split("").map((l, j) => <TracingLetter key={j} letter={l} hasColor={j % 2 === 0} />)}
+                    {s.split("").map((l, j) => <TracingLetter key={j}
+                        letter={l}
+                        previousLetter={j > 0 ? s.charAt(j - 1) : undefined}
+                        hasColor={j % 2 === 0} />)}
                     <TracingLetter letter=" " hasColor={false} />
                 </div>))
             }

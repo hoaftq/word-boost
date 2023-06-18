@@ -61,7 +61,13 @@ const letterPosition: LetterPosition = {
     "z": { left: -6318, width: 60 },
 };
 
-export function TracingLetter({ letter, hasColor }: { letter: string, hasColor: boolean }) {
+type TracingLetterProps = {
+    letter: string;
+    previousLetter?: string;
+    hasColor: boolean;
+}
+
+export function TracingLetter({ letter, previousLetter, hasColor }: TracingLetterProps) {
     const position = letterPosition[letter];
 
     if (position) {
@@ -82,26 +88,44 @@ export function TracingLetter({ letter, hasColor }: { letter: string, hasColor: 
                         left: position.left
                     }}
                 />
-            </div>
-        );
+            </div>);
     }
 
     if (letter === " " || letter === "\t") {
-        return (<div style={{
-            display: "inline-block",
-            marginLeft: 15,
-            marginRight: 15
-        }}>
-            {letter}
-        </div>);
+        return (
+            <div style={{
+                display: "inline-block",
+                marginLeft: 15,
+                marginRight: 15
+            }}></div>);
+    }
+
+    let remainingLetterMarginTop;
+    switch (letter) {
+        case "'":
+            if (previousLetter && previousLetter === previousLetter.toUpperCase()) {
+                remainingLetterMarginTop = 0
+            } else {
+                remainingLetterMarginTop = 40;
+            }
+            break;
+        case "-":
+            remainingLetterMarginTop = 52;
+            break;
+        default:
+            remainingLetterMarginTop = 63;
     }
 
     return <div style={{
         display: "inline-block",
         height: 180,
         overflow: "hidden",
-        fontSize: 50
+        fontSize: 60,
+        marginLeft: 10,
+        marginRight: 10
     }}>
-        {letter}
-    </div>
+        <div style={{ marginTop: remainingLetterMarginTop }}>
+            {letter}
+        </div>
+    </div>;
 }

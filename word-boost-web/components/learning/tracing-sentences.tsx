@@ -47,12 +47,14 @@ export function TracingSentences({ words }: { words: Word[] }) {
         restart();
     }, [words]);
 
-    return randomSentences && randomSentences[sentenceIndex] &&
-        <>
+    const currentSentence = randomSentences?.[sentenceIndex].sentence.value;
+    if (currentSentence) {
+        const writingTime = currentSentence.length * 75;
+        return <>
             <Typography fontSize={55}>
-                {randomSentences[sentenceIndex].sentence.value}
+                {currentSentence}
             </Typography>
-            <TracingSentence sentence={randomSentences[sentenceIndex].sentence.value} />
+            <TracingSentence sentence={currentSentence} />
             <div style={{
                 marginTop: 20,
                 display: "flex",
@@ -80,11 +82,15 @@ export function TracingSentences({ words }: { words: Word[] }) {
                     </IconButton>
                 </div>
                 <ProgressTimer ref={timerRef}
+                    key={currentSentence}
                     mode="minutes"
-                    maxValue={20 * 60}
+                    maxValue={writingTime}
                     onTimeup={handleTimeup} />
             </div>
         </>;
+    }
+
+    return null;
 }
 
 function TracingSentence({ sentence }: { sentence: string }) {

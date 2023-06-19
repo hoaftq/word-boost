@@ -1,4 +1,4 @@
-import { Button, IconButton, Typography } from "@mui/material";
+import { Button, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import { TracingLetter } from "./tracing-letter";
 import { shuffleArray } from "@wb/utils/utils";
 import { useState, useEffect, useRef } from "react";
@@ -8,10 +8,16 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
 
+const TimeForALetterInSeconds = 15;
+const NumberOfExpectedSentences = 5;
+
 export function TracingSentences({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const [randomSentences, setRandomSentences] = useState<CombinedSentence[] | null>(null);
     const timerRef = useRef<ProgressTimerRef>(null);
+
+    const theme = useTheme();
+    const [expectedSentenceCount, setExpectedSentenceCount] = useState(0);
 
     if (!randomSentences) {
         const sentences = words.flatMap(w => w.sentences.map(s => ({
@@ -43,13 +49,17 @@ export function TracingSentences({ words }: { words: Word[] }) {
         moveToNextSentence();
     }
 
+    const handleTicking = (currentValue: number, maxValue: number) => {
+        setExpectedSentenceCount(Math.round((1 - currentValue / maxValue) * NumberOfExpectedSentences));
+    }
+
     useEffect(() => {
         restart();
     }, [words]);
 
     const currentSentence = randomSentences?.[sentenceIndex].sentence.value;
     if (currentSentence) {
-        const writingTime = currentSentence.length * 75;
+        const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
         return <>
             <Typography fontSize={50}>
                 {currentSentence}
@@ -76,16 +86,30 @@ export function TracingSentences({ words }: { words: Word[] }) {
                     }}>
                         {sentenceIndex + 1}/{randomSentences.length}
                     </span>
-                    <IconButton color="secondary"
-                        onClick={restart}>
-                        <RestartAltIcon />
-                    </IconButton>
+                    <Tooltip title="Restart">
+                        <IconButton color="secondary"
+                            onClick={restart}>
+                            <RestartAltIcon />
+                        </IconButton>
+                    </Tooltip>
                 </div>
+
+                {expectedSentenceCount === 0
+                    ? <div>You might be writing</div>
+                    : <div>
+                        <span style={{
+                            color: theme.palette.warning.main,
+                            fontWeight: "bold",
+                            fontSize: 30
+                        }}>{expectedSentenceCount}</span> sentence(s) should be written already
+                    </div>}
+
                 <ProgressTimer ref={timerRef}
                     key={currentSentence}
                     mode="minutes"
                     maxValue={writingTime}
-                    onTimeup={handleTimeup} />
+                    onTimeup={handleTimeup}
+                    onTicking={handleTicking} />
             </div>
         </>;
     }

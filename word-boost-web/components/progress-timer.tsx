@@ -6,7 +6,8 @@ type TimerMode = "seconds" | "minutes";
 type ProgressTimerProps = CircularProgressProps & {
     mode: TimerMode,
     maxValue: number,
-    onTimeup: () => void
+    onTimeup: () => void,
+    onTicking?: (currentValue: number, maxValue: number) => void
 };
 
 export type ProgressTimerRef = {
@@ -14,7 +15,7 @@ export type ProgressTimerRef = {
 }
 
 export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((props, ref) => {
-    const { mode, maxValue, onTimeup, ...circularProgressProps } = props;
+    const { mode, maxValue, onTimeup, onTicking, ...circularProgressProps } = props;
     const [currentValue, setCurrentValue] = useState(maxValue);
     const [isCountingStopped, setIsCountingStopped] = useState(false);
 
@@ -34,6 +35,8 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
                     // With this statement, currentValue won't be changed so it won't triggered this effect for another time
                     return prevValue;
                 }
+
+                onTicking?.(newValue, maxValue);
 
                 return newValue;
             });

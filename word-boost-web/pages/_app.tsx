@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <SnackbarProvider>
       <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Component {...pageProps} />
         </Container>
       </DndProvider>

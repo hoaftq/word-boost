@@ -56,7 +56,10 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
     }
 
     useImperativeHandle(ref, () => ({
-        resetTimer: () => setCurrentValue(maxValue)
+        resetTimer: () => {
+            setCurrentValue(maxValue);
+            setIsCountingStopped(false);
+        }
     }));
 
     return (
@@ -66,7 +69,9 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
                 <CircularProgress {...circularProgressProps}
                     variant="determinate"
                     size="4rem"
-                    value={currentValue * 100 / maxValue} />
+                    value={currentValue * 100 / maxValue}
+                    color={isCountingStopped ? "error" : "primary"}
+                />
                 <Box
                     sx={{
                         top: 0,
@@ -77,12 +82,13 @@ export const ProgressTimer = forwardRef<ProgressTimerRef, ProgressTimerProps>((p
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        userSelect: "none"
                     }}
                 >
                     <Typography
                         variant="caption"
                         component="div"
-                        color="primary"
+                        color={isCountingStopped ? "error" : "primary"}
                         fontSize="2rem"
                         fontWeight="bold"
                     >{currentValue}</Typography>

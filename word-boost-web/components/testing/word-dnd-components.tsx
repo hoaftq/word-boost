@@ -25,8 +25,8 @@ export function DraggableWordChip({ word }: { word: Word }) {
             color="info"
             variant={isDragging ? "outlined" : "filled"}
             sx={{
-                fontSize: 27,
-                padding: 2.5,
+                fontSize: 40,
+                padding: 2.7,
                 cursor: "move",
                 userSelect: "none"
             }}
@@ -80,7 +80,7 @@ export function DroppableWordPool({ remainingWords, onDrop }: DroppableWordPoolP
 
     return <Stack ref={dropRef}
         direction={"row"}
-        spacing={2}
+        spacing={1}
         useFlexGap
         flexWrap="wrap"
         justifyContent="center"
@@ -112,8 +112,8 @@ export function DraggingWordLayer() {
             color="info"
             variant="filled"
             sx={{
-                fontSize: 27,
-                padding: 2.5,
+                fontSize: 40,
+                padding: 2.7,
                 cursor: "move",
                 userSelect: "none",
                 pointerEvents: "none",

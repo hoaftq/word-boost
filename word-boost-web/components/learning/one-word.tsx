@@ -107,7 +107,7 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
         <>
             <div style={{
                 width: "100%",
-                height: 300,
+                height: 349,
                 position: "relative",
                 display: "flex",
                 justifyContent: "center",
@@ -124,7 +124,12 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
                 label={word?.value}
                 clickable
                 color="primary"
-                sx={{ marginTop: 1, fontSize: 30, p: 3 }}
+                sx={{
+                    marginTop: 1,
+                    marginBottom: 3,
+                    fontSize: 50,
+                    p: 4,
+                }}
                 onClick={handleWordClick}
             />
         </>
@@ -221,7 +226,7 @@ function SentenceCard({ word }: { word: Word }) {
     const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
-        <div style={{ width: "100%", minHeight: 356 }}>
+        <div style={{ width: "100%", minHeight: 445 }}>
             {word.sentences.map((s, i) => {
                 const isCardExpanded = expandedIndex === i;
                 const isCardFocused = focusIndex == i;
@@ -234,6 +239,7 @@ function SentenceCard({ word }: { word: Word }) {
                             <SentenceTypography variant={isCardFocused ? "h4" : "h5"}
                                 component="div"
                                 color={isCardFocused ? "primary" : "gray"}
+                                fontSize={isCardFocused ? 50 : 40}
                                 fontWeight={isCardFocused ? "bold" : "normal"}
                                 sx={{ flexGrow: 1 }}
                                 word={word}

@@ -116,8 +116,8 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
     return (<div>
         <AudioPlayer mediaUrl={sentence.mediaUrl} />
         <div style={{
-            fontSize: 30,
-            lineHeight: "75px",
+            fontSize: 50,
+            lineHeight: "100px",
             marginTop: 40,
             color: theme.palette.primary.main
         }}>
@@ -206,7 +206,7 @@ function Blank({ word, onChange }: BlankProps) {
                             inputProps={{
                                 maxLength: 1,
                                 style: {
-                                    fontSize: 30,
+                                    fontSize: 50,
                                     caretColor: "transparent",
                                     cursor: "pointer",
                                     backgroundColor: getBackgroundAt(i),
@@ -214,7 +214,7 @@ function Blank({ word, onChange }: BlankProps) {
                                 }
                             }}
                             style={{
-                                width: 53
+                                width: 70
                             }}
                             onKeyDown={(e) => handleLetterKeyDown(e, i)}
                             onKeyUp={(e) => handleLetterKeyUp(e, i)}
@@ -241,7 +241,7 @@ function Blank({ word, onChange }: BlankProps) {
                 >
                     <Typography sx={{
                         p: 2,
-                        fontSize: 30,
+                        fontSize: 50,
                         color: theme.palette.info.light
                     }}>{word}</Typography>
                 </Popover>

@@ -51,7 +51,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
     if (currentSentence) {
         const writingTime = currentSentence.length * 75;
         return <>
-            <Typography fontSize={55}>
+            <Typography fontSize={50}>
                 {currentSentence}
             </Typography>
             <TracingSentence sentence={currentSentence} />

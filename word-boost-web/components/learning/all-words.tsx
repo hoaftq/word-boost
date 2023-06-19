@@ -24,7 +24,7 @@ export function AllWords({ words }: { words: Word[] }) {
                 <Box key={w.id} padding={2}>
                     <Chip label={`${i + 1}. ${w.value}`}
                         clickable
-                        sx={{ fontSize: 30, p: 4 }}
+                        sx={{ fontSize: 50, p: 4 }}
                         color="primary"
                         onClick={(e) => handleChipClick(e, w)}
                     />

@@ -95,8 +95,8 @@ export function TracingLetter({ letter, previousLetter, hasColor }: TracingLette
         return (
             <div style={{
                 display: "inline-block",
-                marginLeft: 15,
-                marginRight: 15
+                marginLeft: 17,
+                marginRight: 17
             }}></div>);
     }
 
@@ -121,8 +121,8 @@ export function TracingLetter({ letter, previousLetter, hasColor }: TracingLette
         height: 180,
         overflow: "hidden",
         fontSize: 60,
-        marginLeft: 10,
-        marginRight: 10
+        marginLeft: 5,
+        marginRight: 5
     }}>
         <div style={{ marginTop: remainingLetterMarginTop }}>
             {letter}

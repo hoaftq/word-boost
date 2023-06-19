@@ -67,7 +67,7 @@ export function WordTest({ unit }: WordTestProps) {
     }
 
     return <>
-        <Grid container spacing={2} marginBottom={3}>
+        <Grid container spacing={2} marginBottom={2}>
             {state.words.map((w, i) => <Grid key={w.id} item xs={4}>
                 <Card sx={{
                     display: "flex",
@@ -95,12 +95,17 @@ export function WordTest({ unit }: WordTestProps) {
                     <Badge badgeContent={i + 1}
                         sx={{
                             position: "absolute",
-                            top: 10,
-                            left: 10,
+                            top: 16,
+                            left: 16,
                             userSelect: "none",
                             "& .MuiBadge-badge": {
                                 backgroundColor: getStatusColor(i, w, true),
-                                fontWeight: "bold"
+                                fontWeight: "bold",
+                                color: "white",
+                                fontSize: 25,
+                                width: 30,
+                                height: 30,
+                                borderRadius: 30
                             }
                         }}
                     ></Badge>

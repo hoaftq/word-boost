@@ -33,6 +33,7 @@ export function Sentences({ words }: { words: Word[] }) {
                 variant="h4"
                 component="div"
                 color="primary"
+                fontSize={50}
                 fontWeight="bold"
                 sx={{
                     marginX: 1,

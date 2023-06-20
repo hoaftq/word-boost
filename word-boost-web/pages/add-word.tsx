@@ -60,8 +60,8 @@ export default function AddWord() {
             });
     }
 
-    const handleWordChange = (event: FocusEvent<HTMLInputElement>) => {
-        const word = event.target.value?.trim();
+    const handleWordChange = (e: FocusEvent<HTMLInputElement>) => {
+        const word = e.target.value?.trim();
         if (word) {
             window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`, "word_boost_search");
         }
@@ -78,8 +78,8 @@ export default function AddWord() {
         });
     }
 
-    const handleSentenceChange = (event: FocusEvent<HTMLInputElement>) => {
-        const word = event.target.value?.trim();
+    const handleSentenceChange = (e: FocusEvent<HTMLInputElement>) => {
+        const word = e.target.value?.trim();
         if (word) {
             window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(word)}`, "word_boost_search");
         }
@@ -176,17 +176,17 @@ export default function AddWord() {
     )
 }
 
-type TraditionalChangeTextFieldProps = TextFieldProps & { onTraditionalChange: (event: FocusEvent<HTMLInputElement>) => void };
+type TraditionalChangeTextFieldProps = TextFieldProps & { onTraditionalChange: (e: FocusEvent<HTMLInputElement>) => void };
 
 export function TraditionalChangeTextField(props: TraditionalChangeTextFieldProps) {
     const { defaultValue, onTraditionalChange } = props;
 
     const [prevValue, setPrevValue] = useState(defaultValue);
 
-    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
-        const currentValue = event.target.value;
+    const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+        const currentValue = e.target.value;
         if (prevValue !== currentValue) {
-            onTraditionalChange(event);
+            onTraditionalChange(e);
             setPrevValue(currentValue);
         }
     }

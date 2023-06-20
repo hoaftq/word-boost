@@ -9,35 +9,27 @@ type SentenceTypographyProps = TypographyProps<'div', { component: 'div' }> & {
 }
 
 export function SentenceTypography({ word, sentenceIndex, ...typographyProps }: SentenceTypographyProps) {
+    const combinedSentence: CombinedSentence = {
+        sentence: word.sentences[sentenceIndex],
+        words: [word]
+    };
 
-    const highlightWord = () => {
-        const wordRegex = new RegExp(`(\\w*${word.value}\\w*|\\w+)`, "gi");
-        const sentence = word.sentences[sentenceIndex].value;
-        return sentence.replace(wordRegex, (match, group: string) => {
-            const exactWordRegex = new RegExp(`(${word.value})`, "gi");
-            const styledExactWord = group.replace(exactWordRegex, (m, g) => `<span class="${styles['exact-word']}">${g}</span>`)
-            return `<span class="${styles.word}">${styledExactWord}</span>`
-        });
-    }
-
-    return (
-        <Typography {...typographyProps} dangerouslySetInnerHTML={{ __html: highlightWord() }} />
-    );
+    return <CombinedSentenceTypography combinedSentence={combinedSentence} {...typographyProps} />
 }
 
-type SentenceTypography2Props = TypographyProps<'div', { component: 'div' }> & {
+type CombinedSentenceTypographyProps = TypographyProps<'div', { component: 'div' }> & {
     combinedSentence: CombinedSentence;
 }
 
-export function SentenceTypography2({ combinedSentence, ...typographyProps }: SentenceTypography2Props) {
+export function CombinedSentenceTypography({ combinedSentence, ...typographyProps }: CombinedSentenceTypographyProps) {
 
     const highlightWord = () => {
-        const x = combinedSentence.words.map(w => w.value).join("|");
+        const wordsWithPipe = combinedSentence.words.map(w => w.value).join("|");
+        const wordRegex = new RegExp(`(\\w*(${wordsWithPipe})\\w*|\\w+)`, "gi");
 
-        const wordRegex = new RegExp(`(\\w*(${x})\\w*|\\w+)`, "gi");
         const sentence = combinedSentence.sentence.value;
         return sentence.replace(wordRegex, (match, group: string) => {
-            const exactWordRegex = new RegExp(`(${x})`, "gi");
+            const exactWordRegex = new RegExp(`(${wordsWithPipe})`, "gi");
             const styledExactWord = group.replace(exactWordRegex, (m, g) => `<span class="${styles['exact-word']}">${g}</span>`)
             return `<span class="${styles.word}">${styledExactWord}</span>`
         });

@@ -22,12 +22,15 @@ export function LoadingImage({ imageUrl }: { imageUrl: string }) {
                 {loading && <CircularProgress />}
                 <Image src={imageUrl}
                     alt=""
-                    style={{ objectFit: 'contain', opacity: loading ? 0 : 1 }}
+                    style={{
+                        objectFit: 'contain',
+                        opacity: loading ? 0 : 1
+                    }}
                     fill={true}
                     onLoadingComplete={() => { setLoading(false); }} />
             </Box>
         );
     }
 
-    return <></>;
+    return null;
 }

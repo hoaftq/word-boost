@@ -24,8 +24,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
             sentence: s,
             words: [w]
         })));
-        const randomSentences = shuffleArray(sentences);
-        setRandomSentences(randomSentences);
+        setRandomSentences(sentences);
     }
 
     const isLastSentence = () => sentenceIndex >= randomSentences!.length - 1;
@@ -95,7 +94,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
                 </div>
 
                 {expectedSentenceCount === 0
-                    ? <div>You might be writing</div>
+                    ? <div>You might be writing now</div>
                     : <div>
                         <span style={{
                             color: theme.palette.warning.main,

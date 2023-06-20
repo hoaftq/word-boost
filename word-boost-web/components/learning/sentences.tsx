@@ -1,6 +1,6 @@
 import { Paper } from "@mui/material";
 import { Word } from "../word-list";
-import { SentenceTypography2 } from "./sentence-typography";
+import { CombinedSentenceTypography } from "./sentence-typography";
 import { CombinedSentence } from "../testing/fill-blank-test";
 
 export function Sentences({ words }: { words: Word[] }) {
@@ -28,7 +28,7 @@ export function Sentences({ words }: { words: Word[] }) {
             sx={{
                 padding: 1
             }}>
-            {combinedSentences.map((s, i) => <SentenceTypography2 key={s.sentence.value}
+            {combinedSentences.map((s, i) => <CombinedSentenceTypography key={s.sentence.value}
                 combinedSentence={s}
                 variant="h4"
                 component="div"

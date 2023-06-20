@@ -49,8 +49,8 @@ export default function AddWordVideoBased() {
         });
     }
 
-    const handleWordChange = (event: FocusEvent<HTMLInputElement>) => {
-        const word = event.target.value?.trim();
+    const handleWordChange = (e: FocusEvent<HTMLInputElement>) => {
+        const word = e.target.value?.trim();
         if (word) {
             window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}&tbm=isch`, "word_boost_search");
         }

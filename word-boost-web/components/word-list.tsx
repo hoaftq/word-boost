@@ -9,7 +9,6 @@ import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
 import { FillBlankTest } from "./testing/fill-blank-test";
 import { TracingSentences } from "./learning/tracing-sentences";
-import { TracingLetter } from "./learning/tracing-letter";
 
 export interface Word {
     id: string;

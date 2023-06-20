@@ -2,7 +2,7 @@ import { Button, IconButton, Stack, TextField, Tooltip } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from "react";
-import ReactPlayer, { Config } from "react-player";
+import ReactPlayer from "react-player";
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 const YoutubePlayer = dynamic(() => import("./youtube-player"), { ssr: false });
 

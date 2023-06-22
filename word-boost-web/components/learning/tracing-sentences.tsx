@@ -1,6 +1,6 @@
 import { Button, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import { TracingLetter } from "./tracing-letter";
-import { shuffleArray } from "@wb/utils/utils";
+import { combineSentences } from "@wb/utils/utils";
 import { useState, useEffect, useRef } from "react";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import { Word } from "../word-list";
@@ -13,21 +13,17 @@ const NumberOfExpectedSentences = 5;
 
 export function TracingSentences({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
-    const [randomSentences, setRandomSentences] = useState<CombinedSentence[] | null>(null);
+    const [combinedSentences, setCombinedSentences] = useState<CombinedSentence[] | null>(null);
     const timerRef = useRef<ProgressTimerRef>(null);
 
     const theme = useTheme();
     const [expectedSentenceCount, setExpectedSentenceCount] = useState(0);
 
-    if (!randomSentences) {
-        const sentences = words.flatMap(w => w.sentences.map(s => ({
-            sentence: s,
-            words: [w]
-        })));
-        setRandomSentences(sentences);
+    if (!combinedSentences) {
+        setCombinedSentences(combineSentences(words));
     }
 
-    const isLastSentence = () => sentenceIndex >= randomSentences!.length - 1;
+    const isLastSentence = () => sentenceIndex >= combinedSentences!.length - 1;
 
     const moveToNextSentence = () => {
         if (isLastSentence()) {
@@ -39,7 +35,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
     }
 
     const restart = () => {
-        setRandomSentences(null);
+        setCombinedSentences(null);
         setSentenceIndex(0);
         timerRef.current!.resetTimer();
     }
@@ -56,7 +52,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
         restart();
     }, [words]);
 
-    const currentSentence = randomSentences?.[sentenceIndex].sentence.value;
+    const currentSentence = combinedSentences?.[sentenceIndex].sentence.value;
     if (currentSentence) {
         const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
         return <>
@@ -83,7 +79,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
                         fontWeight: "bold",
                         marginRight: 6
                     }}>
-                        {sentenceIndex + 1}/{randomSentences.length}
+                        {sentenceIndex + 1}/{combinedSentences.length}
                     </span>
                     <Tooltip title="Restart">
                         <IconButton color="secondary"
@@ -93,15 +89,14 @@ export function TracingSentences({ words }: { words: Word[] }) {
                     </Tooltip>
                 </div>
 
-                {expectedSentenceCount === 0
-                    ? <div>You might be writing now</div>
-                    : <div>
-                        <span style={{
-                            color: theme.palette.warning.main,
+                <div style={{ color: theme.palette.warning.main }}>
+                    {expectedSentenceCount === 0
+                        ? <>You might be writing now</>
+                        : <><span style={{
                             fontWeight: "bold",
                             fontSize: 30
-                        }}>{expectedSentenceCount}</span> sentence(s) should be written already
-                    </div>}
+                        }}>{expectedSentenceCount}</span> sentence(s) should be written already</>}
+                </div>
 
                 <ProgressTimer ref={timerRef}
                     key={currentSentence}

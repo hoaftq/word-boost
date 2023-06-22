@@ -6,7 +6,7 @@ type LetterPosition = {
     [key: string]: { left: number, width: number };
 }
 
-const letterPosition: LetterPosition = {
+const lettersPosition: LetterPosition = {
     "A": { left: -40, width: 96 },
     "a": { left: -165, width: 60 },
     "B": { left: -275, width: 84 },
@@ -68,7 +68,7 @@ type TracingLetterProps = {
 }
 
 export function TracingLetter({ letter, previousLetter, hasColor }: TracingLetterProps) {
-    const position = letterPosition[letter];
+    const position = lettersPosition[letter];
 
     if (position) {
         return (
@@ -108,6 +108,9 @@ export function TracingLetter({ letter, previousLetter, hasColor }: TracingLette
             } else {
                 remainingLetterMarginTop = 40;
             }
+            break;
+        case "\"":
+            remainingLetterMarginTop = 15;
             break;
         case "-":
             remainingLetterMarginTop = 52;

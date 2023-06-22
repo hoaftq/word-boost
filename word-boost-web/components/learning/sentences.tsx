@@ -1,27 +1,10 @@
 import { Paper } from "@mui/material";
 import { Word } from "../word-list";
 import { CombinedSentenceTypography } from "./sentence-typography";
-import { CombinedSentence } from "../testing/fill-blank-test";
+import { combineSentences } from "@wb/utils/utils";
 
 export function Sentences({ words }: { words: Word[] }) {
-    const sentences = words.flatMap(w => w.sentences.map(s => ({
-        sentence: s,
-        word: w
-    })));
-
-    const combineSentenceMap = new Map<string, CombinedSentence>();
-    for (const s of sentences) {
-        if (combineSentenceMap.has(s.sentence.value)) {
-            combineSentenceMap.get(s.sentence.value)?.words.push(s.word);
-        } else {
-            combineSentenceMap.set(s.sentence.value, {
-                sentence: s.sentence,
-                words: [s.word]
-            })
-        }
-    }
-
-    const combinedSentences = Array.from(combineSentenceMap.values());
+    const combinedSentences = combineSentences(words);
 
     return (
         <Paper elevation={3}

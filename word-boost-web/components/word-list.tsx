@@ -1,7 +1,7 @@
 import { Button, FormControl, FormControlLabel, InputLabel, MenuItem, Select, SelectChangeEvent, Switch } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import getConfig from "next/config";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
 import { OneWord } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
@@ -26,28 +26,26 @@ const MODE_WRITE_SENTENCES = "3";
 const MODE_WORDS_TEST = "4";
 const MODE_FILLBLANK_TEST = "5";
 
-export function WordList() {
-    const { publicRuntimeConfig: { apiUrl } } = getConfig();
+const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
+export function WordList() {
     const [units, setUnits] = useState([] as string[]);
     const [selectedUnit, setSelectedUnit] = useState('');
-
     const [mode, setMode] = useState(MODE_LEARN_ONE_WORD);
-
     const [imageVisible, setImageVisible] = useState(false);
 
     const [words, setWords] = useState([] as Word[]);
 
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
-    const [testComponentKey, setTestComponentKey] = useState(0);
+    const [testIndex, setTestIndex] = useState(0);
+    const optionsPrefix = useId();
 
     useEffect(() => {
         blockingFetch(`${apiUrl}/units`)
             .then(rsp => rsp.json())
             .then((units: string[]) => { setUnits(units); })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [blockingFetch]);
 
     const handleUnitChange = (e: SelectChangeEvent) => {
         const unit = e.target.value;
@@ -67,14 +65,14 @@ export function WordList() {
     }
 
     const handleNewTestClick = () => {
-        setTestComponentKey(testComponentKey + 1);
+        setTestIndex(testIndex + 1);
     }
 
     return (
         <>
             <FormControl sx={{ minWidth: 150, marginRight: 3, marginTop: 2 }} size="small">
-                <InputLabel id="unit">Unit</InputLabel>
-                <Select labelId="unit"
+                <InputLabel id={`${optionsPrefix}-unit`}>Unit</InputLabel>
+                <Select labelId={`${optionsPrefix}-unit`}
                     value={selectedUnit}
                     size="small"
                     label="Unit"
@@ -85,8 +83,8 @@ export function WordList() {
             </FormControl>
 
             <FormControl sx={{ minWidth: 230, marginRight: 3, marginTop: 2 }} size="small">
-                <InputLabel id="mode">Mode</InputLabel>
-                <Select labelId="mode"
+                <InputLabel id={`${optionsPrefix}-mode`}>Mode</InputLabel>
+                <Select labelId={`${optionsPrefix}-mode`}
                     value={mode}
                     label="Mode"
                     onChange={handleModeChange}>
@@ -114,7 +112,7 @@ export function WordList() {
                 {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
                 {mode === MODE_READ_SENTENCES && !!words.length && <Sentences words={words} />}
                 {mode === MODE_WRITE_SENTENCES && !!words.length && <TracingSentences words={words} />}
-                {mode == MODE_WORDS_TEST && selectedUnit && <WordTest unit={selectedUnit} key={`${selectedUnit}_${testComponentKey}`} />}
+                {mode == MODE_WORDS_TEST && selectedUnit && <WordTest unit={selectedUnit} key={testIndex} />}
                 {mode == MODE_FILLBLANK_TEST && selectedUnit && <FillBlankTest words={words} />}
             </div>
             <FetchingBackdrop />

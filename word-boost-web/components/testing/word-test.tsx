@@ -8,11 +8,12 @@ import { DroppableBlank, DroppableWordPool, DraggingWordLayer } from "./word-dnd
 import { getRandomArray, shuffleArray } from "@wb/utils/utils";
 import { initialState, testingReducer } from "./word-test-reducer";
 
+const { publicRuntimeConfig: { apiUrl } } = getConfig();
+
 type WordTestProps = {
     unit: string;
 }
 export function WordTest({ unit }: WordTestProps) {
-    const { publicRuntimeConfig: { apiUrl } } = getConfig();
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
     const [state, dispatch] = useImmerReducer(testingReducer, initialState);
     const theme = useTheme();
@@ -34,7 +35,7 @@ export function WordTest({ unit }: WordTestProps) {
                     payload: getRandomArray(words.filter(w => w.imageUrl), 6)
                 });
             });
-    }, []);
+    }, [blockingFetch, dispatch, unit]);
 
     const handleDropOnBank = (position: number, word: Word) => {
         dispatch({

@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useCallback, useDebugValue, useState } from "react";
 import { Backdrop, CircularProgress } from "@mui/material";
 
 export function useBlockingFetch() {
     const [open, setOpen] = useState(false);
+    useDebugValue(open ? "Fetching" : "Fetched");
 
-    function blockingFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    const blockingFetch = useCallback((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         setOpen(true);
         return fetch(input, init)
             .finally(() => setOpen(false));
-    }
+    }, []);
 
     function FetchingBackdrop() {
         return (

@@ -4,7 +4,7 @@ import { useState, MouseEvent } from "react";
 import { LoadingImage } from "../loading-image";
 
 export function AllWords({ words }: { words: Word[] }) {
-    const [anchorEl, setAnchorEl] = useState<HTMLElement>();
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const open = !!anchorEl;
 
     const [selectedWord, setSelectedWord] = useState<Word>();
@@ -15,7 +15,7 @@ export function AllWords({ words }: { words: Word[] }) {
     }
 
     const handleClose = () => {
-        setAnchorEl(undefined);
+        setAnchorEl(null);
     }
 
     return (

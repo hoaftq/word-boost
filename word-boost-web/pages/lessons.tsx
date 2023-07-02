@@ -18,8 +18,9 @@ export default function Lessons() {
 
     return <>
         <h2>Lesson experiment</h2>
-        {lessonData.lessons.map(l => <Button key={l.name}
-            onClick={() => handleOpenDialogClick(l)}> {l.name} </Button>)}
+        {lessonData.lessons.map((l, i) => <Button key={l.name}
+            style={{ display: "block" }}
+            onClick={() => handleOpenDialogClick(l)}>{`${i + 1}. ${l.name}`}</Button>)}
 
         {lesson && <Dialog open={open} fullScreen>
             <Lesson lesson={lesson} onEnd={handleEndClick}></Lesson>

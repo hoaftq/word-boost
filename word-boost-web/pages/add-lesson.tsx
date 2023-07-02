@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useId, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import ReactPlayer from "react-player";
-import { OnProgressProps } from "react-player/base";
 
 const YoutubePlayer = dynamic(() => import("../components/youtube-player"), { ssr: false });
 
@@ -12,7 +11,7 @@ export default function AddLesson() {
     const [positions, setPositions] = useState<Position[]>([]);
     const idPrefix = useId();
     const [commands, setCommands] = useState<PlayCommand[]>([]);
-    const { control, getValues } = useForm({
+    const { control, getValues, resetField } = useForm({
         defaultValues: {
             url: "",
             label: "",
@@ -40,6 +39,8 @@ export default function AddLesson() {
             repeat: getValues("repeat"),
             description: getValues("description")
         }]);
+        resetField("label");
+        resetField("description");
     }
 
     return <>
@@ -73,34 +74,36 @@ export default function AddLesson() {
                     render={({ field }) => <FormControl size="small" fullWidth>
                         <InputLabel id={`${idPrefix}-rate`}>Rate</InputLabel>
                         <Select {...field} labelId={`${idPrefix}-rate`} label="Rate">
-                            {[0.5, 0.75, 1].map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                            {[0.5, 0.6, 0.7, 0.75, 1].map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
                         </Select>
                     </FormControl>}
                 />
             </Stack>
 
-            <Controller control={control}
-                name="delay"
-                render={({ field }) => <TextField {...field} label="Delay" type="number" size="small" />}
-            />
-
-            <Controller control={control}
-                name="repeat"
-                render={({ field }) => <TextField {...field} label="Repeat" type="number" size="small" />}
-            />
-
+            <Stack direction="row" spacing={4}>
+                <Controller control={control}
+                    name="delay"
+                    render={({ field }) => <TextField {...field} label="Delay" type="number" size="small" />}
+                />
+                <Controller control={control}
+                    name="repeat"
+                    render={({ field }) => <TextField {...field} label="Repeat" type="number" size="small" />}
+                />
+            </Stack>
             <Controller control={control}
                 name="description"
                 render={({ field }) => < TextField {...field} label="Description" size="small" fullWidth />}
             />
 
-            <Button style={{ alignSelf: "end" }} onClick={handleAddCommandClick}>Add command</Button>
+            <Button variant="contained"
+                color="primary"
+                style={{ alignSelf: "end" }}
+                onClick={handleAddCommandClick}>Add command</Button>
 
             <TextField multiline rows={4} fullWidth value={JSON.stringify(commands)}></TextField>
         </Stack>
     </>
 }
-
 
 enum TestingStatus {
     NotStarted,
@@ -115,7 +118,7 @@ type Position = {
 
 function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) => void }) {
     const playerRef = useRef<ReactPlayer>(null);
-    const { control, watch, setValue, getValues } = useForm({
+    const { control, watch, setValue, getValues, resetField } = useForm({
         defaultValues: {
             videoUrl: "",
             currentPosition: "",
@@ -143,7 +146,7 @@ function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) =>
         setValue("currentPosition", seekToValue.toString());
     }
 
-    const handleGetPositionClick = () => {
+    const handleGetCurrentPositionClick = () => {
         const position = playerRef.current?.getCurrentTime();
         setValue("currentPosition", position?.toString() ?? "");
     }
@@ -162,13 +165,13 @@ function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) =>
             label: value.label,
             position: parseFloat(value.currentPosition)
         });
+        resetField("label");
     }
 
-    function handleProgress(state: OnProgressProps): void {
+    function handleCustomProgress(duration: number): void {
         switch (testingStatus) {
             case TestingStatus.BeforeCurrentPosition:
-                if (state.playedSeconds >= currentPosition) {
-                    console.log(state.playedSeconds + ":" + currentPosition);
+                if (duration >= currentPosition) {
                     playerRef.current?.getInternalPlayer().pauseVideo();
                     const timerId = setTimeout(() => {
                         playerRef.current?.getInternalPlayer().playVideo();
@@ -178,9 +181,9 @@ function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) =>
                 }
                 break;
             case TestingStatus.AfterCurrentPosition:
-                if (state.playedSeconds >= currentPosition + 5) {
-                    console.log(state.playedSeconds + "-" + (currentPosition + 5));
+                if (duration >= currentPosition + 5) {
                     playerRef.current?.getInternalPlayer().pauseVideo();
+                    playerRef.current?.seekTo(currentPosition);
                     setTestingStatus(TestingStatus.NotStarted);
                 }
                 break;
@@ -199,25 +202,31 @@ function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) =>
                     }
                 }}
                 url={videoUrl}
-                onProgress={handleProgress}
+                onCustomProgress={handleCustomProgress}
             />
             <div style={{ marginTop: 10 }}>
-                {[-3, -2, -1, -0.8, -0.6, -0.4, -0.2, -0.1, 0.1, 0.2, 0.4, 0.6, 0.8, 1, 2, 3]
-                    .map(v => <Button key={v} onClick={() => handleSeekButtonClick(v)}>{v}s</Button>)}
+                {[-3, -1, -0.5, -0.1, 0.1, 0.5, 1, 3].map(v => <Button key={v} onClick={() => handleSeekButtonClick(v)}>{v}s</Button>)}
             </div>
             <Stack direction="row" spacing={1}>
                 <Controller control={control}
                     name="currentPosition"
                     render={({ field }) => <TextField {...field} size="small" label="Current Position" type="number" />} />
-                <Button onClick={handleGetPositionClick}>Get position</Button>
-                <Button onClick={handleTestPositionClick}>Test position</Button>
+                <Button variant="contained"
+                    color="secondary"
+                    onClick={handleGetCurrentPositionClick}>Get currrent position</Button>
+                <Button variant="contained"
+                    color="secondary"
+                    onClick={handleTestPositionClick}>Test position</Button>
             </Stack>
             <Controller control={control}
                 name="label"
                 render={({ field }) => <TextField {...field} size="small" label="Position Label" fullWidth />}
             />
 
-            <Button style={{ alignSelf: "end" }} onClick={handleUsePositionClick} > Use position</Button>
+            <Button variant="contained"
+                color="primary"
+                style={{ alignSelf: "end" }}
+                onClick={handleUsePositionClick}>Use position</Button>
         </Stack>
     );
 }

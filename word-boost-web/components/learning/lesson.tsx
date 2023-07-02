@@ -2,7 +2,6 @@ import { Button, Typography } from "@mui/material";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-import { OnProgressProps } from "react-player/base";
 const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
 
 export type PlayCommand = {
@@ -21,48 +20,55 @@ export type Lesson = {
     commands: PlayCommand[]
 }
 
+enum DelayStatus {
+    NotStarted,
+    Started,
+    Done
+}
+
 type LessonProps = {
     lesson: Lesson;
     onEnd: () => void;
 }
 
 export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentRepeat, setCurrentRepeat] = useState(0);
-    const delayedRef = useRef<"not_started" | "doing" | "done">("not_started");
+    const [currentCommand, setCurrentCommand] = useState({ index: 0, repeat: 0 });
+    const delayedRef = useRef(DelayStatus.NotStarted);
     const playerRef = useRef<ReactPlayer>(null);
 
-    const command = commands[currentIndex];
+    const command = commands[currentCommand.index];
 
-    const handleProgress = (duration: OnProgressProps) => {
-        if (delayedRef.current === "doing") {
+    const handleCustomProgress = (duration: number) => {
+        if (delayedRef.current === DelayStatus.Started) {
             return;
         }
 
-        if (duration.playedSeconds >= command.end) {
-            if (delayedRef.current === "not_started" && command.delay) {
-                playerRef.current?.getInternalPlayer()?.pauseVideo();
-                delayedRef.current = "doing";
+        if (duration >= command.end) {
+            playerRef.current?.getInternalPlayer()?.pauseVideo();
+
+            // Check if needs to delay
+            if (command.delay && delayedRef.current === DelayStatus.NotStarted) {
+                delayedRef.current = DelayStatus.Started;
 
                 setTimeout(() => {
-                    delayedRef.current = "done";
+                    delayedRef.current = DelayStatus.Done;
                     playerRef.current?.getInternalPlayer()?.playVideo();
                 }, command.delay * 1000);
                 return;
             }
 
-            if (currentRepeat < command.repeat - 1) {
-                setCurrentRepeat(currentRepeat + 1);
-                delayedRef.current = "not_started";
+            // Check if needs to repeat
+            if (currentCommand.repeat < command.repeat - 1) {
+                setCurrentCommand(({ index, repeat }) => ({ index, repeat: repeat + 1 }));
             } else {
-                playerRef.current?.getInternalPlayer()?.pauseVideo();
 
-                if (currentIndex < commands.length - 1) {
-                    setCurrentIndex(currentIndex + 1);
-                    setCurrentRepeat(0);
-                    delayedRef.current = "not_started";
+                // Move to next command
+                if (currentCommand.index < commands.length - 1) {
+                    setCurrentCommand(({ index }) => ({ index: index + 1, repeat: 0 }));
                 }
             }
+
+            delayedRef.current = DelayStatus.NotStarted;
         }
     }
 
@@ -70,12 +76,17 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
         const player = playerRef.current;
         player?.seekTo(command.start);
         player?.getInternalPlayer()?.playVideo();
-    }, [command.start, currentIndex, currentRepeat]);
+        console.log(command.start);
+    }, [command, currentCommand]);
 
     return command
-        ? <div style={{ width: "100%", height: "100%" }}>
+        ? <div style={{
+            width: "100%",
+            height: "100%",
+            marginTop: 1
+        }}>
             <YoutubePlayer playerRef={playerRef}
-                onProgress={handleProgress}
+                onCustomProgress={handleCustomProgress}
                 url={command.url}
                 playbackRate={command.rate}
                 width="100%"
@@ -85,7 +96,8 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
                         playerVars: {
                             autoplay: 1,
                             modestbranding: 1,
-                            rel: 0
+                            rel: 0,
+                            controls: 1
                         }
                     }
                 }}

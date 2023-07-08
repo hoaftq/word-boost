@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -37,8 +38,16 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
     private String addWord(String requestBody) {
         var newWord = objectMapper.readValue(requestBody, Word.class);
         var wordId = UUID.randomUUID().toString();
-        var sentences = newWord.getSentences().stream()
-                .collect(Collectors.toMap(Sentence::getValue, Sentence::getMediaUrl));
+        var sentences2 = newWord.getSentences2().stream()
+                .map(s -> {
+                    try {
+                        return objectMapper.writeValueAsString(s);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
 
         var table = dynamoDB.getTable(wordsTableName);
         table.putItem(new Item()
@@ -47,7 +56,8 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
                 .with("unit", newWord.getUnit())
                 .with("course", newWord.getCourse())
                 .with("imageUrl", newWord.getImageUrl())
-                .withMap("sentences", sentences)
+                .with("order", newWord.getOrder())
+                .with("sentences2", sentences2)
         );
 
         return wordId;

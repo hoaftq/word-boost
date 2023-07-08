@@ -21,5 +21,9 @@ public class Word {
 
     private String imageUrl;
 
+    private int order;
+
     private List<Sentence> sentences;
+
+    private List<Sentence> sentences2;
 }

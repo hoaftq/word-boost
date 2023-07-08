@@ -7,12 +7,15 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
@@ -55,7 +58,17 @@ public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEven
                 .map(i -> {
                             var sentenceMap = i.getOrDefault("sentences", new AttributeValue().withM(new HashMap<>())).getM();
                             var sentences = sentenceMap.keySet().stream()
-                                    .map(k -> new Sentence(k, sentenceMap.getOrDefault(k, new AttributeValue()).getS()))
+                                    .map(v -> new Sentence(v, sentenceMap.getOrDefault(v, new AttributeValue()).getS(), Integer.MAX_VALUE));
+                            var sentences2 = i.getOrDefault("sentences2", new AttributeValue().withL()).getL()
+                                    .stream().map(s -> {
+                                        try {
+                                            return objectMapper.readValue(s.getS(), Sentence.class);
+                                        } catch (JsonProcessingException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
+                            var allSentences = Stream.concat(sentences, sentences2)
+                                    .sorted(Comparator.comparingInt(Sentence::getOrder))
                                     .collect(Collectors.toList());
                             return Word.builder()
                                     .id(i.get("id").getS())
@@ -63,7 +76,7 @@ public class GetWordsByUnit implements RequestHandler<APIGatewayProxyRequestEven
                                     .unit(i.get("unit").getS())
                                     .course(i.get("course").getS())
                                     .imageUrl(i.getOrDefault("imageUrl", new AttributeValue()).getS())
-                                    .sentences(sentences)
+                                    .sentences(allSentences)
                                     .build();
                         }
                 ).collect(Collectors.toList());

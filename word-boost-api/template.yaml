@@ -3,79 +3,59 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Word Boost
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 20
-    MemorySize: 128
+    MemorySize: 512
+    Runtime: java11
+    Architectures:
+      - x86_64
     Environment:
       Variables:
+        PARAM1: VALUE
+        JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
         WORDS_TABLE: !Ref WordsTable
 
 Resources:
   AddWordFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
       Handler: wordboost.AddWord::handleRequest
-      Runtime: java11
-      Architectures:
-        - x86_64
-      MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
-          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref WordsTable
       Events:
         AddWord:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /add
             Method: post
   GetWordsByUnitFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
       Handler: wordboost.GetWordsByUnit::handleRequest
-      Runtime: java11
-      Architectures:
-        - x86_64
-      MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
-          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
         GetWordsByUnit:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /words
             Method: get
   GetUnitsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
       Handler: wordboost.GetUnits::handleRequest
-      Runtime: java11
-      Architectures:
-        - x86_64
-      MemorySize: 512
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
-          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1 # More info about tiered compilation https://aws.amazon.com/blogs/compute/optimizing-aws-lambda-function-performance-for-java/
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
         GetUnits:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /units
             Method: get
@@ -87,28 +67,15 @@ Resources:
         Type: String
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   ApiUrl:
-    Description: "API Gateway endpoint URL"
+    Description: "API gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
   AddWordApi:
-    Description: "API Gateway endpoint URL for Prod stage for adding a new word function"
+    Description: "AddWord URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/add/"
   AddWordFunction:
-    Description: "AddWord Lambda Function ARN"
+    Description: "AddWord ARN"
     Value: !GetAtt AddWordFunction.Arn
   AddWordFunctionIamRole:
-    Description: "Implicit IAM Role created for AddWord function"
+    Description: "AddWord's implicit IAM role"
     Value: !GetAtt AddWordFunctionRole.Arn
-
-  GetWordsByUnitApi:
-    Description: "API Gateway endpoint URL for Prod stage for GetWordsByUnit function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/list/"
-  GetWordsByUnitFunction:
-    Description: "GetWordsByUnit Lambda Function ARN"
-    Value: !GetAtt GetWordsByUnitFunction.Arn
-  GetWordsByUnitFunctionIamRole:
-    Description: "Implicit IAM Role created for GetWordsByUnit function"
-    Value: !GetAtt GetWordsByUnitFunctionRole.Arn

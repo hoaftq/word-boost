@@ -7,40 +7,48 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import wordboost.common.DynamoDBUtil;
-import wordboost.entities.Word;
+import wordboost.common.FunctionBase;
+import wordboost.dtos.WordDto;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private final String wordsTableName = System.getenv("WORDS_TABLE");
+public class AddWord extends FunctionBase implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private final DynamoDB dynamoDB = new DynamoDB(DynamoDBUtil.GetAmazonDynamoDB());
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    @SneakyThrows
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent request, final Context context) {
         context.getLogger().log("Request: " + request.getBody());
-
-        var wordId = addWord(request.getBody());
-
-        return new APIGatewayProxyResponseEvent()
-                .withHeaders(new HashMap<>() {{
-                    put("Access-Control-Allow-Origin", "*");
-                }})
-                .withStatusCode(200)
-                .withBody(wordId);
+        var newWord = objectMapper.readValue(request.getBody(), WordDto.class);
+        var wordId = addWord(newWord);
+        return createResponse(wordId);
     }
 
     @SneakyThrows
-    private String addWord(String requestBody) {
-        var newWord = objectMapper.readValue(requestBody, Word.class);
+    private String addWord(WordDto wordDto) {
         var wordId = UUID.randomUUID().toString();
-        var sentences2 = newWord.getSentences2().stream()
+        var sentences = getSentences(wordDto);
+
+        var table = dynamoDB.getTable(wordsTableName);
+        table.putItem(new Item()
+                .with("id", wordId)
+                .with("value", wordDto.getValue())
+                .with("unit", wordDto.getUnit())
+                .with("course", wordDto.getCourse())
+                .with("imageUrl", wordDto.getImageUrl())
+                .with("order", wordDto.getOrder())
+                .with("sentences2", sentences)
+        );
+
+        return wordId;
+    }
+
+    private List<String> getSentences(WordDto wordDto) {
+        return wordDto.getSentences().stream()
                 .map(s -> {
                     try {
                         return objectMapper.writeValueAsString(s);
@@ -49,19 +57,5 @@ public class AddWord implements RequestHandler<APIGatewayProxyRequestEvent, APIG
                     }
                 })
                 .collect(Collectors.toList());
-
-
-        var table = dynamoDB.getTable(wordsTableName);
-        table.putItem(new Item()
-                .with("id", wordId)
-                .with("value", newWord.getValue())
-                .with("unit", newWord.getUnit())
-                .with("course", newWord.getCourse())
-                .with("imageUrl", newWord.getImageUrl())
-                .with("order", newWord.getOrder())
-                .with("sentences2", sentences2)
-        );
-
-        return wordId;
     }
 }

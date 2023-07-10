@@ -19,7 +19,7 @@ public class GetUnits extends FunctionBase implements RequestHandler<APIGatewayP
         var scanRequest = new ScanRequest().withTableName(wordsTableName)
                 .withProjectionExpression("#unit")
                 .withExpressionAttributeNames(Map.of("#unit", "unit"));
-        var units = dynamoDB.scan(scanRequest).getItems()
+        var units = amazonDynamoDB.scan(scanRequest).getItems()
                 .stream()
                 .map(i -> i.get("unit").getS())
                 .distinct()

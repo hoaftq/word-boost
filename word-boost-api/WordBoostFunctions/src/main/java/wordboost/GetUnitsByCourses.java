@@ -36,7 +36,7 @@ public class GetUnitsByCourses extends FunctionBase implements RequestHandler<AP
                     .withExpressionAttributeValues(attributeValues);
         }
 
-        var unitCourseDtos = dynamoDB.scan(scanRequest).getItems()
+        var unitCourseDtos = amazonDynamoDB.scan(scanRequest).getItems()
                 .stream()
                 .map(i -> new UnitCourseDto(i.get("unit").getS(), i.get("course").getS()))
                 .distinct()

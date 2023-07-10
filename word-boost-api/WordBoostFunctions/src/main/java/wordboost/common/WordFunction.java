@@ -60,7 +60,7 @@ public class WordFunction extends FunctionBase {
     private List<WordDto> getWords(Consumer<ScanRequest> scanRequestConsumer) {
         var scanRequest = new ScanRequest().withTableName(wordsTableName);
         scanRequestConsumer.accept(scanRequest);
-        return dynamoDB.scan(scanRequest).getItems()
+        return amazonDynamoDB.scan(scanRequest).getItems()
                 .stream()
                 .map(this::mapToWord)
                 .collect(Collectors.toList());

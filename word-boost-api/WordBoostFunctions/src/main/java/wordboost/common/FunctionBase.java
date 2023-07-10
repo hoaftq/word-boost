@@ -13,7 +13,7 @@ public class FunctionBase {
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    protected final AmazonDynamoDB dynamoDB = DynamoDBUtil.GetAmazonDynamoDB();
+    protected final AmazonDynamoDB amazonDynamoDB = DynamoDBUtil.GetAmazonDynamoDB();
 
     @SneakyThrows
     protected APIGatewayProxyResponseEvent createResponse(Object body) {

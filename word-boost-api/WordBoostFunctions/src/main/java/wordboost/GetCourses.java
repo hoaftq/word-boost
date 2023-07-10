@@ -15,7 +15,7 @@ public class GetCourses extends FunctionBase implements RequestHandler<APIGatewa
         var scanRequest = new ScanRequest()
                 .withTableName(wordsTableName)
                 .withProjectionExpression("course");
-        var courses = dynamoDB.scan(scanRequest)
+        var courses = amazonDynamoDB.scan(scanRequest)
                 .getItems()
                 .stream().map(i -> i.get("course").getS())
                 .distinct()

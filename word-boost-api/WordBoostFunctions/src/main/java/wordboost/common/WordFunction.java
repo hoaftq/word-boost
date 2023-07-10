@@ -1,4 +1,4 @@
-package wordboost;
+package wordboost.common;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;

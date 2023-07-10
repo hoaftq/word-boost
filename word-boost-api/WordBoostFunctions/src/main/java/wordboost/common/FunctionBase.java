@@ -1,4 +1,4 @@
-package wordboost;
+package wordboost.common;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;

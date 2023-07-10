@@ -45,6 +45,20 @@ Resources:
           Properties:
             Path: /words
             Method: get
+  GetWordsByUnitsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: WordBoostFunctions
+      Handler: wordboost.GetWordsByUnits::handleRequest
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WordsTable
+      Events:
+        GetWordsByUnits:
+          Type: Api
+          Properties:
+            Path: /words-by-units
+            Method: post
   GetUnitsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -68,7 +82,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
-        GetUnits:
+        GetCourses:
           Type: Api
           Properties:
             Path: /courses
@@ -82,7 +96,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
-        GetUnits:
+        GetUnitsByCourses:
           Type: Api
           Properties:
             Path: /units-by-courses

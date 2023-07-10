@@ -1,4 +1,4 @@
-package wordboost;
+package wordboost.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

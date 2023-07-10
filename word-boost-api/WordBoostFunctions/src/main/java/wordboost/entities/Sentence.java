@@ -1,4 +1,4 @@
-package wordboost;
+package wordboost.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

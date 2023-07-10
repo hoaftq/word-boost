@@ -3,6 +3,9 @@ package wordboost;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import wordboost.dtos.UnitCourseDto;
+import wordboost.dtos.WordDto;
+import wordboost.entities.Sentence;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WordFunction extends FunctionBase {
-    protected List<Word> getWordsByUnits(UnitCourseDto[] unitCourseDtos) {
+    protected List<WordDto> getWordsByUnits(UnitCourseDto[] unitCourseDtos) {
         return getWords(scanRequest -> {
             var filterExpressionBuilder = new StringBuilder();
             HashMap<String, String> attributeNames = new HashMap<>();
@@ -42,7 +45,7 @@ public class WordFunction extends FunctionBase {
         });
     }
 
-    protected List<Word> getWordsByUnit(String unit) {
+    protected List<WordDto> getWordsByUnit(String unit) {
         return getWords(scanRequest -> {
             if (unit == null || unit.isEmpty()) {
                 return;
@@ -54,7 +57,7 @@ public class WordFunction extends FunctionBase {
         });
     }
 
-    private List<Word> getWords(Consumer<ScanRequest> scanRequestConsumer) {
+    private List<WordDto> getWords(Consumer<ScanRequest> scanRequestConsumer) {
         var scanRequest = new ScanRequest().withTableName(wordsTableName);
         scanRequestConsumer.accept(scanRequest);
         return dynamoDB.scan(scanRequest).getItems()
@@ -63,7 +66,7 @@ public class WordFunction extends FunctionBase {
                 .collect(Collectors.toList());
     }
 
-    private Word mapToWord(Map<String, AttributeValue> item) {
+    private WordDto mapToWord(Map<String, AttributeValue> item) {
         var sentenceMap = item.getOrDefault("sentences", new AttributeValue().withM(new HashMap<>())).getM();
         var sentences = sentenceMap.keySet().stream()
                 .map(v -> new Sentence(v, sentenceMap.getOrDefault(v, new AttributeValue()).getS(), Integer.MAX_VALUE));
@@ -78,8 +81,7 @@ public class WordFunction extends FunctionBase {
         var allSentences = Stream.concat(sentences, sentences2)
                 .sorted(Comparator.comparingInt(Sentence::getOrder))
                 .collect(Collectors.toList());
-        return Word.builder()
-                .id(item.get("id").getS())
+        return WordDto.builder()
                 .value(item.get("value").getS())
                 .unit(item.get("unit").getS())
                 .course(item.get("course").getS())

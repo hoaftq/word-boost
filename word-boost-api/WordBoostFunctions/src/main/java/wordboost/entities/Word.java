@@ -1,10 +1,9 @@
-package wordboost;
+package wordboost.entities;
 
 import lombok.*;
 
 import java.util.List;
 
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

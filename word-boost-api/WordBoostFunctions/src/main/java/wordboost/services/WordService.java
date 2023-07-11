@@ -1,4 +1,4 @@
-package wordboost.common;
+package wordboost.services;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -6,6 +6,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
+import wordboost.common.DynamoDBUtil;
+import wordboost.common.ServiceBase;
 import wordboost.dtos.UnitCourseDto;
 import wordboost.dtos.WordDto;
 import wordboost.entities.Sentence;
@@ -15,11 +17,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class WordFunction extends FunctionBase {
+public class WordService extends ServiceBase {
 
     private final DynamoDB dynamoDB = new DynamoDB(DynamoDBUtil.GetAmazonDynamoDB());
 
-    protected List<WordDto> getWordsByUnits(UnitCourseDto[] unitCourseDtos) {
+    public List<WordDto> getWordsByUnits(UnitCourseDto[] unitCourseDtos) {
         return getWords(scanRequest -> {
             var filterExpressionBuilder = new StringBuilder();
             HashMap<String, String> attributeNames = new HashMap<>();
@@ -48,7 +50,7 @@ public class WordFunction extends FunctionBase {
         });
     }
 
-    protected List<WordDto> getWordsByUnit(String unit) {
+    public List<WordDto> getWordsByUnit(String unit) {
         return getWords(scanRequest -> {
             if (unit == null || unit.isEmpty()) {
                 return;
@@ -61,7 +63,7 @@ public class WordFunction extends FunctionBase {
     }
 
     @SneakyThrows
-    protected String addWord(WordDto wordDto) {
+    public String addWord(WordDto wordDto) {
         var wordId = UUID.randomUUID().toString();
         var sentences = getSentences(wordDto);
 

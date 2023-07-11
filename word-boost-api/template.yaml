@@ -21,7 +21,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
-      Handler: wordboost.AddWord::handleRequest
+      Handler: wordboost.functions.AddWord::handleRequest
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref WordsTable
@@ -35,7 +35,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
-      Handler: wordboost.AddWordsSentence::handleRequest
+      Handler: wordboost.functions.AddWordsSentence::handleRequest
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref WordsTable
@@ -50,7 +50,7 @@ Resources:
     Properties:
       Description: Deprecated. This is a legacy function. GetWordsByUnitsFunction should be used as a replacement
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetWordsByUnit::handleRequest
+      Handler: wordboost.functions.GetWordsByUnit::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
@@ -64,7 +64,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetWordsByUnits::handleRequest
+      Handler: wordboost.functions.GetWordsByUnits::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
@@ -79,7 +79,7 @@ Resources:
     Properties:
       Description: Deprecated. This is a legacy function. GetUnitsAndCoursesFunction should be used as a replacement
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetUnits::handleRequest
+      Handler: wordboost.functions.GetUnits::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
@@ -93,7 +93,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetUnitsAndCourses::handleRequest
+      Handler: wordboost.functions.GetUnitsAndCourses::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
@@ -108,7 +108,7 @@ Resources:
     Properties:
       Description: Deprecated. GetUnitsAndCoursesFunction should be used as a replacement
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetUnitsByCourses::handleRequest
+      Handler: wordboost.functions.GetUnitsByCourses::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable

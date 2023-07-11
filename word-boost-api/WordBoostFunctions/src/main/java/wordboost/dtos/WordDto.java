@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WordDto {
+    private String id;
 
     private String value;
 

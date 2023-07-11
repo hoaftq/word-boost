@@ -118,6 +118,7 @@ public class WordService extends ServiceBase {
                 .sorted(Comparator.comparingInt(Sentence::getOrder))
                 .collect(Collectors.toList());
         return WordDto.builder()
+                .id(item.get("id").getS())
                 .value(item.get("value").getS())
                 .unit(item.get("unit").getS())
                 .course(item.get("course").getS())

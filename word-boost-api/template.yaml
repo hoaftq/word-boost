@@ -31,6 +31,20 @@ Resources:
           Properties:
             Path: /add
             Method: post
+  AddWordsSentenceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: WordBoostFunctions
+      Handler: wordboost.AddWordsSentence::handleRequest
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WordsTable
+      Events:
+        AddWord:
+          Type: Api
+          Properties:
+            Path: /add-words-sentence
+            Method: post
   GetWordsByUnitFunction:
     Type: AWS::Serverless::Function
     Properties:

@@ -1,21 +1,24 @@
 package wordboost.common;
 
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.SneakyThrows;
 import wordboost.dtos.UnitCourseDto;
 import wordboost.dtos.WordDto;
 import wordboost.entities.Sentence;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WordFunction extends FunctionBase {
+
+    private final DynamoDB dynamoDB = new DynamoDB(DynamoDBUtil.GetAmazonDynamoDB());
+
     protected List<WordDto> getWordsByUnits(UnitCourseDto[] unitCourseDtos) {
         return getWords(scanRequest -> {
             var filterExpressionBuilder = new StringBuilder();
@@ -55,6 +58,37 @@ public class WordFunction extends FunctionBase {
                     .withExpressionAttributeNames(Map.of("#unit", "unit"))
                     .withExpressionAttributeValues(Map.of(":unit", new AttributeValue().withS(unit)));
         });
+    }
+
+    @SneakyThrows
+    protected String addWord(WordDto wordDto) {
+        var wordId = UUID.randomUUID().toString();
+        var sentences = getSentences(wordDto);
+
+        var table = dynamoDB.getTable(wordsTableName);
+        table.putItem(new Item()
+                .with("id", wordId)
+                .with("value", wordDto.getValue())
+                .with("unit", wordDto.getUnit())
+                .with("course", wordDto.getCourse())
+                .with("imageUrl", wordDto.getImageUrl())
+                .with("order", wordDto.getOrder())
+                .with("sentences2", sentences)
+        );
+
+        return wordId;
+    }
+
+    private List<String> getSentences(WordDto wordDto) {
+        return wordDto.getSentences().stream()
+                .map(s -> {
+                    try {
+                        return objectMapper.writeValueAsString(s);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private List<WordDto> getWords(Consumer<ScanRequest> scanRequestConsumer) {

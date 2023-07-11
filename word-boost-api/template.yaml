@@ -34,6 +34,7 @@ Resources:
   GetWordsByUnitFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: Deprecated. This is a legacy function. GetWordsByUnitsFunction should be used as a replacement
       CodeUri: WordBoostFunctions
       Handler: wordboost.GetWordsByUnit::handleRequest
       Policies:
@@ -62,6 +63,7 @@ Resources:
   GetUnitsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: Deprecated. This is a legacy function. GetUnitsAndCoursesFunction should be used as a replacement
       CodeUri: WordBoostFunctions
       Handler: wordboost.GetUnits::handleRequest
       Policies:
@@ -73,23 +75,24 @@ Resources:
           Properties:
             Path: /units
             Method: get
-  GetCoursesFunction:
+  GetUnitsAndCoursesFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: WordBoostFunctions
-      Handler: wordboost.GetCourses::handleRequest
+      Handler: wordboost.GetUnitsAndCourses::handleRequest
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
       Events:
-        GetCourses:
+        GetUnitsAndCourses:
           Type: Api
           Properties:
-            Path: /courses
+            Path: /units-and-courses
             Method: get
   GetUnitsByCoursesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Description: Deprecated. GetUnitsAndCoursesFunction should be used as a replacement
       CodeUri: WordBoostFunctions
       Handler: wordboost.GetUnitsByCourses::handleRequest
       Policies:

@@ -118,12 +118,40 @@ Resources:
           Properties:
             Path: /units-by-courses
             Method: get
+  AddLessonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: WordBoostFunctions
+      Handler: wordboost.functions.AddLesson::handleRequest
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LessonsTable
+      Events:
+        AddLesson:
+          Type: Api
+          Properties:
+            Path: /add-lesson
+            Method: post
   WordsTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
       PrimaryKey:
         Name: id
         Type: String
+  LessonsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Lesson
+      AttributeDefinitions:
+        - AttributeName: course
+          AttributeType: S
+        - AttributeName: unit
+          AttributeType: S
+      KeySchema:
+        - AttributeName: course
+          KeyType: HASH
+        - AttributeName: unit
+          KeyType: RANGE
 
 Outputs:
   ApiUrl:

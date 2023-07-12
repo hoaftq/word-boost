@@ -18,4 +18,10 @@ public abstract class FunctionBase {
                 }})
                 .withBody(objectMapper.writeValueAsString(body));
     }
+
+    protected APIGatewayProxyResponseEvent createBadRequestResponse(String message) {
+        return new APIGatewayProxyResponseEvent()
+                .withStatusCode(400)
+                .withBody(message);
+    }
 }

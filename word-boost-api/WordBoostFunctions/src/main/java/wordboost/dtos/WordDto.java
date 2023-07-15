@@ -1,7 +1,6 @@
 package wordboost.dtos;
 
 import lombok.*;
-import wordboost.entities.Sentence;
 
 import java.util.List;
 
@@ -21,7 +20,5 @@ public class WordDto {
 
     private String imageUrl;
 
-    private int order;
-
-    private List<Sentence> sentences;
+    private List<SentenceDto> sentences;
 }

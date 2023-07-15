@@ -8,8 +8,11 @@ import lombok.SneakyThrows;
 import wordboost.common.FunctionBase;
 import wordboost.dtos.LessonWordsDto;
 import wordboost.dtos.UnitCourseDto;
+import wordboost.dtos.WordDtoMapper;
 import wordboost.services.LessonService;
 import wordboost.services.WordService;
+
+import java.util.stream.Collectors;
 
 public class GetWordsByUnits extends FunctionBase implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final WordService wordService = new WordService();
@@ -23,7 +26,9 @@ public class GetWordsByUnits extends FunctionBase implements RequestHandler<APIG
             return createBadRequestResponse("Empty request");
         }
 
-        var words = wordService.getWordsByUnits(unitCourseDtos);
+        var words = wordService.getWordsByUnits(unitCourseDtos)
+                .stream().map(WordDtoMapper.INSTANCE::mapWord)
+                .collect(Collectors.toList());
 
         // Only get the lesson for the first option
         var lesson = lessonService.getLesson(unitCourseDtos[0]);

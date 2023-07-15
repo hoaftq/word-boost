@@ -6,6 +6,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Word {
@@ -20,7 +21,7 @@ public class Word {
 
     private String imageUrl;
 
-    private int order;
+    private long order;
 
     private List<Sentence> sentences;
 

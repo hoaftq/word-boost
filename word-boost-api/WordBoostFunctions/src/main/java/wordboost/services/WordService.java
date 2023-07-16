@@ -126,13 +126,16 @@ public class WordService extends ServiceBase {
         var allSentences = Stream.concat(sentences, sentences2)
                 .sorted(Comparator.comparingInt(Sentence::getOrder))
                 .collect(Collectors.toList());
+        var order = Long.parseLong(item
+                .getOrDefault("order", new AttributeValue().withN(String.valueOf(Long.MAX_VALUE)))
+                .getN());
         return Word.builder()
                 .id(item.get("id").getS())
                 .value(item.get("value").getS())
                 .unit(item.get("unit").getS())
                 .course(item.get("course").getS())
                 .imageUrl(item.getOrDefault("imageUrl", new AttributeValue()).getS())
-                .order(Long.parseLong(item.get("order").getN()))
+                .order(order)
                 .sentences(allSentences)
                 .build();
     }

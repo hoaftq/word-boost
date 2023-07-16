@@ -152,6 +152,9 @@ Resources:
           KeyType: HASH
         - AttributeName: unit
           KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
 Outputs:
   ApiUrl:

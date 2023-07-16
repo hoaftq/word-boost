@@ -34,7 +34,6 @@ public class UnitCourseService extends ServiceBase {
                 .getItems()
                 .stream().map(i -> new UnitCourseDto(i.get("unit").getS(), i.get("course").getS()))
                 .distinct()
-                .sorted()
                 .collect(Collectors.toList());
     }
 

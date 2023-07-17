@@ -68,6 +68,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref WordsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref LessonsTable
       Events:
         GetWordsByUnits:
           Type: Api

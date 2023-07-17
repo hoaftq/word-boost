@@ -152,7 +152,7 @@ export function WordList() {
                 {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
                 {mode === MODE_READ_SENTENCES && !!words.length && <Sentences words={words} />}
                 {mode === MODE_WRITE_SENTENCES && !!words.length && <TracingSentences words={words} />}
-                {/* {mode == MODE_WORDS_TEST && selectedUnit && <WordTest unit={selectedUnit} key={testIndex} />}*/}
+                {mode == MODE_WORDS_TEST && <WordTest key={testIndex} words={words} />}
                 {mode == MODE_FILLBLANK_TEST && <FillBlankTest words={words} />}
             </div>
             <FetchingBackdrop />

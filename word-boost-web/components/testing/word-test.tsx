@@ -1,25 +1,16 @@
-import { useBlockingFetch } from "@wb/utils/blocking-fetch";
-import getConfig from "next/config";
 import { useEffect } from "react";
 import { Word } from "../word-list";
 import { Badge, Card, CardContent, CardMedia, Grid, useTheme } from "@mui/material";
 import { useImmerReducer } from "use-immer";
 import { DroppableBlank, DroppableWordPool, DraggingWordLayer } from "./word-dnd-components";
-import { getRandomArray, shuffleArray } from "@wb/utils/utils";
+import { getRandomArray } from "@wb/utils/utils";
 import { initialState, testingReducer } from "./word-test-reducer";
 
-const { publicRuntimeConfig: { apiUrl } } = getConfig();
-
-type WordTestProps = {
-    unit: string;
-}
-export function WordTest({ unit }: WordTestProps) {
-    const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
+export function WordTest({ words }: { words: Word[] }) {
     const [state, dispatch] = useImmerReducer(testingReducer, initialState);
     const theme = useTheme();
 
-    let remainingWords = state.words.filter(w => state.blankWordIds.findIndex(wid => wid === w.id) < 0);
-    remainingWords = shuffleArray(remainingWords);
+    const remainingWords = state.words.filter(w => state.blankWordIds.findIndex(wid => wid === w.id) < 0);
 
     const getBlankWordAt = (position: number) => {
         const wordId = state.blankWordIds[position];
@@ -27,15 +18,11 @@ export function WordTest({ unit }: WordTestProps) {
     }
 
     useEffect(() => {
-        blockingFetch(`${apiUrl}/words?unit=${unit}`)
-            .then((rsp: Response) => rsp.json())
-            .then((words: Word[]) => {
-                dispatch({
-                    type: "load-words",
-                    payload: getRandomArray(words.filter(w => w.imageUrl), 6)
-                });
-            });
-    }, [blockingFetch, dispatch, unit]);
+        dispatch({
+            type: "load-words",
+            payload: getRandomArray(words.filter(w => w.imageUrl), 6)
+        })
+    }, [dispatch, words]);
 
     const handleDropOnBank = (position: number, word: Word) => {
         dispatch({
@@ -115,7 +102,6 @@ export function WordTest({ unit }: WordTestProps) {
         </Grid >
         <DroppableWordPool remainingWords={remainingWords} onDrop={handleDropOnPool} />
         <DraggingWordLayer />
-        <FetchingBackdrop />
     </>;
 }
 

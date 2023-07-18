@@ -40,7 +40,7 @@ const MODE_FILLBLANK_TEST = "5";
 
 const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
-export function WordList() {
+export function Main() {
     const [unitAndCourses, setUnitAndCourses] = useState<UnitAndCourse[]>([]);
     const [groupOptions, setGroupOptions] = useState<GroupOptions[]>([]);
 

@@ -1,4 +1,4 @@
-import { Word } from "../word-list";
+import { Word } from "../main";
 import { Button, IconButton, Popover, TextField, Typography, useTheme } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useRef, useState, KeyboardEvent, useEffect } from "react";

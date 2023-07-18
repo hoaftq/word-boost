@@ -1,5 +1,5 @@
 import { Typography, TypographyProps } from "@mui/material";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import styles from "../../styles/SentenceTypography.module.css";
 import { CombinedSentence } from "../testing/fill-blank-test";
 

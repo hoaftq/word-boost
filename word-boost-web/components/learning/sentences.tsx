@@ -1,5 +1,5 @@
 import { Paper } from "@mui/material";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import { CombinedSentenceTypography } from "./sentence-typography";
 import { combineSentences } from "@wb/utils/utils";
 

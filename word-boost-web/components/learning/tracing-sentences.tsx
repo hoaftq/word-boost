@@ -3,7 +3,7 @@ import { TracingLetter } from "./tracing-letter";
 import { combineSentences } from "@wb/utils/utils";
 import { useState, useEffect, useRef } from "react";
 import { CombinedSentence } from "../testing/fill-blank-test";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";

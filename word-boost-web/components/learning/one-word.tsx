@@ -1,6 +1,6 @@
 import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";

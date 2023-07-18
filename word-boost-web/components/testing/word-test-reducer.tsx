@@ -1,4 +1,4 @@
-import { Word } from "../word-list";
+import { Word } from "../main";
 
 type TestingState = {
     blankWordIds: (string | undefined)[],

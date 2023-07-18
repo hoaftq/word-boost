@@ -1,5 +1,5 @@
 import { Box, Chip, Popover, Stack } from "@mui/material";
-import { Word } from "@wb/components/word-list";
+import { Word } from "@wb/components/main";
 import { useState, MouseEvent } from "react";
 import { LoadingImage } from "../loading-image";
 

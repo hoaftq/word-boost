@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import { Badge, Card, CardContent, CardMedia, Grid, useTheme } from "@mui/material";
 import { useImmerReducer } from "use-immer";
 import { DroppableBlank, DroppableWordPool, DraggingWordLayer } from "./word-dnd-components";

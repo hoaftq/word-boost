@@ -1,5 +1,5 @@
 import { CombinedSentence } from "@wb/components/testing/fill-blank-test";
-import { Word } from "@wb/components/word-list";
+import { Word } from "@wb/components/main";
 
 export function getRandomArray<T>(arr: T[], numberOfItems: number): T[] {
     const indexs = arr.map((_, i) => i);

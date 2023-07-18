@@ -1,5 +1,5 @@
 import { useDrag, useDragLayer, useDrop } from "react-dnd";
-import { Word } from "../word-list";
+import { Word } from "../main";
 import { useEffect } from "react";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { Chip, Stack } from "@mui/material";

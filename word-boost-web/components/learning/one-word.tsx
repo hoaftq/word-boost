@@ -1,5 +1,5 @@
-import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps, Checkbox, FormControlLabel } from "@mui/material";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Word } from "../main";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
@@ -12,6 +12,9 @@ import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { SentenceTypography } from "./sentence-typography";
+import dynamic from "next/dynamic";
+import ReactPlayer from "react-player";
+const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -135,44 +138,69 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
     );
 }
 
-function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
-    const iframeRef = useRef(null);
-    const autoplayQueryString = "autoplay=1";
-
-    const makeAutoPlayVideoUrl = (url: string) => {
-        if (url.indexOf(autoplayQueryString) >= 0) {
-            return url;
-        }
-
-        if (url.indexOf("?") > 0) {
-            return `${url}&${autoplayQueryString}`;
-        }
-
-        return `${url}?${autoplayQueryString}`
-    }
-
-    const makeVideoUrlWithoutTimeRange = (url: string) => {
-        const startOrEndRegex = new RegExp("(&*start=[\\w\\d]+)|(&*end=[\\w\\d]+)", "gi");
-        return url.replace(startOrEndRegex, "");
-    }
+function SentenceYoutubePlayer({ videoUrl, play }: { videoUrl: string, play: boolean }) {
+    const playerRef = useRef<ReactPlayer>(null);
+    const [isPlayingWholeVideo, setIsPlayingWholeVideo] = useState(false);
+    const [hasControl, setHasControl] = useState(false);
 
     const handleReplayClick = () => {
-        (iframeRef.current as any).src = makeAutoPlayVideoUrl(videoUrl);
+        setIsPlayingWholeVideo(false);
+        playAt(startEnd.start);
     }
 
     const handlePlayAllClick = () => {
-        (iframeRef.current as any).src = makeAutoPlayVideoUrl(makeVideoUrlWithoutTimeRange(videoUrl));
+        setIsPlayingWholeVideo(true);
+        playAt(0);
+    }
+
+    const startEnd: { [key: string]: number } = { start: 0 };
+    const splittedUrlParts = videoUrl.split(/[?|&]/g);
+    for (let i = 1; i < splittedUrlParts.length; i++) {
+        const query = splittedUrlParts[i].split("=");
+        startEnd[query[0]] = parseFloat(query[1]);
+    }
+
+    const handleCustomProgress = (duration: number) => {
+        if (isPlayingWholeVideo) {
+            return;
+        }
+
+        if (startEnd.end && duration > startEnd.end) {
+            playerRef.current?.getInternalPlayer().pauseVideo();
+        }
+    }
+
+    const handleHasControlChange = (event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        setHasControl(checked);
+    }
+
+    useEffect(() => {
+        if (play) {
+            const timerId = setTimeout(() => {
+                playAt(startEnd.start);
+            }, 500);
+
+            return () => {
+                clearTimeout(timerId);
+            }
+        }
+    }, [startEnd.start, play]);
+
+    const playAt = (pos: number) => {
+        playerRef.current?.seekTo(pos, "seconds");
+        playerRef.current?.getInternalPlayer().playVideo();
     }
 
     return (
         <>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <iframe ref={iframeRef}
-                    src={videoUrl}
-                    title="YouTube video player"
-                    style={{ border: 0, width: "min(560px, 100vw - 4px)", height: 315 }}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-                    allowFullScreen></iframe>
+                <YoutubePlayer playerRef={playerRef}
+                    key={hasControl ? "yp_1" : "yp_0"}
+                    width="min(560px, 100vw - 4px)"
+                    height="315px"
+                    controls={hasControl}
+                    url={splittedUrlParts[0]}
+                    onCustomProgress={handleCustomProgress} />
                 <div>
                     <Tooltip title="Replay with time range">
                         <IconButton sx={{ marginRight: 1 }} onClick={handleReplayClick}>
@@ -180,10 +208,12 @@ function EmbbebedYoutube({ videoUrl }: { videoUrl: string }) {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Play the whole video">
-                        <IconButton onClick={handlePlayAllClick}>
+                        <IconButton sx={{ marginRight: 5 }} onClick={handlePlayAllClick}>
                             <RestartAltIcon />
                         </IconButton>
                     </Tooltip>
+                    <FormControlLabel label="Control"
+                        control={<Checkbox checked={hasControl} onChange={handleHasControlChange} />} />
                 </div>
             </div>
         </>
@@ -249,7 +279,7 @@ function SentenceCard({ word }: { word: Word }) {
                         </CardActions>
                         <Collapse in={isCardExpanded}>
                             {isYoutubeLink(s.mediaUrl) ?
-                                <EmbbebedYoutube videoUrl={s.mediaUrl} /> :
+                                <SentenceYoutubePlayer videoUrl={s.mediaUrl} play={isCardExpanded} /> :
                                 <div style={{ width: "100%", height: 300 }}>
                                     <LoadingImage imageUrl={s.mediaUrl} />
                                 </div>

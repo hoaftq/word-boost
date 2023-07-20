@@ -59,25 +59,23 @@ export default function AddWordVideoBased() {
     const onSubmit = async (data: VideoForm) => {
         const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
-        for (const word of data.words) {
-            await blockingFetch(`${apiUrl}/add`, {
-                method: "post",
-                body: JSON.stringify({
-                    value: word.value?.trim(),
-                    unit: data.unit?.trim(),
-                    course: data.course?.trim(),
-                    imageUrl: word.imageUrl?.trim(),
-                    sentences: [{
-                        value: data.sentence,
-                        mediaUrl: data.videoUrl
-                    }]
-                })
+        await blockingFetch(`${apiUrl}/add-words-sentence`, {
+            method: "post",
+            body: JSON.stringify({
+                sentence: data.sentence.trim(),
+                unit: data.unit.trim(),
+                course: data.course.trim(),
+                mediaUrl: data.videoUrl.trim(),
+                words: data.words.map(w => ({
+                    value: w.value.trim(),
+                    imageUrl: w.imageUrl.trim(),
+                }))
             })
-                .then(resp => resp.text())
-                .then((wordId: string) => {
-                    enqueueSnackbar(`Added a new word with id of ${wordId}`, { variant: 'success' });
-                });
-        }
+        })
+            .then(resp => resp.text())
+            .then((wordIds: string) => {
+                enqueueSnackbar(`Added ${wordIds.split(",").length} new word(s)`, { variant: 'success' });
+            });
 
         resetField("sentence");
         resetField("words");

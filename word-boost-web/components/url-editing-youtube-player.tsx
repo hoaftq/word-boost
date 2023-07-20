@@ -33,14 +33,14 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
     const [timeFocus, setTimeFocus] = useState<"start" | "end" | "none">("none");
 
     const handleStartCurrentTimeClick = () => {
-        const currentTime = Math.floor(playerRef.current!.getCurrentTime());
+        const currentTime = playerRef.current!.getCurrentTime();
         playerRef.current!.getInternalPlayer().pauseVideo();
         setValue("start", currentTime.toString());
         setTimeFocus("start");
     }
 
     const handleEndCurrentTimeClick = () => {
-        const currentTime = Math.round(playerRef.current!.getCurrentTime());
+        const currentTime = playerRef.current!.getCurrentTime();
         playerRef.current!.getInternalPlayer().pauseVideo();
         setValue("end", currentTime.toString());
         setTimeFocus("end");
@@ -54,10 +54,10 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
 
         switch (timeFocus) {
             case "start":
-                setValue("start", Math.floor(seekToValue).toString());
+                setValue("start", seekToValue.toString());
                 break;
             case "end":
-                setValue("end", Math.round(seekToValue).toString());
+                setValue("end", seekToValue.toString());
         }
 
         playerRef.current?.seekTo(seekToValue, "seconds");
@@ -102,9 +102,9 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
             return;
         }
 
-        const startTime = Number.parseInt(end) + 1;
-        setValue("start", startTime.toString());
-        playerRef.current?.seekTo(startTime, "seconds");
+        const newStartTime = end;
+        setValue("start", newStartTime);
+        playerRef.current?.seekTo(parseFloat(newStartTime), "seconds");
         setValue("end", "");
         setTimeFocus("none");
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,7 +138,7 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                             readOnly: true
                         }}
                         sx={{
-                            width: 100,
+                            width: 200,
                             backgroundColor: timeFocus == "start" ? "lightblue" : ""
                         }} />}
                 />
@@ -156,7 +156,7 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                             readOnly: true
                         }}
                         sx={{
-                            width: 100,
+                            width: 200,
                             marginLeft: 2,
                             backgroundColor: timeFocus == "end" ? "lightblue" : ""
                         }} />} />
@@ -167,7 +167,7 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                 </Tooltip>
             </div>
             <div style={{ marginTop: 10 }}>
-                {[-3, -2, -1, 1, 2, 3].map(v => <Button key={v} onClick={() => handleSeekButtonClick(v)}>{v}s</Button>)}
+                {[-3, -1, -0.5, -0.1, 0.1, 0.5, 1, 3].map(v => <Button key={v} onClick={() => handleSeekButtonClick(v)}>{v}s</Button>)}
             </div>
             <Controller control={control}
                 name="finalVideoUrl"

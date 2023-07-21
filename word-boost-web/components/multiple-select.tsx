@@ -20,12 +20,11 @@ export function MultipleSelect({ label, formControllSx, options, onCloseWithChan
     };
 
     function handleClose(event: SyntheticEvent<Element, Event>) {
-        if (isEqual(selectedValue, prevSelectedValue, (t1, t2) => t1 === t2)) {
-            return;
+        if (!isEqual(selectedValue, prevSelectedValue, (t1, t2) => t1 === t2)) {
+            onCloseWithChanges(selectedValue);
         }
 
         setPrevSelectedValue(selectedValue);
-        onCloseWithChanges(selectedValue);
     }
 
     return (
@@ -80,12 +79,11 @@ export function MultipleGroupedSelect({ label, formControllSx, groupOptions, onC
         setSelectedValue(selectedOptions);
     };
 
-    function handleClose(event: SyntheticEvent<Element, Event>): void {
-        if (isEqual(selectedValue, prevSelectedValue, (t1, t2) => t1.group === t2.group && t1.option === t2.option)) {
-            return;
+    function handleClose(_: SyntheticEvent<Element, Event>): void {
+        if (!isEqual(selectedValue, prevSelectedValue, (t1, t2) => t1.group === t2.group && t1.option === t2.option)) {
+            onCloseWithChanges(selectedValue);
         }
 
-        onCloseWithChanges(selectedValue);
         setPrevSelectedValue(selectedValue);
     }
 

@@ -66,7 +66,7 @@ export function Main() {
     }, [blockingFetch]);
 
 
-    const handleCourseChange = (courses: string[]) => {
+    const handleCourseCloseWithChanges = (courses: string[]) => {
         const groupOptions = unitAndCourses.filter(uc => courses.some(c => c === uc.course))
             .sort((uc1, uc2) => uc1.course.localeCompare(uc2.course))
             .reduce((prev, curr) => {
@@ -83,9 +83,14 @@ export function Main() {
                 return [...prev, newItem];
             }, [] as GroupOptions[])
         setGroupOptions(groupOptions);
+        setWords([]);
     }
 
     const handleUnitCloseWithChanges = (units: SelectionType[]) => {
+        if (!units.length) {
+            return;
+        }
+
         blockingFetch(`${apiUrl}/words-by-units`,
             {
                 method: "post",
@@ -113,7 +118,7 @@ export function Main() {
                 <Grid item xs={3}>
                     <MultipleSelect label="Course"
                         options={allCourses}
-                        onChange={handleCourseChange} />
+                        onCloseWithChanges={handleCourseCloseWithChanges} />
                 </Grid>
                 <Grid item xs={3}>
                     <MultipleGroupedSelect label="Unit"

@@ -1,7 +1,7 @@
-import { Button, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Switch } from "@mui/material";
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, ToggleButton, Tooltip } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import getConfig from "next/config";
-import { ChangeEvent, useEffect, useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
 import { OneWord } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
@@ -11,6 +11,9 @@ import { FillBlankTest } from "./testing/fill-blank-test";
 import { TracingSentences } from "./learning/tracing-sentences";
 import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./multiple-select";
 import { Lesson } from "./learning/lesson";
+import { shuffleArray } from "@wb/utils/utils";
+import ImageIcon from '@mui/icons-material/Image';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 export interface Word {
     id: string;
@@ -31,12 +34,14 @@ type UnitAndCourse = {
     course: string;
 }
 
-const MODE_LEARN_ONE_WORD = "0";
-const MODE_LEARN_ALL_WORDS = "1";
-const MODE_READ_SENTENCES = "2";
-const MODE_WRITE_SENTENCES = "3";
-const MODE_WORDS_TEST = "4";
-const MODE_FILLBLANK_TEST = "5";
+enum LearningMode {
+    OneWord = "One word",
+    AllWords = "All words",
+    ReadSentences = "Read sentences",
+    WriteSentences = "Write sentences",
+    WordsTest = "Words test",
+    FillBlankTest = "Fill-blank test"
+}
 
 const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
@@ -44,15 +49,16 @@ export function Main() {
     const [unitAndCourses, setUnitAndCourses] = useState<UnitAndCourse[]>([]);
     const [groupOptions, setGroupOptions] = useState<GroupOptions[]>([]);
 
-    const [mode, setMode] = useState(MODE_LEARN_ONE_WORD);
+    const [mode, setMode] = useState<string>(LearningMode.OneWord);
     const [imageVisible, setImageVisible] = useState(false);
+    const [isRandomOrder, setIsRandomeOrder] = useState(false);
 
     const [words, setWords] = useState([] as Word[]);
 
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
     const [testIndex, setTestIndex] = useState(0);
-    const optionsPrefix = useId();
+    const modeId = useId();
 
     const allCourses = unitAndCourses
         .map(uc => uc.course)
@@ -97,15 +103,28 @@ export function Main() {
                 body: JSON.stringify(units.map(uc => ({ course: uc.group, unit: uc.option })))
             })
             .then((rsp: Response) => rsp.json())
-            .then((lessonWords: LessonWords) => { setWords(lessonWords.words); });
+            .then((lessonWords: LessonWords) => { setWords(isRandomOrder ? shuffleArray(lessonWords.words) : lessonWords.words); });
     }
 
     const handleModeChange = (e: SelectChangeEvent) => {
         setMode(e.target.value);
     }
 
-    const handleImageVisibleChange = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        setImageVisible(checked);
+    const handleImageVisibleChange = (_: React.MouseEvent<HTMLElement>, value: any) => {
+        setImageVisible(!imageVisible);
+    }
+
+    const handleRandomOrderChange = (_: React.MouseEvent<HTMLElement>, value: any) => {
+        if (words.length === 0) {
+            setIsRandomeOrder(!isRandomOrder);
+            return;
+        }
+
+        if (!isRandomOrder) {
+            setIsRandomeOrder(true);
+        }
+
+        setWords(shuffleArray(words));
     }
 
     const handleNewTestClick = () => {
@@ -128,38 +147,57 @@ export function Main() {
                 </Grid>
                 <Grid item xs={3}>
                     <FormControl size="small" sx={{ minWidth: 230 }}>
-                        <InputLabel id={`${optionsPrefix}-mode`}>Mode</InputLabel>
-                        <Select labelId={`${optionsPrefix}-mode`}
+                        <InputLabel id={modeId}>Mode</InputLabel>
+                        <Select labelId={modeId}
                             value={mode}
                             label="Mode"
                             onChange={handleModeChange}>
-                            <MenuItem value={MODE_LEARN_ONE_WORD}>Learn one word at a time</MenuItem>
-                            <MenuItem value={MODE_LEARN_ALL_WORDS}>Learn all words</MenuItem>
-                            <MenuItem value={MODE_READ_SENTENCES}>Read sentences</MenuItem>
-                            <MenuItem value={MODE_WRITE_SENTENCES}>Write sentences</MenuItem>
-                            <MenuItem value={MODE_WORDS_TEST}>Test</MenuItem>
-                            <MenuItem value={MODE_FILLBLANK_TEST}>Fill in the blank</MenuItem>
+                            <MenuItem value={LearningMode.OneWord}>Learn one word at a time</MenuItem>
+                            <MenuItem value={LearningMode.AllWords}>Learn all words</MenuItem>
+                            <MenuItem value={LearningMode.ReadSentences}>Read sentences</MenuItem>
+                            <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
+                            <MenuItem value={LearningMode.WordsTest}>Test</MenuItem>
+                            <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={3}>
-                    {mode === MODE_LEARN_ONE_WORD && <FormControlLabel
-                        control={<Switch checked={imageVisible} onChange={handleImageVisibleChange} />}
-                        label="Always show image" />}
-
-                    {mode == MODE_WORDS_TEST && <Button variant="outlined"
+                    {mode === LearningMode.OneWord
+                        && <Tooltip title="Show images for next learning">
+                            <ToggleButton
+                                value="image"
+                                selected={imageVisible}
+                                color="secondary"
+                                size="small"
+                                sx={{ marginRight: 1 }}
+                                onChange={handleImageVisibleChange}
+                            >
+                                <ImageIcon />
+                            </ToggleButton>
+                        </Tooltip>}
+                    {mode !== LearningMode.WordsTest
+                        && <Tooltip title="Random order">
+                            <ToggleButton value="random"
+                                selected={isRandomOrder}
+                                color="secondary"
+                                size="small"
+                                onChange={handleRandomOrderChange}>
+                                <ShuffleIcon />
+                            </ToggleButton>
+                        </Tooltip>}
+                    {mode === LearningMode.WordsTest && <Button variant="outlined"
                         color="secondary"
                         onClick={handleNewTestClick}>New test</Button>}
                 </Grid>
             </Grid>
-            <div style={{ marginTop: 16 }}>
-                {mode === MODE_LEARN_ALL_WORDS && !!words.length && <AllWords words={words} />}
-                {mode === MODE_LEARN_ONE_WORD && !!words.length && <OneWord words={words} initialImageVisible={imageVisible} />}
-                {mode === MODE_READ_SENTENCES && !!words.length && <Sentences words={words} />}
-                {mode === MODE_WRITE_SENTENCES && !!words.length && <TracingSentences words={words} />}
-                {mode == MODE_WORDS_TEST && <WordTest key={testIndex} words={words} />}
-                {mode == MODE_FILLBLANK_TEST && <FillBlankTest words={words} />}
-            </div>
+            {!!words.length && <div style={{ marginTop: 16 }}>
+                {mode === LearningMode.AllWords && <AllWords words={words} />}
+                {mode === LearningMode.OneWord && <OneWord words={words} initialImageVisible={imageVisible} />}
+                {mode === LearningMode.ReadSentences && <Sentences words={words} />}
+                {mode === LearningMode.WriteSentences && <TracingSentences words={words} />}
+                {mode === LearningMode.WordsTest && <WordTest key={testIndex} words={words} />}
+                {mode === LearningMode.FillBlankTest && <FillBlankTest words={words} />}
+            </div>}
             <FetchingBackdrop />
         </>
     );

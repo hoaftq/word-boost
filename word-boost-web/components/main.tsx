@@ -14,6 +14,7 @@ import { Lesson } from "./learning/lesson";
 import { shuffleArray } from "@wb/utils/utils";
 import ImageIcon from '@mui/icons-material/Image';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
+import QuizIcon from '@mui/icons-material/Quiz';
 
 export interface Word {
     id: string;
@@ -163,7 +164,7 @@ export function Main() {
                 </Grid>
                 <Grid item xs={3}>
                     {mode === LearningMode.OneWord
-                        && <Tooltip title="Show images for next learning">
+                        && <Tooltip title="Show images for next words">
                             <ToggleButton
                                 value="image"
                                 selected={imageVisible}
@@ -187,6 +188,7 @@ export function Main() {
                         </Tooltip>}
                     {mode === LearningMode.WordsTest && <Button variant="outlined"
                         color="secondary"
+                        startIcon={<QuizIcon />}
                         onClick={handleNewTestClick}>New test</Button>}
                 </Grid>
             </Grid>

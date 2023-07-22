@@ -1,7 +1,6 @@
 import { Button, Divider, Grid, IconButton, Stack, TextField, TextFieldProps, Typography } from "@mui/material";
 import { Controller, useFieldArray, useForm } from "react-hook-form"
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import getConfig from "next/config";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { useSnackbar } from "notistack";
 import { FocusEvent, useState } from "react";
@@ -39,8 +38,7 @@ export default function AddWord() {
     const { enqueueSnackbar } = useSnackbar();
 
     const onSubmit = (data: WordForm) => {
-        const { publicRuntimeConfig: { apiUrl } } = getConfig();
-        blockingFetch(`${apiUrl}/add`, {
+        blockingFetch('add', {
             method: "post",
             body: JSON.stringify({
                 value: data.value?.trim(),

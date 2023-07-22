@@ -6,7 +6,6 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { TraditionalChangeTextField } from "./add-word";
-import getConfig from "next/config";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { enqueueSnackbar } from "notistack";
 
@@ -57,9 +56,7 @@ export default function AddWordVideoBased() {
     }
 
     const onSubmit = async (data: VideoForm) => {
-        const { publicRuntimeConfig: { apiUrl } } = getConfig();
-
-        await blockingFetch(`${apiUrl}/add-words-sentence`, {
+        await blockingFetch('add-words-sentence', {
             method: "post",
             body: JSON.stringify({
                 sentence: data.sentence.trim(),

@@ -1,6 +1,5 @@
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, ToggleButton, Tooltip } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
-import getConfig from "next/config";
 import { useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
 import { OneWord } from "@wb/components/learning/one-word";
@@ -44,8 +43,6 @@ enum LearningMode {
     FillBlankTest = "Fill-blank test"
 }
 
-const { publicRuntimeConfig: { apiUrl } } = getConfig();
-
 export function Main() {
     const [unitAndCourses, setUnitAndCourses] = useState<UnitAndCourse[]>([]);
     const [groupOptions, setGroupOptions] = useState<GroupOptions[]>([]);
@@ -67,7 +64,7 @@ export function Main() {
         .sort();
 
     useEffect(() => {
-        blockingFetch(`${apiUrl}/units-and-courses`)
+        blockingFetch('units-and-courses')
             .then(rsp => rsp.json())
             .then((unitAndCourses: UnitAndCourse[]) => { setUnitAndCourses(unitAndCourses); })
     }, [blockingFetch]);
@@ -98,7 +95,7 @@ export function Main() {
             return;
         }
 
-        blockingFetch(`${apiUrl}/words-by-units`,
+        blockingFetch('words-by-units',
             {
                 method: "post",
                 body: JSON.stringify(units.map(uc => ({ course: uc.group, unit: uc.option })))

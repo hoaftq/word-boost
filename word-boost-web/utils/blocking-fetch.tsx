@@ -1,5 +1,8 @@
 import { useCallback, useDebugValue, useState } from "react";
 import { Backdrop, CircularProgress } from "@mui/material";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig: { apiUrl } } = getConfig();
 
 export function useBlockingFetch() {
     const [open, setOpen] = useState(false);
@@ -7,7 +10,7 @@ export function useBlockingFetch() {
 
     const blockingFetch = useCallback((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         setOpen(true);
-        return fetch(input, init)
+        return fetch(`${apiUrl}/${input}`, init)
             .finally(() => setOpen(false));
     }, []);
 

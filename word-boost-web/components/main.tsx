@@ -72,7 +72,7 @@ export function Main() {
 
     const handleCourseCloseWithChanges = (courses: string[]) => {
         const groupOptions = unitAndCourses.filter(uc => courses.some(c => c === uc.course))
-            .sort((uc1, uc2) => uc1.course.localeCompare(uc2.course))
+            .sort((uc1, uc2) => uc1.course.localeCompare(uc2.course) || uc1.unit.localeCompare(uc2.unit))
             .reduce((prev, curr) => {
                 const lastItem = prev.slice(-1)?.[0];
                 if (lastItem && lastItem.group === curr.course) {

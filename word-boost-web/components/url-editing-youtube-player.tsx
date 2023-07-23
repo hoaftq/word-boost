@@ -1,15 +1,17 @@
 import { Button, IconButton, Stack, TextField, Tooltip } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import dynamic from 'next/dynamic'
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, MouseEvent } from "react";
 import ReactPlayer from "react-player";
-import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
+import BugReportIcon from '@mui/icons-material/BugReport';
+
 const YoutubePlayer = dynamic(() => import("./youtube-player"), { ssr: false });
 
 type UrlEditingYouTubePlayerProps = {
     onChange: (event: { target: { value: string } }) => void,
     rangeIndex: number
-
 };
 
 export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouTubePlayerProps) {
@@ -27,23 +29,18 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
         }
     });
     const videoUrl = watch("videoUrl", "");
-    const end = watch("end");
+    const start = parseFloat(watch("start"));
+    const end = parseFloat(watch("end"));
 
     const playerRef = useRef<ReactPlayer>(null);
     const [timeFocus, setTimeFocus] = useState<"start" | "end" | "none">("none");
+    const [isTesting, setIsTesting] = useState(false);
 
-    const handleStartCurrentTimeClick = () => {
+    const handleCurrentTimeClick = (target: "start" | "end") => {
         const currentTime = playerRef.current!.getCurrentTime();
         playerRef.current!.getInternalPlayer().pauseVideo();
-        setValue("start", currentTime.toString());
-        setTimeFocus("start");
-    }
-
-    const handleEndCurrentTimeClick = () => {
-        const currentTime = playerRef.current!.getCurrentTime();
-        playerRef.current!.getInternalPlayer().pauseVideo();
-        setValue("end", currentTime.toString());
-        setTimeFocus("end");
+        setValue(target, currentTime.toString());
+        setTimeFocus(target);
     }
 
     const handleSeekButtonClick = (value: number) => {
@@ -52,15 +49,30 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
             return;
         }
 
-        switch (timeFocus) {
-            case "start":
-                setValue("start", seekToValue.toString());
-                break;
-            case "end":
-                setValue("end", seekToValue.toString());
+        if (timeFocus !== "none") {
+            setValue(timeFocus, seekToValue.toString());
         }
 
         playerRef.current?.seekTo(seekToValue, "seconds");
+    }
+
+    const handleGotoButtonClick = (target: "start" | "end") => {
+        const seekToValue = target === "start" ? start : end;
+        playerRef.current?.seekTo(seekToValue, "seconds");
+        setTimeFocus(target);
+    }
+
+    const handleTestClick = (event: MouseEvent<HTMLButtonElement>) => {
+        setIsTesting(true);
+        playerRef.current?.seekTo(start, "seconds");
+        playerRef.current!.getInternalPlayer().playVideo();
+    }
+
+    const handleCustomProgress = (duration: number) => {
+        if (isTesting && duration >= end) {
+            playerRef.current!.getInternalPlayer().pauseVideo();
+            setIsTesting(false);
+        }
     }
 
     useEffect(() => {
@@ -102,13 +114,12 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
             return;
         }
 
-        const newStartTime = end;
+        const newStartTime = watch("end");;
         setValue("start", newStartTime);
         playerRef.current?.seekTo(parseFloat(newStartTime), "seconds");
         setValue("end", "");
         setTimeFocus("none");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rangeIndex, setValue]);
+    }, [rangeIndex, setValue, watch]);
 
     return (
         <Stack direction={"column"} alignItems={"center"}>
@@ -127,7 +138,8 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                     }
                 }}
                 url={videoUrl}
-                onPlay={() => setTimeFocus("none")} />
+                onPlay={() => setTimeFocus("none")}
+                onCustomProgress={handleCustomProgress} />
             <div style={{ marginTop: 10 }}>
                 <Controller control={control}
                     name="start"
@@ -142,9 +154,15 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                             backgroundColor: timeFocus == "start" ? "lightblue" : ""
                         }} />}
                 />
-                <Tooltip title="Current time">
-                    <IconButton onClick={handleStartCurrentTimeClick}>
-                        <AccessAlarmIcon />
+                <Tooltip title="Use current time">
+                    <IconButton color="secondary" onClick={() => handleCurrentTimeClick("start")}>
+                        <DownloadIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Seek to start time">
+                    <IconButton sx={{ marginRight: 3 }}
+                        onClick={() => handleGotoButtonClick("start")}>
+                        <UploadIcon />
                     </IconButton>
                 </Tooltip>
                 <Controller control={control}
@@ -157,17 +175,29 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
                         }}
                         sx={{
                             width: 200,
-                            marginLeft: 2,
                             backgroundColor: timeFocus == "end" ? "lightblue" : ""
                         }} />} />
-                <Tooltip title="Current time">
-                    <IconButton onClick={handleEndCurrentTimeClick}>
-                        <AccessAlarmIcon />
+                <Tooltip title="Use current time">
+                    <IconButton color="secondary" onClick={() => handleCurrentTimeClick("end")}>
+                        <DownloadIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Seek to start end">
+                    <IconButton sx={{ marginRight: 3 }}
+                        onClick={() => handleGotoButtonClick("end")}>
+                        <UploadIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Test">
+                    <IconButton onClick={handleTestClick}>
+                        <BugReportIcon />
                     </IconButton>
                 </Tooltip>
             </div>
             <div style={{ marginTop: 10 }}>
-                {[-3, -1, -0.5, -0.1, 0.1, 0.5, 1, 3].map(v => <Button key={v} onClick={() => handleSeekButtonClick(v)}>{v}s</Button>)}
+                {[-3, -1, -0.5, -0.1, 0.1, 0.5, 1, 3].map(v => <Button key={v}
+                    onClick={() => handleSeekButtonClick(v)}>{v}s
+                </Button>)}
             </div>
             <Controller control={control}
                 name="finalVideoUrl"
@@ -183,4 +213,3 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
         </Stack >
     )
 }
-

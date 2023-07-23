@@ -117,7 +117,7 @@ export default function AddWordVideoBased() {
                         size="small"
                         fullWidth />} />
 
-                <Divider textAlign="left" >Words</Divider>
+                <Divider textAlign="left">Words</Divider>
 
                 {fields.map((f, i) => (<Grid key={f.id} container rowSpacing={2}>
                     <Grid item xs={12}>

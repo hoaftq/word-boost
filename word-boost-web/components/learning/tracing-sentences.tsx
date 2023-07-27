@@ -1,5 +1,4 @@
-import { Button, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
-import { TracingLetter } from "./tracing-letter";
+import { Button, IconButton, Tooltip, useTheme } from "@mui/material";
 import { combineSentences } from "@wb/utils/utils";
 import { useState, useEffect, useRef } from "react";
 import { CombinedSentence } from "../testing/fill-blank-test";
@@ -7,8 +6,8 @@ import { Word } from "../main";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
+import { TimeForALetterInSeconds, TracingSentenceWithOrigin } from "./tracing-sentence";
 
-const TimeForALetterInSeconds = 15;
 const NumberOfExpectedSentences = 5;
 
 export function TracingSentences({ words }: { words: Word[] }) {
@@ -56,10 +55,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
     if (currentSentence) {
         const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
         return <>
-            <Typography fontSize={50}>
-                {currentSentence}
-            </Typography>
-            <TracingSentence sentence={currentSentence} />
+            <TracingSentenceWithOrigin sentence={currentSentence} />
             <div style={{
                 marginTop: 20,
                 display: "flex",
@@ -109,20 +105,4 @@ export function TracingSentences({ words }: { words: Word[] }) {
     }
 
     return null;
-}
-
-function TracingSentence({ sentence }: { sentence: string }) {
-    return (
-        <div>
-            {sentence.split(" ").map((s, i) => (
-                <div key={i} style={{ display: "inline-block" }}>
-                    {s.split("").map((l, j) => <TracingLetter key={j}
-                        letter={l}
-                        previousLetter={j > 0 ? s.charAt(j - 1) : undefined}
-                        hasColor={j % 2 === 0} />)}
-                    <TracingLetter letter=" " hasColor={false} />
-                </div>))
-            }
-        </div>
-    )
 }

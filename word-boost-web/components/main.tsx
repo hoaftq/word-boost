@@ -1,6 +1,6 @@
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, ToggleButton, Tooltip } from "@mui/material";
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, ToggleButton, Tooltip } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
-import { useEffect, useId, useState } from "react";
+import { ChangeEvent, useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
 import { OneWord } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
@@ -14,6 +14,7 @@ import { shuffleArray } from "@wb/utils/utils";
 import ImageIcon from '@mui/icons-material/Image';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import QuizIcon from '@mui/icons-material/Quiz';
+import { TracingParagraph } from "./learning/tracing-paragraph";
 
 export interface Word {
     id: string;
@@ -39,6 +40,7 @@ enum LearningMode {
     AllWords = "All words",
     ReadSentences = "Read sentences",
     WriteSentences = "Write sentences",
+    WriteAParagraph = "Write a paragraph",
     WordsTest = "Words test",
     FillBlankTest = "Fill-blank test"
 }
@@ -57,6 +59,7 @@ export function Main() {
 
     const [testIndex, setTestIndex] = useState(0);
     const modeId = useId();
+    const [paragraphScrollSpeed, setParagraphScrollSpeed] = useState<number | null>(2);
 
     const allCourses = unitAndCourses
         .map(uc => uc.course)
@@ -129,6 +132,15 @@ export function Main() {
         setTestIndex(testIndex + 1);
     }
 
+    const handleSpeedChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        let newSpeed: number | null = parseFloat(event.target.value);
+        if (isNaN(newSpeed) || newSpeed < 0) {
+            newSpeed = null;
+        }
+
+        setParagraphScrollSpeed(newSpeed);
+    }
+
     return (
         <>
             <Grid container spacing={2} paddingTop={1}>
@@ -154,6 +166,7 @@ export function Main() {
                             <MenuItem value={LearningMode.AllWords}>Learn all words</MenuItem>
                             <MenuItem value={LearningMode.ReadSentences}>Read sentences</MenuItem>
                             <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
+                            <MenuItem value={LearningMode.WriteAParagraph}>Write a paragraph</MenuItem>
                             <MenuItem value={LearningMode.WordsTest}>Test</MenuItem>
                             <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
                         </Select>
@@ -173,7 +186,7 @@ export function Main() {
                                 <ImageIcon />
                             </ToggleButton>
                         </Tooltip>}
-                    {mode !== LearningMode.WordsTest
+                    {mode !== LearningMode.WordsTest && mode !== LearningMode.WriteAParagraph
                         && <Tooltip title="Random order">
                             <ToggleButton value="random"
                                 selected={isRandomOrder}
@@ -187,6 +200,15 @@ export function Main() {
                         color="secondary"
                         startIcon={<QuizIcon />}
                         onClick={handleNewTestClick}>New test</Button>}
+                    {mode === LearningMode.WriteAParagraph && <TextField
+                        label="Speed"
+                        type="number"
+                        value={paragraphScrollSpeed}
+                        size="small"
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ width: 80 }}
+                        onChange={handleSpeedChange}
+                    />}
                 </Grid>
             </Grid>
             {!!words.length && <div style={{ marginTop: 16 }}>
@@ -194,6 +216,7 @@ export function Main() {
                 {mode === LearningMode.OneWord && <OneWord words={words} initialImageVisible={imageVisible} />}
                 {mode === LearningMode.ReadSentences && <Sentences words={words} />}
                 {mode === LearningMode.WriteSentences && <TracingSentences words={words} />}
+                {mode === LearningMode.WriteAParagraph && <TracingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}
                 {mode === LearningMode.WordsTest && <WordTest key={testIndex} words={words} />}
                 {mode === LearningMode.FillBlankTest && <FillBlankTest words={words} />}
             </div>}

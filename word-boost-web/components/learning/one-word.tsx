@@ -14,6 +14,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { SentenceTypography } from "./sentence-typography";
 import dynamic from "next/dynamic";
 import ReactPlayer from "react-player";
+import { BingTranslateReader } from "../common/bing-translate-reader";
 const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
@@ -122,18 +123,29 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
                         maxValue={15}
                         onTimeup={handleTimeup} />}
             </div>
-            <Chip key={word?.id}
-                label={word?.value}
-                clickable
-                color="primary"
-                sx={{
-                    marginTop: 1,
-                    marginBottom: 3,
-                    fontSize: 50,
-                    p: 4,
-                }}
-                onClick={handleWordClick}
-            />
+            <div style={{
+                display: "flex",
+                flexDirection: "row",
+                marginTop: 1,
+                marginBottom: 3,
+                paddingLeft: 45,
+            }}>
+                <Chip key={word?.id}
+                    label={word?.value}
+                    clickable
+                    color="primary"
+                    sx={{
+                        fontSize: 50,
+                        p: 4
+                    }}
+                    onClick={handleWordClick} />
+                <div style={{
+                    alignSelf: "center",
+                    marginLeft: 3
+                }}>
+                    <BingTranslateReader text={word?.value} />
+                </div>
+            </div>
         </>
     );
 }

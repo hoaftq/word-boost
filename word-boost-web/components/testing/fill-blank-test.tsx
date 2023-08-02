@@ -1,17 +1,14 @@
 import { Word } from "../main";
 import { Button, IconButton, Popover, TextField, Typography, useTheme } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { useRef, useState, KeyboardEvent, useEffect } from "react";
-import ReactPlayer from "react-player";
-import YoutubePlayer from "../youtube-player";
+import { useState, KeyboardEvent, useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Sentence } from "@wb/pages/add-word";
 import { shuffleArray } from "@wb/utils/utils";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import { Cheerleader, CheerleaderStatus } from "./cheerleader";
+import { AudioPlayer } from "../common/audio-player";
 
 export type CombinedSentence = {
     sentence: Sentence;
@@ -248,52 +245,4 @@ function Blank({ word, onChange }: BlankProps) {
             </span>
         </form>
     );
-}
-
-function AudioPlayer({ mediaUrl }: { mediaUrl: string }) {
-    const playerRef = useRef<ReactPlayer>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    const handlePlay = () => {
-        setIsPlaying(true);
-    }
-
-    const handlePause = () => {
-        setIsPlaying(false);
-    }
-
-    const handleEnded = () => {
-        setIsPlaying(false);
-    }
-
-    const handlePlayPauseButtonClick = () => {
-        const internalPlayer = playerRef.current!.getInternalPlayer();
-        if (isPlaying) {
-            internalPlayer.pauseVideo();
-        } else {
-            internalPlayer.playVideo();
-        }
-    }
-
-    return (<div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 3
-    }}>
-        <div>Listen:</div>
-        <YoutubePlayer playerRef={playerRef}
-            url={mediaUrl}
-            width={50}
-            height={40}
-            style={{ display: "inline-block", }}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onEnded={handleEnded}
-        />
-        <IconButton color="error"
-            size="large"
-            onClick={handlePlayPauseButtonClick}>
-            {isPlaying ? <PauseCircleIcon /> : <SmartDisplayIcon />}
-        </IconButton>
-    </div>);
 }

@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Word } from "../main";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import { combineSentences } from "@wb/utils/utils";
-import { TimeForALetterInSeconds, TracingSentenceWithOrigin } from "./tracing-sentence";
+import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
 
-type TracingParagraphProps = {
+type WritingParagraphProps = {
     words: Word[];
     speed: number;
 }
-export function TracingParagraph({ words, speed }: TracingParagraphProps) {
+export function WritingParagraph({ words, speed }: WritingParagraphProps) {
     const [combinedSentences, setCombinedSentences] = useState<CombinedSentence[] | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const countRef = useRef(0);
@@ -48,6 +48,6 @@ export function TracingParagraph({ words, speed }: TracingParagraphProps) {
                 height: "calc(100vh - 80px)",
                 overflowY: "auto"
             }}>
-            {combinedSentences.map((cs) => <TracingSentenceWithOrigin key={cs.sentence.value} sentence={cs.sentence.value} />)}
+            {combinedSentences.map((cs) => <WritingSentenceWithOrigin key={cs.sentence.value} sentence={cs.sentence.value} />)}
         </div>
 }

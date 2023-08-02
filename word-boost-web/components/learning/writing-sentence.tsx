@@ -3,20 +3,20 @@ import { TracingLetter } from "./tracing-letter";
 
 export const TimeForALetterInSeconds = 6;
 
-type TracingSentenceProps = {
+type WritingSentenceProps = {
     sentence: string;
 }
 
-export function TracingSentenceWithOrigin({ sentence }: TracingSentenceProps) {
+export function WritingSentenceWithOrigin({ sentence }: WritingSentenceProps) {
     return <>
         <Typography fontSize={50}>
             {sentence}
         </Typography>
-        <TracingSentence sentence={sentence} />
+        <WritingSentence sentence={sentence} />
     </>
 };
 
-export function TracingSentence({ sentence }: TracingSentenceProps) {
+export function WritingSentence({ sentence }: WritingSentenceProps) {
     return (
         <div>
             {sentence.split(" ").map((w, i) => (

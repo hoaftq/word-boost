@@ -6,11 +6,11 @@ import { Word } from "../main";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
-import { TimeForALetterInSeconds, TracingSentenceWithOrigin } from "./tracing-sentence";
+import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
 
 const NumberOfExpectedSentences = 5;
 
-export function TracingSentences({ words }: { words: Word[] }) {
+export function WritingSentences({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const [combinedSentences, setCombinedSentences] = useState<CombinedSentence[] | null>(null);
     const timerRef = useRef<ProgressTimerRef>(null);
@@ -55,7 +55,7 @@ export function TracingSentences({ words }: { words: Word[] }) {
     if (currentSentence) {
         const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
         return <>
-            <TracingSentenceWithOrigin sentence={currentSentence} />
+            <WritingSentenceWithOrigin sentence={currentSentence} />
             <div style={{
                 marginTop: 20,
                 display: "flex",

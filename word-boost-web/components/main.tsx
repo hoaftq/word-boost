@@ -7,14 +7,14 @@ import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
 import { FillBlankTest } from "./testing/fill-blank-test";
-import { TracingSentences } from "./learning/tracing-sentences";
+import { WritingSentences } from "./learning/writing-sentences";
 import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./multiple-select";
 import { Lesson } from "./learning/lesson";
 import { shuffleArray } from "@wb/utils/utils";
 import ImageIcon from '@mui/icons-material/Image';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import QuizIcon from '@mui/icons-material/Quiz';
-import { TracingParagraph } from "./learning/tracing-paragraph";
+import { WritingParagraph } from "./learning/writing-paragraph";
 
 export interface Word {
     id: string;
@@ -215,8 +215,8 @@ export function Main() {
                 {mode === LearningMode.AllWords && <AllWords words={words} />}
                 {mode === LearningMode.OneWord && <OneWord words={words} initialImageVisible={imageVisible} />}
                 {mode === LearningMode.ReadSentences && <Sentences words={words} />}
-                {mode === LearningMode.WriteSentences && <TracingSentences words={words} />}
-                {mode === LearningMode.WriteAParagraph && <TracingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}
+                {mode === LearningMode.WriteSentences && <WritingSentences words={words} />}
+                {mode === LearningMode.WriteAParagraph && <WritingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}
                 {mode === LearningMode.WordsTest && <WordTest key={testIndex} words={words} />}
                 {mode === LearningMode.FillBlankTest && <FillBlankTest words={words} />}
             </div>}

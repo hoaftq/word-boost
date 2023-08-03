@@ -54,7 +54,9 @@ export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
         if (duration > urlInfo.end) {
             playerRef.current?.getInternalPlayer().pauseVideo();
             setPlayerState("ended");
-            onFinish?.();
+            setTimeout(() => {
+                onFinish?.();
+            }, 0);
         }
     }
 

@@ -111,7 +111,13 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
     const wordsRegex = new RegExp(`(${words.map(w => w.value).join("|")})`, "gi");
     const splittedParts = sentence.value.split(wordsRegex);
     return (<div>
-        <AudioPlayer mediaUrl={sentence.mediaUrl} />
+        <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 3
+        }}><div>Listen:</div>
+            <AudioPlayer videoUrl={sentence.mediaUrl} />
+        </div>
         <div style={{
             fontSize: 50,
             lineHeight: "100px",

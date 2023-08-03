@@ -1,54 +1,94 @@
-import { IconButton } from "@mui/material";
 import YoutubePlayer from "../youtube-player";
 import ReactPlayer from "react-player";
-import { useRef, useState } from "react";
-import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import { useEffect, useRef, useState } from "react";
+import { parseVideoUrl } from "./player-utils";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 
-export function AudioPlayer({ mediaUrl }: { mediaUrl: string }) {
+type AudioPlayerProps = {
+    videoUrl: string;
+    rate?: number;
+    onFinish?: () => void;
+}
+
+export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [playerState, setPlayerState] = useState<"unstarted" | "playing" | "paused" | "ended">("unstarted");
+    const [canAutomaticallyStart, setCanAutomaticallyStart] = useState(false);
+
+    const urlInfo = parseVideoUrl(videoUrl);
 
     const handlePlay = () => {
-        setIsPlaying(true);
+        setPlayerState("playing")
+        setCanAutomaticallyStart(true);
     }
 
     const handlePause = () => {
-        setIsPlaying(false);
+        setPlayerState(prev => prev !== "ended" ? "paused" : "ended");
     }
 
     const handleEnded = () => {
-        setIsPlaying(false);
+        setPlayerState("ended");
     }
 
     const handlePlayPauseButtonClick = () => {
-        const internalPlayer = playerRef.current!.getInternalPlayer();
-        if (isPlaying) {
-            internalPlayer.pauseVideo();
-        } else {
-            internalPlayer.playVideo();
+        switch (playerState) {
+            case "playing":
+                playerRef.current?.getInternalPlayer().pauseVideo();
+                break;
+            case "paused":
+                playerRef.current?.getInternalPlayer().playVideo();
+                break;
+            case "ended":
+                playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+                playerRef.current?.getInternalPlayer().playVideo();
+                break;
         }
     }
 
-    return (<div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 3
-    }}>
-        <div>Listen:</div>
-        <YoutubePlayer playerRef={playerRef}
-            url={mediaUrl}
-            width={50}
-            height={40}
-            style={{ display: "inline-block", }}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onEnded={handleEnded}
-        />
-        <IconButton color="error"
-            size="large"
-            onClick={handlePlayPauseButtonClick}>
-            {isPlaying ? <PauseCircleIcon /> : <SmartDisplayIcon />}
-        </IconButton>
-    </div>);
+    const handleCustomProgress = (duration: number) => {
+        if (duration > urlInfo.end) {
+            playerRef.current?.getInternalPlayer().pauseVideo();
+            setPlayerState("ended");
+            onFinish?.();
+        }
+    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+        }, 1000);
+    }, [urlInfo.start]);
+
+    return (
+        <div>
+            <YoutubePlayer playerRef={playerRef}
+                url={urlInfo.url}
+                width={50}
+                height={40}
+                playbackRate={rate ?? 1}
+                style={{ display: canAutomaticallyStart ? "none" : "inline-block" }}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onEnded={handleEnded}
+                onCustomProgress={handleCustomProgress}
+            />
+            {playerState === "playing"
+                ? <PauseIcon htmlColor="white"
+                    sx={{
+                        backgroundColor: "red",
+                        width: 50,
+                        height: 40,
+                        cursor: "pointer"
+                    }}
+                    onClick={handlePlayPauseButtonClick} />
+                : canAutomaticallyStart && <PlayArrowIcon htmlColor="white"
+                    sx={{
+                        backgroundColor: "red",
+                        width: 50,
+                        height: 40,
+                        cursor: "pointer"
+                    }}
+                    onClick={handlePlayPauseButtonClick} />}
+        </div>);
 }

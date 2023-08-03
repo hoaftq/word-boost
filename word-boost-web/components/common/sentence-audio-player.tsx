@@ -7,9 +7,13 @@ import PauseIcon from '@mui/icons-material/Pause';
 
 type AudioPlayerProps = {
     videoUrl: string;
-    rate?: number;
+    rate: number;
     onFinish?: () => void;
 }
+
+AudioPlayer.defaultProps = {
+    rate: 1
+};
 
 export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);

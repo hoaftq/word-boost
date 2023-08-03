@@ -8,7 +8,7 @@ import { shuffleArray } from "@wb/utils/utils";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import { Cheerleader, CheerleaderStatus } from "./cheerleader";
-import { AudioPlayer } from "../common/audio-player";
+import { AudioPlayer } from "../common/sentence-audio-player";
 
 export type CombinedSentence = {
     sentence: Sentence;

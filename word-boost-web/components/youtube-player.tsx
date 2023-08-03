@@ -23,7 +23,7 @@ export default function YoutubePlayer(props: YoutubePlayerProps) {
             if (currentTime && isPlaying()) {
                 onCustomProgress(currentTime);
             }
-        }, 10);
+        }, 2);
 
         return () => {
             clearInterval(timerId);

@@ -1,5 +1,5 @@
-import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Tooltip, Card, CardActions, Collapse, IconButtonProps, Checkbox, FormControlLabel } from "@mui/material";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Stack, Chip, Button, Tabs, Tab, styled, IconButton, Card, CardActions, Collapse, IconButtonProps } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { Word } from "../main";
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
@@ -8,14 +8,10 @@ import { LoadingImage } from "../loading-image";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AbcIcon from '@mui/icons-material/Abc';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { SentenceTypography } from "./sentence-typography";
-import dynamic from "next/dynamic";
-import ReactPlayer from "react-player";
 import { BingTranslateReader } from "../common/bing-translate-reader";
-const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
+import { SentenceYoutubePlayer } from "../common/sentence-youtube-player";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -148,88 +144,6 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
             </div>
         </>
     );
-}
-
-function SentenceYoutubePlayer({ videoUrl, play }: { videoUrl: string, play: boolean }) {
-    const playerRef = useRef<ReactPlayer>(null);
-    const [isPlayingWholeVideo, setIsPlayingWholeVideo] = useState(false);
-    const [hasControl, setHasControl] = useState(false);
-
-    const handleReplayClick = () => {
-        setIsPlayingWholeVideo(false);
-        playAt(startEnd.start);
-    }
-
-    const handlePlayAllClick = () => {
-        setIsPlayingWholeVideo(true);
-        playAt(0);
-    }
-
-    const startEnd: { [key: string]: number } = { start: 0 };
-    const splittedUrlParts = videoUrl.split(/[?|&]/g);
-    for (let i = 1; i < splittedUrlParts.length; i++) {
-        const query = splittedUrlParts[i].split("=");
-        startEnd[query[0]] = parseFloat(query[1]);
-    }
-
-    const handleCustomProgress = (duration: number) => {
-        if (isPlayingWholeVideo) {
-            return;
-        }
-
-        if (startEnd.end && duration > startEnd.end) {
-            playerRef.current?.getInternalPlayer().pauseVideo();
-        }
-    }
-
-    const handleHasControlChange = (event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-        setHasControl(checked);
-    }
-
-    useEffect(() => {
-        if (play) {
-            const timerId = setTimeout(() => {
-                playAt(startEnd.start);
-            }, 500);
-
-            return () => {
-                clearTimeout(timerId);
-            }
-        }
-    }, [startEnd.start, play]);
-
-    const playAt = (pos: number) => {
-        playerRef.current?.seekTo(pos, "seconds");
-        playerRef.current?.getInternalPlayer().playVideo();
-    }
-
-    return (
-        <>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <YoutubePlayer playerRef={playerRef}
-                    key={hasControl ? "yp_1" : "yp_0"}
-                    width="min(560px, 100vw - 4px)"
-                    height="315px"
-                    controls={hasControl}
-                    url={splittedUrlParts[0]}
-                    onCustomProgress={handleCustomProgress} />
-                <div>
-                    <Tooltip title="Replay with time range">
-                        <IconButton sx={{ marginRight: 1 }} onClick={handleReplayClick}>
-                            <ReplayCircleFilledIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Play the whole video">
-                        <IconButton sx={{ marginRight: 5 }} onClick={handlePlayAllClick}>
-                            <RestartAltIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <FormControlLabel label="Control"
-                        control={<Checkbox checked={hasControl} onChange={handleHasControlChange} />} />
-                </div>
-            </div>
-        </>
-    )
 }
 
 interface ExpandMoreProps extends IconButtonProps {

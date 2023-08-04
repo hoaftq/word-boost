@@ -25,6 +25,12 @@ export function AudioPlayer({ videoUrl, rate, repeat, onFinish }: AudioPlayerPro
 
     const handlePlay = () => {
         setPlayerState("playing")
+
+        // For browsers that don't support autoplay
+        if (!canAutomaticallyStart) {
+            playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+            playerRef.current?.getInternalPlayer().playVideo();
+        }
         setCanAutomaticallyStart(true);
     }
 

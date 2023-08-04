@@ -19,7 +19,9 @@ export function WritingFromAudio({ words }: { words: Word[] }) {
 
     function handleFinish(): void {
         if (sentenceIndex < combinedSentences!.length - 1) {
-            setSentenceIndex(prev => prev + 1);
+            // This will be called twice on a TV browser?
+            // setSentenceIndex(prev => prev + 1);
+            setSentenceIndex(sentenceIndex + 1);
         }
     }
 
@@ -59,24 +61,24 @@ function WritingSenntenceFromAudio({ combinedSentence, onFinish }: { combinedSen
                     setSentenceVisible(false);
                 }, wordCount * AverageDisplayTimeForAWord);
             }
-            setRepeat(prev => prev + 1);
+            setRepeat(repeat + 1);
         }, MinDelayTime + (MaxDelayTime - MinDelayTime) * repeat / repeatCount);
     }
 
     return <>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="h5">
-                Listen and write
-            </Typography>
             <AudioPlayer videoUrl={combinedSentence.sentence.mediaUrl}
                 rate={rate}
                 repeat={repeat}
                 onFinish={handleFinish} />
-            <Typography variant="h6" fontWeight="bold">
+            <Typography variant="h5" fontWeight="bold">
+                Listen and write
+            </Typography>
+            <Typography variant="h6" color="secondary">
                 Repeat times: {repeat} / {repeatCount}
             </Typography>
         </div>
-        <Typography fontSize={55} color="primary">
+        <Typography fontSize={100} color="primary">
             {sentenceVisible && combinedSentence?.sentence.value}
         </Typography>
     </>

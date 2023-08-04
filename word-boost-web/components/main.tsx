@@ -15,6 +15,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { WritingParagraph } from "./learning/writing-paragraph";
+import { WritingFromAudio } from "./learning/writing-from-audio";
 
 export interface Word {
     id: string;
@@ -41,6 +42,7 @@ enum LearningMode {
     ReadSentences = "Read sentences",
     WriteSentences = "Write sentences",
     WriteAParagraph = "Write a paragraph",
+    WriteFromAnAudio = "Write from an audio",
     WordsTest = "Words test",
     FillBlankTest = "Fill-blank test"
 }
@@ -167,6 +169,7 @@ export function Main() {
                             <MenuItem value={LearningMode.ReadSentences}>Read sentences</MenuItem>
                             <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
                             <MenuItem value={LearningMode.WriteAParagraph}>Write a paragraph</MenuItem>
+                            <MenuItem value={LearningMode.WriteFromAnAudio}>Write from an audio</MenuItem>
                             <MenuItem value={LearningMode.WordsTest}>Test</MenuItem>
                             <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
                         </Select>
@@ -218,6 +221,7 @@ export function Main() {
                 {mode === LearningMode.WriteSentences && <WritingSentences words={words} />}
                 {mode === LearningMode.WriteAParagraph && <WritingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}
                 {mode === LearningMode.WordsTest && <WordTest key={testIndex} words={words} />}
+                {mode === LearningMode.WriteFromAnAudio && <WritingFromAudio words={words} />}
                 {mode === LearningMode.FillBlankTest && <FillBlankTest words={words} />}
             </div>}
             <FetchingBackdrop />

@@ -1,6 +1,6 @@
 import YoutubePlayer from "../youtube-player";
 import ReactPlayer from "react-player";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { parseVideoUrl } from "./player-utils";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -8,6 +8,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 type AudioPlayerProps = {
     videoUrl: string;
     rate: number;
+    repeat?: number;
     onFinish?: () => void;
 }
 
@@ -15,12 +16,12 @@ AudioPlayer.defaultProps = {
     rate: 1
 };
 
-export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
+export function AudioPlayer({ videoUrl, rate, repeat, onFinish }: AudioPlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);
     const [playerState, setPlayerState] = useState<"unstarted" | "playing" | "paused" | "ended">("unstarted");
     const [canAutomaticallyStart, setCanAutomaticallyStart] = useState(false);
 
-    const urlInfo = parseVideoUrl(videoUrl);
+    const urlInfo = useMemo(() => parseVideoUrl(videoUrl), [videoUrl]);
 
     const handlePlay = () => {
         setPlayerState("playing")
@@ -62,9 +63,13 @@ export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
 
     useEffect(() => {
         setTimeout(() => {
+            // Notice this will also play the video when it's paused on normal browsers
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+
+            // Make sure the video is played when it's the next sentence
+            playerRef.current?.getInternalPlayer().playVideo();
         }, 1000);
-    }, [urlInfo.start]);
+    }, [urlInfo, repeat]);
 
     return (
         <div>
@@ -72,7 +77,7 @@ export function AudioPlayer({ videoUrl, rate, onFinish }: AudioPlayerProps) {
                 url={urlInfo.url}
                 width={50}
                 height={40}
-                playbackRate={rate ?? 1}
+                playbackRate={rate}
                 style={{ display: canAutomaticallyStart ? "none" : "inline-block" }}
                 onPlay={handlePlay}
                 onPause={handlePause}

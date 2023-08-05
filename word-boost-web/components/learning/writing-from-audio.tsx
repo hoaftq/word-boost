@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Word } from "../main";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import { combineSentences } from "@wb/utils/utils";
 import { AudioPlayer } from "../common/sentence-audio-player";
 import { Typography, useTheme } from "@mui/material";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
-import DrawIcon from '@mui/icons-material/Draw';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import { Navigator } from "../common/navigator";
 
 const StartRate = 0.6;
@@ -39,6 +39,10 @@ export function WritingFromAudio({ words }: { words: Word[] }) {
 
     return <>
         {combinedSentences && <WritingSentenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />}
+        {isFinished && <Typography marginTop={5}
+            variant="h3"
+            textAlign={"center"}
+            color={theme.palette.warning.main}>Finish!</Typography>}
         <Navigator containerStyle={{ marginTop: 20 }}
             index={sentenceIndex}
             total={combinedSentences.length}
@@ -46,10 +50,6 @@ export function WritingFromAudio({ words }: { words: Word[] }) {
             onPrev={() => setSentenceIndex(sentenceIndex - 1)}
             onRestart={handleRestart}
         />
-        {isFinished && <Typography marginTop={5}
-            variant="h3"
-            textAlign={"center"}
-            color={theme.palette.warning.main}>Finish!</Typography>}
     </>
 }
 
@@ -57,6 +57,7 @@ function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSent
     const [repeat, setRepeat] = useState(0);
     const [sentenceVisible, setSentenceVisible] = useState(false);
     const [prevCombinedSentence, setPrevCombinedSentence] = useState<CombinedSentence | null>(null);
+    const repeatTimerId = useRef<number | null>(null);
 
     const wordCount = combinedSentence.sentence.value.split(" ").length;
     const repeatCount = wordCount * 2;
@@ -78,7 +79,7 @@ function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSent
             return;
         }
 
-        window.setTimeout(() => {
+        repeatTimerId.current = window.setTimeout(() => {
             if (repeat % 3 === 1) {
                 setSentenceVisible(true);
                 setTimeout(() => {
@@ -88,6 +89,12 @@ function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSent
             setRepeat(repeat + 1);
         }, MinDelayTime + (MaxDelayTime - MinDelayTime) * repeat / repeatCount);
     }
+
+    useEffect(() => {
+        if (repeatTimerId.current) {
+            window.clearTimeout(repeatTimerId.current);
+        }
+    }, [combinedSentence]);
 
     return <>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -100,7 +107,7 @@ function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSent
                 <Typography variant={"h5"}
                     fontWeight={"bold"}
                     marginX={1}>Listen and write</Typography>
-                <DrawIcon fontSize="large" color="info" />
+                <EditNoteIcon fontSize="large" color="info" />
             </div>
             <Typography variant="h6" color="secondary">
                 Repeat times: {repeat} / {repeatCount}

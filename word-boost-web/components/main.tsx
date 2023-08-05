@@ -189,7 +189,7 @@ export function Main() {
                                 <ImageIcon />
                             </ToggleButton>
                         </Tooltip>}
-                    {mode !== LearningMode.WordsTest && mode !== LearningMode.WriteAParagraph
+                    {mode !== LearningMode.WordsTest && mode !== LearningMode.WriteAParagraph && mode !== LearningMode.WriteFromAnAudio
                         && <Tooltip title="Random order">
                             <ToggleButton value="random"
                                 selected={isRandomOrder}

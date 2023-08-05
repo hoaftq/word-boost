@@ -1,14 +1,14 @@
 import { Word } from "../main";
-import { Button, IconButton, Popover, TextField, Typography, useTheme } from "@mui/material";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { useState, KeyboardEvent, useEffect } from "react";
+import { IconButton, Popover, TextField, Typography, useTheme } from "@mui/material";
+import { useState, KeyboardEvent, useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Sentence } from "@wb/pages/add-word";
 import { shuffleArray } from "@wb/utils/utils";
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import InfoIcon from '@mui/icons-material/Info';
 import { Cheerleader, CheerleaderStatus } from "./cheerleader";
 import { AudioPlayer } from "../common/sentence-audio-player";
+import HeadphonesIcon from '@mui/icons-material/Headphones';
+import { Navigator } from "../common/navigator";
 
 export type CombinedSentence = {
     sentence: Sentence;
@@ -17,31 +17,27 @@ export type CombinedSentence = {
 
 export function FillBlankTest({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
-    const [randomSentences, setRandomSentences] = useState<CombinedSentence[] | null>(null);
     const [cheerleaderStatus, setCheerleaderStatus] = useState<CheerleaderStatus>("doing");
 
-    if (!randomSentences) {
+    const randomSentences = useMemo(() => {
         const sentences = words.flatMap(w => w.sentences.map(s => ({
             sentence: s,
             words: [w]
         })));
-        const randomSentences = shuffleArray(sentences);
-        setRandomSentences(randomSentences);
+        return shuffleArray(sentences);
+    }, [words]);
+
+    const handlePrevSentenceClick = () => {
+        setSentenceIndex(sentenceIndex - 1);
+        setCheerleaderStatus("doing");
     }
 
-    const isLastSentence = () => sentenceIndex >= randomSentences!.length - 1;
-
     const handleNextSentenceClick = () => {
-        if (isLastSentence()) {
-            return;
-        }
-
         setSentenceIndex(sentenceIndex + 1);
         setCheerleaderStatus("doing");
     }
 
     const restart = () => {
-        setRandomSentences(null);
         setSentenceIndex(0);
         setCheerleaderStatus("doing");
     }
@@ -75,26 +71,11 @@ export function FillBlankTest({ words }: { words: Word[] }) {
                 justifyContent: "space-between",
                 alignItems: "end"
             }}>
-                <div>
-                    <Button variant="outlined"
-                        sx={{ marginRight: 1 }}
-                        startIcon={<ArrowRightIcon />}
-                        color="secondary"
-                        disabled={isLastSentence()}
-                        onClick={handleNextSentenceClick}>
-                        Next
-                    </Button>
-                    <span style={{
-                        fontWeight: "bold",
-                        marginRight: 6
-                    }}>
-                        {sentenceIndex + 1}/{randomSentences.length}
-                    </span>
-                    <IconButton color="secondary"
-                        onClick={restart}>
-                        <RestartAltIcon />
-                    </IconButton>
-                </div>
+                <Navigator index={sentenceIndex}
+                    total={randomSentences.length}
+                    onPrev={handlePrevSentenceClick}
+                    onNext={handleNextSentenceClick}
+                    onRestart={restart} />
                 <Cheerleader status={cheerleaderStatus} />
             </div>
         </>;
@@ -115,7 +96,9 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
             display: "flex",
             alignItems: "center",
             gap: 3
-        }}><div>Listen:</div>
+        }}>
+            <HeadphonesIcon fontSize="large" color="info" />
+            <Typography variant="h4" marginRight={2}>Listen:</Typography>
             <AudioPlayer videoUrl={sentence.mediaUrl} />
         </div>
         <div style={{
@@ -126,7 +109,7 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
         }}>
             {splittedParts.map((p, i) => {
                 if (words.some(w => w.value.toLowerCase() === p.toLowerCase())) {
-                    return <Blank key={p + i}
+                    return <Blanks key={p + i}
                         word={p}
                         onChange={(isAllCorrect, isCurrentCorrect) => onBlankChange(isAllCorrect, isCurrentCorrect)}
                     />
@@ -140,12 +123,12 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
     );
 }
 
-type BlankProps = {
+type BlanksProps = {
     word: string;
     onChange: (isAllCorrect: boolean, isCurrentCorrect?: boolean) => void
 }
 
-function Blank({ word, onChange }: BlankProps) {
+function Blanks({ word, onChange }: BlanksProps) {
     const theme = useTheme();
     const { control, setValue, setFocus, watch } = useForm({
         defaultValues: {

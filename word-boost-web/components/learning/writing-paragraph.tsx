@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Word } from "../main";
-import { CombinedSentence } from "../testing/fill-blank-test";
 import { combineSentences } from "@wb/utils/utils";
 import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
 
@@ -9,13 +8,9 @@ type WritingParagraphProps = {
     speed: number;
 }
 export function WritingParagraph({ words, speed }: WritingParagraphProps) {
-    const [combinedSentences, setCombinedSentences] = useState<CombinedSentence[] | null>(null);
+    const combinedSentences = useMemo(() => combineSentences(words), [words]);
     const containerRef = useRef<HTMLDivElement>(null);
     const countRef = useRef(0);
-
-    if (!combinedSentences) {
-        setCombinedSentences(combineSentences(words));
-    }
 
     useEffect(() => {
         if (!combinedSentences || combinedSentences.length === 0) {

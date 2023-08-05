@@ -1,7 +1,6 @@
 import { Button, IconButton, Tooltip, useTheme } from "@mui/material";
 import { combineSentences } from "@wb/utils/utils";
-import { useState, useEffect, useRef } from "react";
-import { CombinedSentence } from "../testing/fill-blank-test";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Word } from "../main";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -12,15 +11,11 @@ const NumberOfExpectedSentences = 5;
 
 export function WritingSentences({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
-    const [combinedSentences, setCombinedSentences] = useState<CombinedSentence[] | null>(null);
+    const combinedSentences = useMemo(() => combineSentences(words), [words]);
     const timerRef = useRef<ProgressTimerRef>(null);
 
     const theme = useTheme();
     const [expectedSentenceCount, setExpectedSentenceCount] = useState(0);
-
-    if (!combinedSentences) {
-        setCombinedSentences(combineSentences(words));
-    }
 
     const isLastSentence = () => sentenceIndex >= combinedSentences!.length - 1;
 
@@ -34,7 +29,6 @@ export function WritingSentences({ words }: { words: Word[] }) {
     }
 
     const restart = () => {
-        setCombinedSentences(null);
         setSentenceIndex(0);
         timerRef.current!.resetTimer();
     }

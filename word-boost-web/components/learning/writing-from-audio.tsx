@@ -3,7 +3,9 @@ import { Word } from "../main";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import { combineSentences } from "@wb/utils/utils";
 import { AudioPlayer } from "../common/sentence-audio-player";
-import { Typography } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
+import HeadphonesIcon from '@mui/icons-material/Headphones';
+import DrawIcon from '@mui/icons-material/Draw';
 
 const StartRate = 0.6;
 const EndRate = 1;
@@ -16,17 +18,23 @@ const AverageDisplayTimeForAWord = 2500;
 export function WritingFromAudio({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const combinedSentences = useMemo(() => combineSentences(words), [words]);
+    const [isFinished, setIsFinished] = useState(false);
+    const theme = useTheme();
 
     function handleFinish(): void {
         if (sentenceIndex < combinedSentences!.length - 1) {
             // This will be called twice on a TV browser?
             // setSentenceIndex(prev => prev + 1);
             setSentenceIndex(sentenceIndex + 1);
+        } else {
+            setIsFinished(true);
         }
     }
 
-    return combinedSentences && <WritingSenntenceFromAudio combinedSentence={combinedSentences[sentenceIndex]}
-        onFinish={handleFinish} />
+    return <>
+        {combinedSentences && <WritingSenntenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />}
+        {isFinished && <Typography marginTop={5} variant="h3" textAlign={"center"} color={theme.palette.warning.main}>Finish!</Typography>}
+    </>
 }
 
 function WritingSenntenceFromAudio({ combinedSentence, onFinish }: { combinedSentence: CombinedSentence, onFinish: () => void }) {
@@ -71,9 +79,13 @@ function WritingSenntenceFromAudio({ combinedSentence, onFinish }: { combinedSen
                 rate={rate}
                 repeat={repeat}
                 onFinish={handleFinish} />
-            <Typography variant="h5" fontWeight="bold">
-                Listen and write
-            </Typography>
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <HeadphonesIcon fontSize="large" color="info" />
+                <Typography variant={"h5"}
+                    fontWeight={"bold"}
+                    marginX={1}>Listen and write</Typography>
+                <DrawIcon fontSize="large" color="info" />
+            </div>
             <Typography variant="h6" color="secondary">
                 Repeat times: {repeat} / {repeatCount}
             </Typography>

@@ -6,6 +6,7 @@ import { AudioPlayer } from "../common/sentence-audio-player";
 import { Typography, useTheme } from "@mui/material";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
 import DrawIcon from '@mui/icons-material/Draw';
+import { Navigator } from "../common/navigator";
 
 const StartRate = 0.6;
 const EndRate = 1;
@@ -31,13 +32,28 @@ export function WritingFromAudio({ words }: { words: Word[] }) {
         }
     }
 
+    function handleRestart(): void {
+        setSentenceIndex(0);
+        setIsFinished(false);
+    }
+
     return <>
-        {combinedSentences && <WritingSenntenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />}
-        {isFinished && <Typography marginTop={5} variant="h3" textAlign={"center"} color={theme.palette.warning.main}>Finish!</Typography>}
+        {combinedSentences && <WritingSentenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />}
+        <Navigator containerStyle={{ marginTop: 20 }}
+            index={sentenceIndex}
+            total={combinedSentences.length}
+            onNext={() => setSentenceIndex(sentenceIndex + 1)}
+            onPrev={() => setSentenceIndex(sentenceIndex - 1)}
+            onRestart={handleRestart}
+        />
+        {isFinished && <Typography marginTop={5}
+            variant="h3"
+            textAlign={"center"}
+            color={theme.palette.warning.main}>Finish!</Typography>}
     </>
 }
 
-function WritingSenntenceFromAudio({ combinedSentence, onFinish }: { combinedSentence: CombinedSentence, onFinish: () => void }) {
+function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSentence: CombinedSentence, onFinish: () => void }) {
     const [repeat, setRepeat] = useState(0);
     const [sentenceVisible, setSentenceVisible] = useState(false);
     const [prevCombinedSentence, setPrevCombinedSentence] = useState<CombinedSentence | null>(null);

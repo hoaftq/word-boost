@@ -6,6 +6,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
 import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
+import { Navigator } from "../common/navigator";
 
 const NumberOfExpectedSentences = 5;
 
@@ -17,13 +18,12 @@ export function WritingSentences({ words }: { words: Word[] }) {
     const theme = useTheme();
     const [expectedSentenceCount, setExpectedSentenceCount] = useState(0);
 
-    const isLastSentence = () => sentenceIndex >= combinedSentences!.length - 1;
+    const moveToPrevSentence = () => {
+        setSentenceIndex(sentenceIndex - 1);
+        timerRef.current!.resetTimer();
+    }
 
     const moveToNextSentence = () => {
-        if (isLastSentence()) {
-            return;
-        }
-
         setSentenceIndex(sentenceIndex + 1);
         timerRef.current!.resetTimer();
     }
@@ -56,28 +56,11 @@ export function WritingSentences({ words }: { words: Word[] }) {
                 justifyContent: "space-between",
                 alignItems: "end"
             }}>
-                <div>
-                    <Button variant="outlined"
-                        sx={{ marginRight: 1 }}
-                        startIcon={<ArrowRightIcon />}
-                        color="secondary"
-                        disabled={isLastSentence()}
-                        onClick={moveToNextSentence}>
-                        Next
-                    </Button>
-                    <span style={{
-                        fontWeight: "bold",
-                        marginRight: 6
-                    }}>
-                        {sentenceIndex + 1}/{combinedSentences.length}
-                    </span>
-                    <Tooltip title="Restart">
-                        <IconButton color="secondary"
-                            onClick={restart}>
-                            <RestartAltIcon />
-                        </IconButton>
-                    </Tooltip>
-                </div>
+                <Navigator index={sentenceIndex}
+                    total={combinedSentences.length}
+                    onPrev={moveToPrevSentence}
+                    onNext={moveToNextSentence}
+                    onRestart={restart} />
 
                 <div style={{ color: theme.palette.warning.main }}>
                     {expectedSentenceCount === 0

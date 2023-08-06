@@ -1,36 +1,42 @@
 import { Box, CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
-export function LoadingImage({ imageUrl }: { imageUrl: string }) {
+export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible: boolean }) {
     const [loading, setLoading] = useState(true);
+    const [prevImageUrl, setPrevImageUrl] = useState<string | null>(null);
 
-    useEffect(() => {
+    if (imageUrl !== prevImageUrl) {
         setLoading(true);
-    }, [imageUrl]);
-
-    if (imageUrl) {
-        return (
-            <Box sx={{
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                height: "100%"
-            }}>
-                {loading && <CircularProgress />}
-                <Image src={imageUrl}
-                    alt=""
-                    style={{
-                        objectFit: 'contain',
-                        opacity: loading ? 0 : 1
-                    }}
-                    fill={true}
-                    onLoadingComplete={() => { setLoading(false); }} />
-            </Box>
-        );
+        setPrevImageUrl(imageUrl);
     }
 
-    return null;
+    if (!imageUrl) {
+        return null;
+    }
+
+    return (
+        <Box sx={{
+            position: "relative",
+            display: visible ? "flex" : "none",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            height: "100%"
+        }}>
+            {loading && <CircularProgress />}
+            <Image src={imageUrl}
+                alt=""
+                style={{
+                    objectFit: 'contain',
+                    opacity: loading ? 0 : 1
+                }}
+                fill={true}
+                onLoadingComplete={() => { setLoading(false); }} />
+        </Box>
+    );
+}
+
+LoadingImage.defaultProps = {
+    visible: true
 }

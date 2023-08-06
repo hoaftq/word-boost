@@ -112,12 +112,11 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
                 justifyContent: "center",
                 alignItems: "center",
             }}>
-                {imageVisible ?
-                    <LoadingImage imageUrl={word?.imageUrl} /> :
-                    <ProgressTimer ref={timer}
-                        mode="seconds"
-                        maxValue={15}
-                        onTimeup={handleTimeup} />}
+                <LoadingImage imageUrl={word?.imageUrl} visible={imageVisible} />
+                {!imageVisible && <ProgressTimer ref={timer}
+                    mode="seconds"
+                    maxValue={15}
+                    onTimeup={handleTimeup} />}
             </div>
             <div style={{
                 display: "flex",

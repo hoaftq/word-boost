@@ -1,12 +1,11 @@
-import { Button, IconButton, Tooltip, useTheme } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import { combineSentences } from "@wb/utils/utils";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Word } from "../main";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
 import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
 import { Navigator } from "../common/navigator";
+import { AudioPlayer } from "../common/sentence-audio-player";
 
 const NumberOfExpectedSentences = 5;
 
@@ -56,11 +55,14 @@ export function WritingSentences({ words }: { words: Word[] }) {
                 justifyContent: "space-between",
                 alignItems: "end"
             }}>
-                <Navigator index={sentenceIndex}
-                    total={combinedSentences.length}
-                    onPrev={moveToPrevSentence}
-                    onNext={moveToNextSentence}
-                    onRestart={restart} />
+                <Stack direction={"row"} gap={1}>
+                    <Navigator index={sentenceIndex}
+                        total={combinedSentences.length}
+                        onPrev={moveToPrevSentence}
+                        onNext={moveToNextSentence}
+                        onRestart={restart} />
+                    <AudioPlayer videoUrl={combinedSentences[sentenceIndex].sentence.mediaUrl} repeat={expectedSentenceCount} />
+                </Stack>
 
                 <div style={{ color: theme.palette.warning.main }}>
                     {expectedSentenceCount === 0

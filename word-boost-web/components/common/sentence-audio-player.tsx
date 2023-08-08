@@ -9,29 +9,41 @@ type AudioPlayerProps = {
     videoUrl: string;
     rate: number;
     repeat?: number;
+    autoplay: boolean;
     onFinish?: () => void;
 }
 
 AudioPlayer.defaultProps = {
-    rate: 1
+    rate: 1,
+    autoplay: true
 };
 
-export function AudioPlayer({ videoUrl, rate, repeat, onFinish }: AudioPlayerProps) {
+export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: AudioPlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);
+
+    // Only set this state in player callback functions
     const [playerState, setPlayerState] = useState<"unstarted" | "playing" | "paused" | "ended">("unstarted");
-    const [canAutomaticallyStart, setCanAutomaticallyStart] = useState(false);
+    const [canAutomaticallyStart, setCanAutomaticallyStart] = useState<boolean | null>(null);
 
     const urlInfo = useMemo(() => parseVideoUrl(videoUrl), [videoUrl]);
 
     const handlePlay = () => {
-        setPlayerState("playing")
 
-        // For browsers that don't support autoplay
+        // First time the video has been started
         if (!canAutomaticallyStart) {
+
+            // It gets here, so from now on the video can be surelly controlled by our script
+            setCanAutomaticallyStart(true);
+
+            // After user clicks to play the video, we need to seek to start position (it will be paused by youtube)
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
-            playerRef.current?.getInternalPlayer().playVideo();
+
+            if (autoplay) {
+                playerRef.current?.getInternalPlayer().playVideo();
+            }
+        } else {
+            setPlayerState("playing");
         }
-        setCanAutomaticallyStart(true);
     }
 
     const handlePause = () => {
@@ -67,24 +79,39 @@ export function AudioPlayer({ videoUrl, rate, repeat, onFinish }: AudioPlayerPro
         }
     }
 
+    // When we change the url (actually start and end position), and it doesn't affect the first one
     useEffect(() => {
         setTimeout(() => {
-            // Notice this will also play the video when it's paused on normal browsers
+            // Notice this will also play or pause the video
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
 
-            // Make sure the video is played when it's the next sentence
-            playerRef.current?.getInternalPlayer().playVideo();
+            if (autoplay) {
+                playerRef.current?.getInternalPlayer().playVideo();
+            } else {
+                playerRef.current?.getInternalPlayer().pauseVideo();
+            }
         }, 1000);
-    }, [urlInfo, repeat]);
+    }, [urlInfo, repeat, autoplay]);
+
+
+    useEffect(() => {
+
+        // After 500ms, if canAutomaticallyStart is still null, that means the video can't be automatically played
+        setTimeout(() => {
+            if (canAutomaticallyStart === null) {
+                setCanAutomaticallyStart(false);
+            }
+        }, 500);
+    }, [canAutomaticallyStart]);
 
     return (
-        <div>
+        <div style={{ display: canAutomaticallyStart === null ? "none" : "block" }}>
             <YoutubePlayer playerRef={playerRef}
                 url={urlInfo.url}
                 width={50}
                 height={40}
-                playbackRate={rate}
                 style={{ display: canAutomaticallyStart ? "none" : "inline-block" }}
+                playbackRate={rate}
                 onPlay={handlePlay}
                 onPause={handlePause}
                 onEnded={handleEnded}

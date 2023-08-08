@@ -97,6 +97,7 @@ export function Main() {
 
     const handleUnitCloseWithChanges = (units: SelectionType[]) => {
         if (!units.length) {
+            setWords([]);
             return;
         }
 
@@ -190,7 +191,7 @@ export function Main() {
                             </ToggleButton>
                         </Tooltip>}
                     {mode !== LearningMode.WordsTest && mode !== LearningMode.WriteAParagraph && mode !== LearningMode.WriteFromAnAudio
-                        && <Tooltip title="Random order">
+                        && <Tooltip title="Random order (It can be toggled off if there are no words loaded, otherwise it will generate a new random)">
                             <ToggleButton value="random"
                                 selected={isRandomOrder}
                                 color="secondary"

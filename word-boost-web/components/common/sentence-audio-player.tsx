@@ -21,22 +21,24 @@ AudioPlayer.defaultProps = {
 
 export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: AudioPlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);
+    const [playerKey, setPlayerKey] = useState(0);
 
     // Only set this state in player callback functions
     const [playerState, setPlayerState] = useState<"unstarted" | "playing" | "paused" | "ended">("unstarted");
-    const [canAutomaticallyStart, setCanAutomaticallyStart] = useState<boolean | null>(null);
+    const [automaticallyStartStatus, setAutomaticallyStartStatus] = useState<"undetermined" | "automatically" | "no">("undetermined");
+    const isManuallyPlayedRef = useRef(false);
 
     const urlInfo = useMemo(() => parseVideoUrl(videoUrl), [videoUrl]);
 
     const handlePlay = () => {
 
         // The video has been started manually
-        if (canAutomaticallyStart === false) {
-
-            // Need to seek it to the desire position otherwise it will start from 0
+        if (automaticallyStartStatus === "no") {
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
             playerRef.current?.getInternalPlayer().playVideo();
-            setCanAutomaticallyStart(true);
+
+            setAutomaticallyStartStatus("automatically");
+            isManuallyPlayedRef.current = true;
         }
 
         setPlayerState("playing");
@@ -75,33 +77,75 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
         }
     }
 
+    // Whenever the url (without start and end) is changed, determine if it can be played automatically
     useEffect(() => {
 
-        // When we change the url (actually start and end position)
-        const timerId = setTimeout(() => {
+        function waitForReady(playerNode: ReactPlayer | null, callback: () => void, timeout = 0) {
+
+            // 3s
+            if (timeout >= 60) {
+                return;
+            }
+
+            if (typeof playerNode?.getInternalPlayer()?.playVideo === "function") {
+                callback();
+                return;
+            }
+
+            setTimeout(() => {
+                waitForReady(playerNode, callback, timeout + 1);
+            }, 50);
+        }
+
+        waitForReady(playerRef.current, () => {
             try {
 
                 // Try to start the video to determine if it can be automatically played
-                playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+                playerRef.current?.getInternalPlayer().seekTo(0, true);
+                playerRef.current?.getInternalPlayer().mute();
                 playerRef.current?.getInternalPlayer().playVideo();
 
+                // Don't check too soon
                 setTimeout(() => {
-                    setCanAutomaticallyStart(playerRef.current?.getInternalPlayer()?.getPlayerState() === 1);
-                }, 1000);
-            } catch (err) {
-                setCanAutomaticallyStart(false);
+                    const isPlaying = playerRef.current?.getInternalPlayer()?.getPlayerState() === 1;
+                    if (isPlaying) {
+                        playerRef.current?.getInternalPlayer().unMute();
+                        playerRef.current?.getInternalPlayer().pauseVideo();
+                        setAutomaticallyStartStatus("automatically");
+                    } else {
+                        setPlayerKey(prev => prev + 1);
+                        waitForReady(playerRef.current, () => setAutomaticallyStartStatus("no"));
+                    }
+                }, 500);
+            } catch {
+                setAutomaticallyStartStatus("no");
             }
-        }, 1000);
+        });
 
-        return () => {
-            clearTimeout(timerId);
-        };
-    }, [urlInfo, repeat, autoplay]);
+        isManuallyPlayedRef.current = false;
+    }, [urlInfo.url]);
+
+    // Decide what to do based on automaticallyStartStatus
+    useEffect(() => {
+        if (automaticallyStartStatus === "automatically" && isManuallyPlayedRef.current) {
+            isManuallyPlayedRef.current = false;
+            return;
+        }
+
+        if (automaticallyStartStatus === "automatically" && autoplay) {
+            playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+
+            // This makes sure the video play when moving fast to another one when the previous one still playing 
+            setTimeout(() => {
+                playerRef.current?.getInternalPlayer().playVideo();
+            }, 5);
+        }
+    }, [autoplay, automaticallyStartStatus, urlInfo, repeat]);
 
     return (
-        // While canAutomaticallyStart is null, the control isn't visible to user so they won't be able to play it manually
+        // While canAutomaticallyStart is undetermined, the control isn't visible to user so they won't be able to play it manually
         <>
-            {canAutomaticallyStart === null && <div style={{
+            {automaticallyStartStatus === "undetermined" && <div style={{
                 width: 50,
                 height: 40,
                 backgroundColor: "red",
@@ -111,12 +155,13 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
             }}>
                 <CircularProgress size="2em" color="info" />
             </div>}
-            <div style={{ display: canAutomaticallyStart === null ? "none" : "block" }}>
-                <YoutubePlayer playerRef={playerRef}
+            <div style={{ display: automaticallyStartStatus === "undetermined" ? "none" : "block" }}>
+                <YoutubePlayer key={playerKey}
+                    playerRef={playerRef}
                     url={urlInfo.url}
                     width={50}
                     height={40}
-                    style={{ display: (playerState === "playing" || canAutomaticallyStart) ? "none" : "inline-block" }}
+                    style={{ display: automaticallyStartStatus === "automatically" ? "none" : "inline-block" }}
                     playbackRate={rate}
                     onPlay={handlePlay}
                     onPause={handlePause}
@@ -124,22 +169,27 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
                     onCustomProgress={handleCustomProgress}
                 />
                 {playerState === "playing"
-                    ? <PauseIcon htmlColor="white"
-                        sx={{
-                            backgroundColor: "red",
-                            width: 50,
-                            height: 40,
-                            cursor: "pointer"
-                        }}
-                        onClick={handlePlayPauseButtonClick} />
-                    : canAutomaticallyStart && <PlayArrowIcon htmlColor="white"
-                        sx={{
-                            backgroundColor: "red",
-                            width: 50,
-                            height: 40,
-                            cursor: "pointer"
-                        }}
-                        onClick={handlePlayPauseButtonClick} />}
+                    ? (
+                        <PauseIcon htmlColor="white"
+                            sx={{
+                                backgroundColor: "red",
+                                width: 50,
+                                height: 40,
+                                cursor: "pointer"
+                            }}
+                            onClick={handlePlayPauseButtonClick} />
+                    )
+                    : (
+                        automaticallyStartStatus === "automatically" && <PlayArrowIcon htmlColor="white"
+                            sx={{
+                                backgroundColor: "red",
+                                width: 50,
+                                height: 40,
+                                cursor: "pointer"
+                            }}
+                            onClick={handlePlayPauseButtonClick} />
+                    )
+                }
             </div>
         </>);
 }

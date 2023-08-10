@@ -30,28 +30,16 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
 
     const handlePlay = () => {
 
-        // The video has been started automatically
-        if (canAutomaticallyStart === null) {
-            setCanAutomaticallyStart(true);
+        // The video has been started manually
+        if (canAutomaticallyStart === false) {
 
-            // After user clicks to play the video, we need to seek to start position, otherwise it will play from the begining
+            // Need to seek it to the desire position otherwise it will start from 0
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
-
-            if (autoplay) {
-                playerRef.current?.getInternalPlayer().playVideo();
-            } else {
-                playerRef.current?.getInternalPlayer().pauseVideo();
-            }
-
-        } else if (canAutomaticallyStart === false) { // The video has been started manually
-
-            // From now on the video can be controlled by our script
+            playerRef.current?.getInternalPlayer().playVideo();
             setCanAutomaticallyStart(true);
         }
 
-        else {
-            setPlayerState("playing");
-        }
+        setPlayerState("playing");
     }
 
     const handlePause = () => {
@@ -88,46 +76,27 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
     }
 
     useEffect(() => {
+
+        // When we change the url (actually start and end position)
         const timerId = setTimeout(() => {
-            playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
-
-            // When we change the url (actually start and end position)
-            if (canAutomaticallyStart) {
-                playerRef.current?.getInternalPlayer().unMute();
-
-                if (autoplay) {
-                    playerRef.current?.getInternalPlayer().playVideo();
-                } else {
-                    playerRef.current?.getInternalPlayer().pauseVideo();
-                }
-            } else {
+            try {
 
                 // Try to start the video to determine if it can be automatically played
-                playerRef.current?.getInternalPlayer().mute();
+                playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
                 playerRef.current?.getInternalPlayer().playVideo();
-            }
 
-        }, 500);
-
-        return () => {
-            clearTimeout(timerId);
-        }
-    }, [urlInfo, repeat, autoplay, canAutomaticallyStart]);
-
-
-    useEffect(() => {
-
-        // After 1ms, if canAutomaticallyStart is still null, that means the video can't be automatically played
-        const timerId = setTimeout(() => {
-            if (canAutomaticallyStart === null) {
+                setTimeout(() => {
+                    setCanAutomaticallyStart(playerRef.current?.getInternalPlayer()?.getPlayerState() === 1);
+                }, 1000);
+            } catch (err) {
                 setCanAutomaticallyStart(false);
             }
         }, 1000);
 
         return () => {
             clearTimeout(timerId);
-        }
-    }, [canAutomaticallyStart]);
+        };
+    }, [urlInfo, repeat, autoplay]);
 
     return (
         // While canAutomaticallyStart is null, the control isn't visible to user so they won't be able to play it manually

@@ -25,7 +25,7 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
 
     // Only set this state in player callback functions
     const [playerState, setPlayerState] = useState<"unstarted" | "playing" | "paused" | "ended">("unstarted");
-    const [automaticallyStartStatus, setAutomaticallyStartStatus] = useState<"undetermined" | "automatically" | "no">("undetermined");
+    const [canStartAutomatically, setCanStartAutomatically] = useState<boolean | null>(null);
     const isManuallyPlayedRef = useRef(false);
 
     const urlInfo = useMemo(() => parseVideoUrl(videoUrl), [videoUrl]);
@@ -33,11 +33,15 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
     const handlePlay = () => {
 
         // The video has been started manually
-        if (automaticallyStartStatus === "no") {
+        if (canStartAutomatically === false) {
+
+            // Since it started from 0, we need to seek to the desire position and play from there
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
             playerRef.current?.getInternalPlayer().playVideo();
 
-            setAutomaticallyStartStatus("automatically");
+            setCanStartAutomatically(true);
+
+            // This will be used to make changing CanStartAutomatically not trigger playing one more time
             isManuallyPlayedRef.current = true;
         }
 
@@ -111,14 +115,17 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
                     if (isPlaying) {
                         playerRef.current?.getInternalPlayer().unMute();
                         playerRef.current?.getInternalPlayer().pauseVideo();
-                        setAutomaticallyStartStatus("automatically");
+                        setCanStartAutomatically(true);
                     } else {
+
+                        // Reset the player so there will be a red play button in the middle of original youtube player
+                        // And user can click it to start the video manually
                         setPlayerKey(prev => prev + 1);
-                        waitForReady(playerRef.current, () => setAutomaticallyStartStatus("no"));
+                        waitForReady(playerRef.current, () => setCanStartAutomatically(false));
                     }
                 }, 500);
             } catch {
-                setAutomaticallyStartStatus("no");
+                setCanStartAutomatically(false);
             }
         });
 
@@ -127,12 +134,12 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
 
     // Decide what to do based on automaticallyStartStatus
     useEffect(() => {
-        if (automaticallyStartStatus === "automatically" && isManuallyPlayedRef.current) {
+        if (canStartAutomatically === true && isManuallyPlayedRef.current) {
             isManuallyPlayedRef.current = false;
             return;
         }
 
-        if (automaticallyStartStatus === "automatically" && autoplay) {
+        if (canStartAutomatically === true && autoplay) {
             playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
 
             // This makes sure the video play when moving fast to another one when the previous one still playing 
@@ -140,12 +147,12 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
                 playerRef.current?.getInternalPlayer().playVideo();
             }, 5);
         }
-    }, [autoplay, automaticallyStartStatus, urlInfo, repeat]);
+    }, [autoplay, canStartAutomatically, urlInfo, repeat]);
 
     return (
         // While canAutomaticallyStart is undetermined, the control isn't visible to user so they won't be able to play it manually
         <>
-            {automaticallyStartStatus === "undetermined" && <div style={{
+            {canStartAutomatically === null && <div style={{
                 width: 50,
                 height: 40,
                 backgroundColor: "red",
@@ -155,13 +162,13 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
             }}>
                 <CircularProgress size="2em" color="info" />
             </div>}
-            <div style={{ display: automaticallyStartStatus === "undetermined" ? "none" : "block" }}>
+            <div style={{ display: canStartAutomatically === null ? "none" : "block" }}>
                 <YoutubePlayer key={playerKey}
                     playerRef={playerRef}
                     url={urlInfo.url}
                     width={50}
                     height={40}
-                    style={{ display: automaticallyStartStatus === "automatically" ? "none" : "inline-block" }}
+                    style={{ display: canStartAutomatically ? "none" : "inline-block" }}
                     playbackRate={rate}
                     onPlay={handlePlay}
                     onPause={handlePause}
@@ -180,7 +187,7 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
                             onClick={handlePlayPauseButtonClick} />
                     )
                     : (
-                        automaticallyStartStatus === "automatically" && <PlayArrowIcon htmlColor="white"
+                        canStartAutomatically && <PlayArrowIcon htmlColor="white"
                             sx={{
                                 backgroundColor: "red",
                                 width: 50,

@@ -134,19 +134,25 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
 
     // Decide what to do based on automaticallyStartStatus
     useEffect(() => {
-        if (canStartAutomatically === true && isManuallyPlayedRef.current) {
+        if (canStartAutomatically !== true) {
+            return;
+        }
+
+        if (isManuallyPlayedRef.current) {
             isManuallyPlayedRef.current = false;
             return;
         }
 
-        if (canStartAutomatically === true && autoplay) {
-            playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+        playerRef.current?.getInternalPlayer().seekTo(urlInfo.start, true);
+
+        if (autoplay) {
 
             // This makes sure the video play when moving fast to another one when the previous one still playing 
             setTimeout(() => {
                 playerRef.current?.getInternalPlayer().playVideo();
             }, 5);
         }
+
     }, [autoplay, canStartAutomatically, urlInfo, repeat]);
 
     return (

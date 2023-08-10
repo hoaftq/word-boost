@@ -21,7 +21,7 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
 
     function handleScroll(event: UIEvent<HTMLDivElement>): void {
         // Make sure the sanner is in the middle for manually scrolling
-        scannerPositionRef.current = containerRef.current!.clientHeight / 2;
+        scannerPositionRef.current = containerRef.current!.clientHeight / 4;
         setFocusSentence();
     }
 
@@ -55,7 +55,7 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
         }
 
         let timerId1: number, timerId2: number, timerId3: number;
-        timerId1 = moveScannerDown(containerRef.current!.clientHeight / 2, () => {
+        timerId1 = moveScannerDown(containerRef.current!.clientHeight / 4, () => {
             timerId2 = scrollDown(() => {
                 timerId3 = moveScannerDown(containerRef.current!.clientHeight);
             });
@@ -72,7 +72,7 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
     useEffect(() => {
         const container = containerRef.current!;
         setPlayerPosition({
-            top: container.offsetTop,
+            top: container.offsetTop - 56,
             left: container.offsetLeft + container.clientWidth - 50,
         });
     }, []);

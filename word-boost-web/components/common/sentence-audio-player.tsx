@@ -123,7 +123,7 @@ export function AudioPlayer({ videoUrl, rate, repeat, autoplay, onFinish }: Audi
                         setPlayerKey(prev => prev + 1);
                         waitForReady(playerRef.current, () => setCanStartAutomatically(false));
                     }
-                }, 500);
+                }, 1000);
             } catch {
                 setCanStartAutomatically(false);
             }

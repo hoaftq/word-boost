@@ -171,7 +171,7 @@ export function Main() {
                             <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
                             <MenuItem value={LearningMode.WriteAParagraph}>Write a paragraph</MenuItem>
                             <MenuItem value={LearningMode.WriteFromAnAudio}>Write from an audio</MenuItem>
-                            <MenuItem value={LearningMode.WordsTest}>Test</MenuItem>
+                            <MenuItem value={LearningMode.WordsTest}>Test words</MenuItem>
                             <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
                         </Select>
                     </FormControl>

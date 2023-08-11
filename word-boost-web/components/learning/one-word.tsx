@@ -12,6 +12,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { SentenceTypography } from "./sentence-typography";
 import { BingTranslateReader } from "../common/bing-translate-reader";
 import { SentenceYoutubePlayer } from "../common/sentence-youtube-player";
+import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -162,6 +163,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 function SentenceCard({ word }: { word: Word }) {
     const [expandedIndex, setExpandedIndex] = useState(-1);
     const [focusIndex, setFocusIndex] = useState(0);
+    const { onMouseUpCapture, TranslatorPopover } = useSelectionTranslator();
 
     const handleExpandedChange = (index: number) => {
         setExpandedIndex(expandedIndex === index ? -1 : index)
@@ -180,7 +182,8 @@ function SentenceCard({ word }: { word: Word }) {
     const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
-        <div style={{ width: "100%", minHeight: 445 }}>
+        <div style={{ width: "100%", minHeight: 445 }}
+            onMouseUpCapture={onMouseUpCapture}>
             {word.sentences.map((s, i) => {
                 const isCardExpanded = expandedIndex === i;
                 const isCardFocused = focusIndex == i;
@@ -213,6 +216,7 @@ function SentenceCard({ word }: { word: Word }) {
                     </Card>
                 )
             })}
+            <TranslatorPopover />
         </div>
     );
 }

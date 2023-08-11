@@ -9,6 +9,7 @@ import { Cheerleader, CheerleaderStatus } from "./cheerleader";
 import { AudioPlayer } from "../common/sentence-audio-player";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
 import { Navigator } from "../common/navigator";
+import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 
 export type CombinedSentence = {
     sentence: Sentence;
@@ -61,7 +62,7 @@ export function FillBlankTest({ words }: { words: Word[] }) {
 
     return randomSentences && randomSentences[sentenceIndex] &&
         <>
-            <FillBlank key={sentenceIndex}
+            <FillBlanks key={sentenceIndex}
                 combinedSentence={randomSentences[sentenceIndex]}
                 onBlankChange={handleBlankChange}
             />
@@ -81,17 +82,18 @@ export function FillBlankTest({ words }: { words: Word[] }) {
         </>;
 }
 
-type FillBlankProps = {
+type FillBlanksProps = {
     combinedSentence: CombinedSentence;
     onBlankChange: (isAllCorrect: boolean, isCurrentCorrect?: boolean) => void;
 }
 
-function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: FillBlankProps) {
+function FillBlanks({ combinedSentence: { words, sentence }, onBlankChange }: FillBlanksProps) {
     const theme = useTheme();
+    const { onMouseUpCapture, TranslatorPopover } = useSelectionTranslator();
 
     const wordsRegex = new RegExp(`(${words.map(w => w.value).join("|")})`, "gi");
     const splittedParts = sentence.value.split(wordsRegex);
-    return (<div>
+    return (<div onMouseUpCapture={onMouseUpCapture}>
         <div style={{
             display: "flex",
             alignItems: "center",
@@ -119,6 +121,7 @@ function FillBlank({ combinedSentence: { words, sentence }, onBlankChange }: Fil
             })}
         </div>
         <Cheerleader status="not_started" />
+        <TranslatorPopover />
     </div>
     );
 }

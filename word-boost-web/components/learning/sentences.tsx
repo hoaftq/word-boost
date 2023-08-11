@@ -4,10 +4,13 @@ import { CombinedSentenceTypography } from "./sentence-typography";
 import { combineSentences } from "@wb/utils/utils";
 import { AudioPlayer } from "../common/sentence-audio-player";
 import { useMemo, useState } from "react";
+import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 
 export function Sentences({ words }: { words: Word[] }) {
     const combinedSentences = useMemo(() => combineSentences(words), [words]);
     const [focusIndex, setFocusIndex] = useState(0);
+
+    const { onMouseUpCapture, TranslatorPopover } = useSelectionTranslator();
 
     function handleClick(index: number): void {
         setFocusIndex(index);
@@ -15,9 +18,8 @@ export function Sentences({ words }: { words: Word[] }) {
 
     return (
         <Paper elevation={3}
-            sx={{
-                padding: 1
-            }}>
+            sx={{ padding: 1 }}
+            onMouseUpCapture={onMouseUpCapture}>
             {combinedSentences.map((s, i) => (
                 <Stack key={s.sentence.value}
                     direction={"row"}
@@ -41,6 +43,7 @@ export function Sentences({ words }: { words: Word[] }) {
                     {focusIndex === i && <AudioPlayer videoUrl={s.sentence.mediaUrl} autoplay={false} />}
                 </Stack>)
             )}
+            <TranslatorPopover />
         </Paper>
     );
 }

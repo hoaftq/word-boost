@@ -24,8 +24,10 @@ export function Sentences({ words }: { words: Word[] }) {
                     sx={{
                         alignItems: "center",
                         gap: 2,
-                        marginX: 1,
-                        marginY: 2
+                        paddingX: 1,
+                        paddingY: 2.5,
+                        backgroundColor: i % 2 === 0 ? "whitesmoke" : "white",
+                        borderRadius: 2
                     }}>
                     <CombinedSentenceTypography
                         combinedSentence={s}

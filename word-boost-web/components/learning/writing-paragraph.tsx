@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, UIEvent } from "react";
+import { useEffect, useMemo, useRef, useState, UIEvent, useCallback } from "react";
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { WritingSentenceWithOrigin } from "./writing-sentence";
@@ -18,6 +18,20 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
     const [focusIndex, setFocusIndex] = useState(0);
 
     const scannerPositionRef = useRef(0);
+    const [repeat, setRepeat] = useState(0);
+
+    const setFocusSentence = useCallback(() => {
+        const container = containerRef.current!;
+        for (let i = sentencesRef.current.length - 1; i >= 0; i--) {
+            if (sentencesRef.current[i]!.offsetTop < container.scrollTop + container.offsetTop + scannerPositionRef.current) {
+                if (focusIndex != i) {
+                    setFocusIndex(i);
+                    setRepeat(0);
+                }
+                break;
+            }
+        }
+    }, [focusIndex]);
 
     function handleScroll(event: UIEvent<HTMLDivElement>): void {
         // Make sure the sanner is in the middle for manually scrolling
@@ -66,7 +80,7 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
             clearInterval(timerId2);
             clearInterval(timerId3);
         }
-    }, [speed]);
+    }, [setFocusSentence, speed]);
 
     // Put the player to the desire position
     useEffect(() => {
@@ -77,13 +91,9 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
         });
     }, []);
 
-    function setFocusSentence() {
-        const container = containerRef.current!;
-        for (let i = sentencesRef.current.length - 1; i >= 0; i--) {
-            if (sentencesRef.current[i]!.offsetTop < container.scrollTop + container.offsetTop + scannerPositionRef.current) {
-                setFocusIndex(i);
-                break;
-            }
+    function handleAudioFinish(): void {
+        if (repeat === 0) {
+            setTimeout(() => setRepeat(1), 5000);
         }
     }
 
@@ -106,7 +116,9 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
                 height: 40,
                 backgroundColor: "red"
             }}>
-                <AudioPlayer videoUrl={combinedSentences[focusIndex].sentence.mediaUrl} />
+                <AudioPlayer videoUrl={combinedSentences[focusIndex].sentence.mediaUrl}
+                    repeat={repeat}
+                    onFinish={handleAudioFinish} />
             </div>
         </div>
 }

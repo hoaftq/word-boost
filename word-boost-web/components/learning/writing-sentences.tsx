@@ -16,6 +16,7 @@ export function WritingSentences({ words }: { words: Word[] }) {
 
     const theme = useTheme();
     const [expectedSentenceCount, setExpectedSentenceCount] = useState(0);
+    const [repeat, setRepeat] = useState(0);
 
     const moveToPrevSentence = () => {
         setSentenceIndex(sentenceIndex - 1);
@@ -37,16 +38,25 @@ export function WritingSentences({ words }: { words: Word[] }) {
     }
 
     const handleTicking = (currentValue: number, maxValue: number) => {
-        setExpectedSentenceCount(Math.round((1 - currentValue / maxValue) * NumberOfExpectedSentences));
+        const newValue = Math.round((1 - currentValue / maxValue) * NumberOfExpectedSentences);
+        if (expectedSentenceCount != newValue) {
+            setExpectedSentenceCount(newValue);
+            setRepeat(0);
+        }
     }
 
     useEffect(() => {
         restart();
     }, [words]);
 
+    function handleAudioFinish(): void {
+        setTimeout(() => setRepeat(1), 5000);
+    }
+
     const currentSentence = combinedSentences?.[sentenceIndex].sentence.value;
     if (currentSentence) {
         const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
+
         return <>
             <WritingSentenceWithOrigin sentence={currentSentence} />
             <div style={{
@@ -61,12 +71,14 @@ export function WritingSentences({ words }: { words: Word[] }) {
                         onPrev={moveToPrevSentence}
                         onNext={moveToNextSentence}
                         onRestart={restart} />
-                    <AudioPlayer videoUrl={combinedSentences[sentenceIndex].sentence.mediaUrl} repeat={expectedSentenceCount} />
+                    <AudioPlayer videoUrl={combinedSentences[sentenceIndex].sentence.mediaUrl}
+                        repeat={expectedSentenceCount * 2 + repeat}
+                        onFinish={handleAudioFinish} />
                 </Stack>
 
                 <div style={{ color: theme.palette.warning.main }}>
                     {expectedSentenceCount === 0
-                        ? <>You might be writing now</>
+                        ? <>You might be writing the first sentence now</>
                         : <><span style={{
                             fontWeight: "bold",
                             fontSize: 30

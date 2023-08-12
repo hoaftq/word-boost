@@ -107,7 +107,7 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
         <>
             <div style={{
                 width: "100%",
-                height: 349,
+                height: 377,
                 position: "relative",
                 display: "flex",
                 justifyContent: "center",

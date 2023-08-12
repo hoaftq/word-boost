@@ -147,19 +147,19 @@ export function Main() {
     return (
         <>
             <Grid container spacing={2} paddingTop={1}>
-                <Grid item xs={3}>
+                <Grid item xs={6} md={3}>
                     <MultipleSelect label="Course"
                         options={allCourses}
                         onCloseWithChanges={handleCourseCloseWithChanges} />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6} md={3}>
                     <MultipleGroupedSelect label="Unit"
                         groupOptions={groupOptions}
                         onCloseWithChanges={handleUnitCloseWithChanges}
                     />
                 </Grid>
-                <Grid item xs={3}>
-                    <FormControl size="small" sx={{ minWidth: 230 }}>
+                <Grid item xs={6} md={3}>
+                    <FormControl size="small" fullWidth>
                         <InputLabel id={modeId}>Mode</InputLabel>
                         <Select labelId={modeId}
                             value={mode}
@@ -176,7 +176,7 @@ export function Main() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6} md={3}>
                     {mode === LearningMode.OneWord
                         && <Tooltip title="Show images for next words">
                             <ToggleButton

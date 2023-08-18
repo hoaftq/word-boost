@@ -6,6 +6,7 @@ export function BingTranslateReader({ text }: { text: string }) {
     return <div style={{
         width: 42,
         height: 42,
+        borderRadius: "50%",
         position: "relative",
         overflow: "hidden"
     }}>

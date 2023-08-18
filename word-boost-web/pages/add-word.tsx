@@ -86,7 +86,7 @@ export default function AddWord() {
     return (
         <>
             <Typography variant="h5" mb={3}>Add a new word</Typography>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Stack direction={"column"} spacing={2} >
                     <Controller name="unit"
                         control={control}
@@ -94,6 +94,7 @@ export default function AddWord() {
                         render={({ field }) => <TextField {...field}
                             label="Unit"
                             size="small"
+                            required
                             error={!!errors.unit}
                             helperText={errors?.unit?.message}
                         />}
@@ -104,6 +105,7 @@ export default function AddWord() {
                         render={({ field }) => <TextField {...field}
                             label="Course"
                             size="small"
+                            required
                             error={!!errors.course}
                             helperText={errors?.course?.message}
                         />}
@@ -115,6 +117,7 @@ export default function AddWord() {
                             inputRef={ref}
                             label="Word"
                             size="small"
+                            required
                             error={!!errors?.value}
                             helperText={errors?.value?.message}
                             onTraditionalChange={handleWordChange}

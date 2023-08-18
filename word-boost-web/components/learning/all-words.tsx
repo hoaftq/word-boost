@@ -26,7 +26,7 @@ export function AllWords({ words }: { words: Word[] }) {
 
     return (
         <Stack direction={"row"} flexWrap={"wrap"}>
-            {words.map((w, i) => (
+            {words.filter(w => w.value).map((w, i) => (
                 <Stack key={w.id} direction="row" padding={2}>
                     <Chip label={`${i + 1}. ${w.value}`}
                         clickable

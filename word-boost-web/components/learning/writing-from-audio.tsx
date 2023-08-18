@@ -18,7 +18,7 @@ const AverageDisplayTimeForAWord = 2500;
 
 export function WritingFromAudio({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
-    const combinedSentences = useMemo(() => combineSentences(words), [words]);
+    const combinedSentences = useMemo(() => combineSentences(words).filter(s => s.sentence.mediaUrl), [words]);
     const [isFinished, setIsFinished] = useState(false);
     const theme = useTheme();
 
@@ -37,20 +37,26 @@ export function WritingFromAudio({ words }: { words: Word[] }) {
         setIsFinished(false);
     }
 
-    return <>
-        {combinedSentences && <WritingSentenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />}
-        {isFinished && <Typography marginTop={5}
-            variant="h3"
-            textAlign={"center"}
-            color={theme.palette.warning.main}>Finish!</Typography>}
-        <Navigator containerStyle={{ marginTop: 20 }}
-            index={sentenceIndex}
-            total={combinedSentences.length}
-            onNext={() => setSentenceIndex(sentenceIndex + 1)}
-            onPrev={() => setSentenceIndex(sentenceIndex - 1)}
-            onRestart={handleRestart}
-        />
-    </>
+    if (combinedSentences && !!combinedSentences.length) {
+        return <>
+            <WritingSentenceFromAudio combinedSentence={combinedSentences[sentenceIndex]} onFinish={handleFinish} />
+            {isFinished && <Typography marginTop={5}
+                variant="h3"
+                textAlign={"center"}
+                color={theme.palette.warning.main}>Finish!</Typography>}
+            <Navigator containerStyle={{ marginTop: 20 }}
+                index={sentenceIndex}
+                total={combinedSentences.length}
+                onNext={() => setSentenceIndex(sentenceIndex + 1)}
+                onPrev={() => setSentenceIndex(sentenceIndex - 1)}
+                onRestart={handleRestart}
+            />
+        </>
+    }
+
+    return <Typography variant="h6"
+        color="error"
+        textAlign="center">No sentences with audio available</Typography>
 }
 
 function WritingSentenceFromAudio({ combinedSentence, onFinish }: { combinedSentence: CombinedSentence, onFinish: () => void }) {

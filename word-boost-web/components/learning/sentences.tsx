@@ -5,6 +5,7 @@ import { combineSentences } from "@wb/utils/utils";
 import { AudioPlayer } from "../common/sentence-audio-player";
 import { useMemo, useState } from "react";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
+import { BingTranslateReader } from "../common/bing-translate-reader";
 
 export function Sentences({ words }: { words: Word[] }) {
     const combinedSentences = useMemo(() => combineSentences(words), [words]);
@@ -40,7 +41,10 @@ export function Sentences({ words }: { words: Word[] }) {
                         fontWeight="bold"
                         onClick={() => handleClick(i)}
                     />
-                    {focusIndex === i && <AudioPlayer videoUrl={s.sentence.mediaUrl} autoplay={false} />}
+                    {focusIndex === i && s.sentence.mediaUrl && <AudioPlayer videoUrl={s.sentence.mediaUrl} autoplay={false} />}
+                    {focusIndex === i && <div>
+                        <BingTranslateReader text={s.sentence.value} />
+                    </div>}
                 </Stack>)
             )}
             <TranslatorPopover />

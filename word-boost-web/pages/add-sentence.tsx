@@ -20,7 +20,7 @@ type VideoForm = {
     }[];
 }
 
-export default function AddWordVideoBased() {
+export default function AddSentence() {
     const { control, handleSubmit, resetField, setFocus, formState: { errors } } = useForm({
         defaultValues: {
             unit: '',
@@ -81,7 +81,7 @@ export default function AddWordVideoBased() {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <Stack direction={"column"} spacing={2} >
                 <Controller name="unit"
                     control={control}
@@ -89,6 +89,7 @@ export default function AddWordVideoBased() {
                     render={({ field }) => <TextField {...field}
                         label="Unit"
                         size="small"
+                        required
                         error={!!errors.unit}
                         helperText={errors?.unit?.message}
                     />}
@@ -100,6 +101,9 @@ export default function AddWordVideoBased() {
                     render={({ field }) => <TextField {...field}
                         label="Course"
                         size="small"
+                        required
+                        error={!!errors.course}
+                        helperText={errors?.course?.message}
                     />}
                 />
 
@@ -112,9 +116,13 @@ export default function AddWordVideoBased() {
 
                 <Controller control={control}
                     name="sentence"
+                    rules={{ required: { value: true, message: "Sentence is required." } }}
                     render={({ field }) => <TextField {...field}
                         label="Sentence"
                         size="small"
+                        required
+                        error={!!errors.sentence}
+                        helperText={errors.sentence?.message}
                         fullWidth />} />
 
                 <Divider textAlign="left">Words</Divider>
@@ -123,10 +131,14 @@ export default function AddWordVideoBased() {
                     <Grid item xs={12}>
                         <Controller name={`words.${i}.value`}
                             control={control}
+                            rules={{ required: { value: true, message: 'Word is required.' } }}
                             render={({ field }) => <TraditionalChangeTextField {...field}
                                 size="small"
                                 label="Word"
                                 fullWidth
+                                required
+                                error={!!errors.words?.[i]?.value}
+                                helperText={errors?.words?.[i]?.value?.message}
                                 onTraditionalChange={handleWordChange} />}
                         />
                     </Grid>

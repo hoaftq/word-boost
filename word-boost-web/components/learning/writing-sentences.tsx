@@ -53,12 +53,12 @@ export function WritingSentences({ words }: { words: Word[] }) {
         setTimeout(() => setRepeat(1), 5000);
     }
 
-    const currentSentence = combinedSentences?.[sentenceIndex].sentence.value;
-    if (currentSentence) {
-        const writingTime = currentSentence.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
+    const currentSentence = combinedSentences?.[sentenceIndex].sentence;
+    if (currentSentence.value) {
+        const writingTime = currentSentence.value.length * TimeForALetterInSeconds * NumberOfExpectedSentences;
 
         return <>
-            <WritingSentenceWithOrigin sentence={currentSentence} />
+            <WritingSentenceWithOrigin sentence={currentSentence.value} />
             <div style={{
                 marginTop: 20,
                 display: "flex",
@@ -71,9 +71,9 @@ export function WritingSentences({ words }: { words: Word[] }) {
                         onPrev={moveToPrevSentence}
                         onNext={moveToNextSentence}
                         onRestart={restart} />
-                    <AudioPlayer videoUrl={combinedSentences[sentenceIndex].sentence.mediaUrl}
+                    {currentSentence.mediaUrl && <AudioPlayer videoUrl={currentSentence.mediaUrl}
                         repeat={expectedSentenceCount * 2 + repeat}
-                        onFinish={handleAudioFinish} />
+                        onFinish={handleAudioFinish} />}
                 </Stack>
 
                 <div style={{ color: theme.palette.warning.main }}>
@@ -86,7 +86,7 @@ export function WritingSentences({ words }: { words: Word[] }) {
                 </div>
 
                 <ProgressTimer ref={timerRef}
-                    key={currentSentence}
+                    key={currentSentence.value}
                     mode="minutes"
                     maxValue={writingTime}
                     onTimeup={handleTimeup}

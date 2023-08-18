@@ -97,18 +97,20 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
         }
     }
 
-    return combinedSentences
-        && <div ref={containerRef}
+    if (combinedSentences) {
+        const mediaUrl = combinedSentences[focusIndex].sentence.mediaUrl;
+        return <div ref={containerRef}
             style={{
                 height: "calc(100vh - 80px)",
                 overflowY: "auto"
             }} onScroll={handleScroll}>
-            {combinedSentences.map((cs, i) => <>
-                <WritingSentenceWithOrigin key={cs.sentence.value}
-                    ref={(node) => { sentencesRef.current[i] = node }}
-                    sentence={cs.sentence.value} focused={focusIndex === i} />
-            </>)}
-            <div style={{
+            {combinedSentences.map((cs, i) => <WritingSentenceWithOrigin
+                key={cs.sentence.value}
+                ref={(node) => { sentencesRef.current[i] = node }}
+                sentence={cs.sentence.value} focused={focusIndex === i} />
+            )}
+
+            {mediaUrl && <div style={{
                 position: "fixed",
                 top: playerPosition.top,
                 left: playerPosition.left,
@@ -116,9 +118,12 @@ export function WritingParagraph({ words, speed }: WritingParagraphProps) {
                 height: 40,
                 backgroundColor: "red"
             }}>
-                <AudioPlayer videoUrl={combinedSentences[focusIndex].sentence.mediaUrl}
+                <AudioPlayer videoUrl={mediaUrl}
                     repeat={repeat}
                     onFinish={handleAudioFinish} />
-            </div>
+            </div>}
         </div>
+    }
+
+    return null;
 }

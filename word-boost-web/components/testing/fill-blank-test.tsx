@@ -3,13 +3,13 @@ import { IconButton, Popover, TextField, Typography, useTheme } from "@mui/mater
 import { useState, KeyboardEvent, useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Sentence } from "@wb/pages/add-word";
-import { shuffleArray } from "@wb/utils/utils";
 import InfoIcon from '@mui/icons-material/Info';
 import { Cheerleader, CheerleaderStatus } from "./cheerleader";
 import { AudioPlayer } from "../common/sentence-audio-player";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
 import { Navigator } from "../common/navigator";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
+import { BingTranslateReader } from "../common/bing-translate-reader";
 
 export type CombinedSentence = {
     sentence: Sentence;
@@ -20,12 +20,13 @@ export function FillBlankTest({ words }: { words: Word[] }) {
     const [sentenceIndex, setSentenceIndex] = useState(0);
     const [cheerleaderStatus, setCheerleaderStatus] = useState<CheerleaderStatus>("doing");
 
-    const randomSentences = useMemo(() => {
-        const sentences = words.flatMap(w => w.sentences.map(s => ({
-            sentence: s,
-            words: [w]
-        })));
-        return shuffleArray(sentences);
+    const sentences = useMemo(() => {
+        return words
+            .filter(w => w.value)
+            .flatMap(w => w.sentences.filter(s => s.value).map(s => ({
+                sentence: s,
+                words: [w]
+            })));
     }, [words]);
 
     const handlePrevSentenceClick = () => {
@@ -60,10 +61,10 @@ export function FillBlankTest({ words }: { words: Word[] }) {
         restart();
     }, [words]);
 
-    return randomSentences && randomSentences[sentenceIndex] &&
+    return sentences && sentences[sentenceIndex] &&
         <>
             <FillBlanks key={sentenceIndex}
-                combinedSentence={randomSentences[sentenceIndex]}
+                combinedSentence={sentences[sentenceIndex]}
                 onBlankChange={handleBlankChange}
             />
             <div style={{
@@ -73,7 +74,7 @@ export function FillBlankTest({ words }: { words: Word[] }) {
                 alignItems: "end"
             }}>
                 <Navigator index={sentenceIndex}
-                    total={randomSentences.length}
+                    total={sentences.length}
                     onPrev={handlePrevSentenceClick}
                     onNext={handleNextSentenceClick}
                     onRestart={restart} />
@@ -101,7 +102,8 @@ function FillBlanks({ combinedSentence: { words, sentence }, onBlankChange }: Fi
         }}>
             <HeadphonesIcon fontSize="large" color="info" />
             <Typography variant="h4" marginRight={2}>Listen:</Typography>
-            <AudioPlayer videoUrl={sentence.mediaUrl} />
+            {sentence.mediaUrl && <AudioPlayer videoUrl={sentence.mediaUrl} />}
+            <BingTranslateReader text={sentence.value} />
         </div>
         <div style={{
             fontSize: 50,

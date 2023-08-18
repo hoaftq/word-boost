@@ -27,8 +27,7 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
             return;
         }
 
-        setCurrentIndex(currentIndex + 1);
-        setSelectedTab(0);
+        moveTo(currentIndex + 1);
     }
 
     const handlePrevious = () => {
@@ -36,8 +35,12 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
             return;
         }
 
-        setCurrentIndex(currentIndex - 1);
-        setSelectedTab(0);
+        moveTo(currentIndex - 1);
+    }
+
+    const moveTo = (wordIndex: number) => {
+        setCurrentIndex(wordIndex);
+        setSelectedTab(words[wordIndex].value ? 0 : 1);
     }
 
     useEffect(() => {
@@ -56,14 +59,12 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
                 }}
                 sx={{ marginTop: 1 }}
                 onChange={(e, newValue) => setSelectedTab(newValue)}>
-                <Tab icon={<AbcIcon />} />
-                <Tab icon={<FormatListBulletedIcon />} />
+                <Tab icon={<AbcIcon />} disabled={!currentWord.value} />
+                <Tab icon={<FormatListBulletedIcon />} disabled={!currentWord.sentences.length} />
             </Tabs>
-
             <div style={{ marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>
                 {currentIndex + 1}/{words.length}
             </div>
-
             <div>
                 <Button onClick={handlePrevious}
                     variant="outlined"
@@ -190,18 +191,25 @@ function SentenceCard({ word }: { word: Word }) {
                 return (
                     <Card key={s.value} variant="outlined" sx={{ marginBottom: 1, border: 0 }}>
                         <CardActions sx={{ justifyContent: "space-between" }}>
-                            <IconButton sx={{ marginRight: 1 }} onClick={() => handleFocusChange(i)}>
-                                <ArrowRightIcon />
-                            </IconButton>
-                            <SentenceTypography variant={isCardFocused ? "h4" : "h5"}
-                                component="div"
-                                color={isCardFocused ? "primary" : "gray"}
-                                fontSize={isCardFocused ? 50 : 40}
-                                fontWeight={isCardFocused ? "bold" : "normal"}
-                                sx={{ flexGrow: 1 }}
-                                word={word}
-                                sentenceIndex={i} />
-                            <ExpandMore expand={isCardExpanded} onClick={() => handleExpandedChange(i)}>
+                            <Stack direction={"row"} alignItems={"center"} gap={1}>
+                                <IconButton onClick={() => handleFocusChange(i)}>
+                                    <ArrowRightIcon />
+                                </IconButton>
+                                <SentenceTypography variant={isCardFocused ? "h4" : "h5"}
+                                    component="div"
+                                    color={isCardFocused ? "primary" : "gray"}
+                                    fontSize={isCardFocused ? 50 : 40}
+                                    fontWeight={isCardFocused ? "bold" : "normal"}
+                                    sx={{ flexGrow: 1 }}
+                                    word={word}
+                                    sentenceIndex={i} />
+                                <div>
+                                    <BingTranslateReader text={s.value} />
+                                </div>
+                            </Stack>
+                            <ExpandMore expand={isCardExpanded}
+                                disabled={!s.mediaUrl}
+                                onClick={() => handleExpandedChange(i)}>
                                 <ExpandMoreIcon />
                             </ExpandMore>
                         </CardActions>

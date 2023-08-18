@@ -15,7 +15,12 @@ export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible:
         return null;
     }
 
-    return (
+    return <>
+        <Image src={imageUrl}
+            alt=""
+            width={1}
+            height={1}
+            style={{ left: -10 }} />
         <Box sx={{
             position: "relative",
             display: visible ? "flex" : "none",
@@ -32,9 +37,9 @@ export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible:
                     opacity: loading ? 0 : 1
                 }}
                 fill={true}
-                onLoadingComplete={() => { setLoading(false); }} />
+                onLoadingComplete={() => setLoading(false)} />
         </Box>
-    );
+    </>;
 }
 
 LoadingImage.defaultProps = {

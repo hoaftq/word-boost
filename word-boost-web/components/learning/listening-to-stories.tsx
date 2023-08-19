@@ -1,10 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, MouseEvent } from "react";
 import { FullBingTranslate } from "../common/bing-translate-reader";
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { Controller, useForm } from "react-hook-form";
-import { Stack, TextField } from "@mui/material";
+import { IconButton, Stack, TextField } from "@mui/material";
 import { CombinedSentence } from "../testing/fill-blank-test";
+import CopyAllIcon from '@mui/icons-material/CopyAll';
 
 export function ListeningToStories({ words }: { words: Word[] }) {
     const combinedSentences = useMemo(() => combineSentences(words), [words]);
@@ -55,12 +56,19 @@ export function ListeningToStories({ words }: { words: Word[] }) {
         }
     }, [combinedSentences, values.allRepeat, values.sentenceRepeat, values.storyRepeat]);
 
-    const allSentences = useMemo(() => mapAll(), [mapAll]);
+    const allText = useMemo(() => mapAll(), [mapAll]);
+
+    function handleCopyClick(event: MouseEvent<HTMLButtonElement>): void {
+        navigator.clipboard.writeText(allText);
+    }
 
     return (
         <Stack direction={{ xs: "column", md: "row" }} gap={{ xs: 3, md: 3 }}>
-            <FullBingTranslate text={allSentences} />
-            <Stack direction={{ xs: "row", md: "column" }} spacing={3} marginBottom={3}>
+            <FullBingTranslate text={allText.length > 3000 ? "The text is too long. Please copy and paste here" : allText} />
+            <Stack direction={{ xs: "row", md: "column" }}
+                spacing={3}
+                marginBottom={3}
+                alignItems={"start"}>
                 <Controller name="sentenceRepeat"
                     control={control}
                     render={({ field }) => <TextField {...field}
@@ -88,6 +96,9 @@ export function ListeningToStories({ words }: { words: Word[] }) {
                         size="small"
                         sx={{ width: 80 }} />}
                 />
+                <IconButton onClick={handleCopyClick}>
+                    <CopyAllIcon />
+                </IconButton>
             </Stack>
         </Stack>
     );

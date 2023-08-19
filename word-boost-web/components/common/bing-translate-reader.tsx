@@ -22,3 +22,28 @@ export function BingTranslateReader({ text }: { text: string }) {
             src={bingUrl} />
     </div>
 }
+
+export function FullBingTranslate({ text }: { text: string }) {
+    const bingUrl = `https://www.bing.com/translator?from=en&text=${encodeURIComponent(text)}`;
+
+    return <div style={{
+        width: 268,
+        height: 362,
+        overflow: "hidden",
+        position: "relative",
+        borderWidth: 1,
+        borderStyle: "solid",
+        borderColor: "lightgray",
+        borderRadius: 5
+    }}>
+        <iframe style={{
+            border: 0,
+            width: 1024,
+            height: 800,
+            position: "absolute",
+            left: -30,
+            top: -240,
+        }}
+            src={bingUrl} />
+    </div>
+}

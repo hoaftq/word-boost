@@ -16,6 +16,7 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
+import { ListeningToStories } from "./learning/listening-to-stories";
 
 export interface Word {
     id: string;
@@ -44,7 +45,8 @@ enum LearningMode {
     WriteAParagraph = "Write a paragraph",
     WriteFromAnAudio = "Write from an audio",
     WordsTest = "Words test",
-    FillBlankTest = "Fill-blank test"
+    FillBlankTest = "Fill-blank test",
+    ListeningToStories = "Listening to stories"
 }
 
 export function Main() {
@@ -92,7 +94,8 @@ export function Main() {
                 return [...prev, newItem];
             }, [] as GroupOptions[])
         setGroupOptions(groupOptions);
-        setWords([]);
+        // FIXME
+        // setWords([]);
     }
 
     const handleUnitCloseWithChanges = (units: SelectionType[]) => {
@@ -173,6 +176,7 @@ export function Main() {
                             <MenuItem value={LearningMode.WriteFromAnAudio}>Write from an audio</MenuItem>
                             <MenuItem value={LearningMode.WordsTest}>Test words</MenuItem>
                             <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
+                            <MenuItem value={LearningMode.ListeningToStories}>Listening to stories</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -190,7 +194,7 @@ export function Main() {
                                 <ImageIcon />
                             </ToggleButton>
                         </Tooltip>}
-                    {mode !== LearningMode.WordsTest && mode !== LearningMode.WriteAParagraph && mode !== LearningMode.WriteFromAnAudio
+                    {[LearningMode.WordsTest, LearningMode.WriteAParagraph, LearningMode.WriteFromAnAudio, LearningMode.ListeningToStories].indexOf(mode as LearningMode) < 0
                         && <Tooltip title="Random order (It can be toggled off if there are no words loaded, otherwise it will generate a new random)">
                             <ToggleButton value="random"
                                 selected={isRandomOrder}
@@ -224,6 +228,7 @@ export function Main() {
                 {mode === LearningMode.WordsTest && <WordTest key={testIndex} words={words} />}
                 {mode === LearningMode.WriteFromAnAudio && <WritingFromAudio words={words} />}
                 {mode === LearningMode.FillBlankTest && <FillBlankTest words={words} />}
+                {mode === LearningMode.ListeningToStories && <ListeningToStories words={words} />}
             </div>}
             <FetchingBackdrop />
         </>

@@ -1,7 +1,29 @@
+import { useEffect, useRef } from "react";
+
+type BingTranslateReaderProps = {
+    text: string;
+    onClick?: () => void;
+}
 
 // This is just a temporary solution to read text
-export function BingTranslateReader({ text }: { text: string }) {
+export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps) {
+    const iframeRef = useRef(null);
     const bingUrl = `https://www.bing.com/translator?from=en&text=${encodeURIComponent(text)}`;
+
+    useEffect(() => {
+        if (onClick) {
+            const timerId = setInterval(() => {
+                if (document.activeElement === iframeRef.current) {
+                    onClick();
+                    window.focus();
+                }
+            }, 1000);
+
+            return () => {
+                clearInterval(timerId);
+            };
+        }
+    }, [onClick]);
 
     return <div style={{
         width: 42,
@@ -10,14 +32,15 @@ export function BingTranslateReader({ text }: { text: string }) {
         position: "relative",
         overflow: "hidden"
     }}>
-        <iframe style={{
-            border: 0,
-            width: 300,
-            height: 430,
-            position: "absolute",
-            top: -269,
-            left: -19,
-        }}
+        <iframe ref={iframeRef}
+            style={{
+                border: 0,
+                width: 300,
+                height: 430,
+                position: "absolute",
+                top: -269,
+                left: -19,
+            }}
             scrolling="no"
             src={bingUrl} />
     </div>

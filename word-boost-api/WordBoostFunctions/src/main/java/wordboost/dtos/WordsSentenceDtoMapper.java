@@ -6,7 +6,15 @@ import java.util.stream.Collectors;
 public final class WordsSentenceDtoMapper {
 
     public static List<WordDto> toWords(WordsSentenceDto wordsSentenceDto) {
-        return wordsSentenceDto.getWords().stream()
+        var words = wordsSentenceDto.getWords();
+        if (words.isEmpty()) {
+            words = List.of(WordsSentenceDto.Word.builder()
+                    .value("")
+                    .imageUrl("")
+                    .build());
+        }
+
+        return words.stream()
                 .map(w -> WordDto.builder()
                         .course(wordsSentenceDto.getCourse())
                         .unit(wordsSentenceDto.getUnit())

@@ -1,7 +1,6 @@
 package wordboost.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -21,6 +20,9 @@ public class WordsSentenceDto {
 
     private List<Word> words;
 
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     public static class Word {

@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, ToggleButton, Tooltip } from "@mui/material";
+import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, ToggleButton, Tooltip, useMediaQuery, useTheme } from "@mui/material";
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { ChangeEvent, useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
@@ -17,6 +17,7 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
 import { ListeningToStories } from "./learning/listening-to-stories";
+import { Logo } from "./logo";
 
 export interface Word {
     id: string;
@@ -64,6 +65,9 @@ export function Main() {
     const [testIndex, setTestIndex] = useState(0);
     const modeId = useId();
     const [paragraphScrollSpeed, setParagraphScrollSpeed] = useState<number | null>(2);
+
+    const theme = useTheme();
+    const useFullLogo = useMediaQuery(theme.breakpoints.up("md"));
 
     const allCourses = unitAndCourses
         .map(uc => uc.course)
@@ -149,76 +153,82 @@ export function Main() {
 
     return (
         <>
-            <Grid container spacing={2} paddingTop={1}>
-                <Grid item xs={6} md={3}>
-                    <MultipleSelect label="Course"
-                        options={allCourses}
-                        onCloseWithChanges={handleCourseCloseWithChanges} />
+            <Stack direction={"row"} gap={1} paddingTop={1} borderTop={"solid #8abe53 3px"}>
+                <Box display={{ "xs": "none", "sm": "block" }}>
+                    <Logo full={useFullLogo} />
+                </Box>
+                <Grid container spacing={2} alignItems={"center"}>
+                    <Grid item xs={6} md={3}>
+                        <MultipleSelect label="Course"
+                            options={allCourses}
+                            onCloseWithChanges={handleCourseCloseWithChanges} />
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                        <MultipleGroupedSelect label="Unit"
+                            groupOptions={groupOptions}
+                            onCloseWithChanges={handleUnitCloseWithChanges}
+                        />
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                        <FormControl size="small" fullWidth>
+                            <InputLabel id={modeId}>Mode</InputLabel>
+                            <Select labelId={modeId}
+                                value={mode}
+                                label="Mode"
+                                onChange={handleModeChange}>
+                                <MenuItem value={LearningMode.OneWord}>Learn one word at a time</MenuItem>
+                                <MenuItem value={LearningMode.AllWords}>Learn all words</MenuItem>
+                                <MenuItem value={LearningMode.ReadSentences}>Read sentences</MenuItem>
+                                <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
+                                <MenuItem value={LearningMode.WriteAParagraph}>Write a paragraph</MenuItem>
+                                <MenuItem value={LearningMode.WriteFromAnAudio}>Write from an audio</MenuItem>
+                                <MenuItem value={LearningMode.WordsTest}>Test words</MenuItem>
+                                <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
+                                <MenuItem value={LearningMode.ListeningToStories}>Listening to stories</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                        {mode === LearningMode.OneWord
+                            && <Tooltip title="Show images for next words">
+                                <ToggleButton
+                                    value="image"
+                                    selected={imageVisible}
+                                    color="secondary"
+                                    size="small"
+                                    sx={{ marginRight: 1 }}
+                                    onChange={handleImageVisibleChange}
+                                >
+                                    <ImageIcon />
+                                </ToggleButton>
+                            </Tooltip>}
+                        {[LearningMode.WordsTest, LearningMode.WriteAParagraph, LearningMode.WriteFromAnAudio, LearningMode.ListeningToStories].indexOf(mode as LearningMode) < 0
+                            && <Tooltip title="Random order (It can be toggled off if there are no words loaded, otherwise it will generate a new random)">
+                                <ToggleButton value="random"
+                                    selected={isRandomOrder}
+                                    color="secondary"
+                                    size="small"
+                                    onChange={handleRandomOrderChange}>
+                                    <ShuffleIcon />
+                                </ToggleButton>
+                            </Tooltip>}
+                        {mode === LearningMode.WordsTest && <Button variant="outlined"
+                            color="secondary"
+                            startIcon={<QuizIcon />}
+                            onClick={handleNewTestClick}>New test</Button>}
+                        {mode === LearningMode.WriteAParagraph && <TextField
+                            label="Speed"
+                            type="number"
+                            value={paragraphScrollSpeed}
+                            size="small"
+                            InputLabelProps={{ shrink: true }}
+                            sx={{ width: 80 }}
+                            onChange={handleSpeedChange}
+                        />}
+                    </Grid>
                 </Grid>
-                <Grid item xs={6} md={3}>
-                    <MultipleGroupedSelect label="Unit"
-                        groupOptions={groupOptions}
-                        onCloseWithChanges={handleUnitCloseWithChanges}
-                    />
-                </Grid>
-                <Grid item xs={6} md={3}>
-                    <FormControl size="small" fullWidth>
-                        <InputLabel id={modeId}>Mode</InputLabel>
-                        <Select labelId={modeId}
-                            value={mode}
-                            label="Mode"
-                            onChange={handleModeChange}>
-                            <MenuItem value={LearningMode.OneWord}>Learn one word at a time</MenuItem>
-                            <MenuItem value={LearningMode.AllWords}>Learn all words</MenuItem>
-                            <MenuItem value={LearningMode.ReadSentences}>Read sentences</MenuItem>
-                            <MenuItem value={LearningMode.WriteSentences}>Write sentences</MenuItem>
-                            <MenuItem value={LearningMode.WriteAParagraph}>Write a paragraph</MenuItem>
-                            <MenuItem value={LearningMode.WriteFromAnAudio}>Write from an audio</MenuItem>
-                            <MenuItem value={LearningMode.WordsTest}>Test words</MenuItem>
-                            <MenuItem value={LearningMode.FillBlankTest}>Fill in the blank</MenuItem>
-                            <MenuItem value={LearningMode.ListeningToStories}>Listening to stories</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                    {mode === LearningMode.OneWord
-                        && <Tooltip title="Show images for next words">
-                            <ToggleButton
-                                value="image"
-                                selected={imageVisible}
-                                color="secondary"
-                                size="small"
-                                sx={{ marginRight: 1 }}
-                                onChange={handleImageVisibleChange}
-                            >
-                                <ImageIcon />
-                            </ToggleButton>
-                        </Tooltip>}
-                    {[LearningMode.WordsTest, LearningMode.WriteAParagraph, LearningMode.WriteFromAnAudio, LearningMode.ListeningToStories].indexOf(mode as LearningMode) < 0
-                        && <Tooltip title="Random order (It can be toggled off if there are no words loaded, otherwise it will generate a new random)">
-                            <ToggleButton value="random"
-                                selected={isRandomOrder}
-                                color="secondary"
-                                size="small"
-                                onChange={handleRandomOrderChange}>
-                                <ShuffleIcon />
-                            </ToggleButton>
-                        </Tooltip>}
-                    {mode === LearningMode.WordsTest && <Button variant="outlined"
-                        color="secondary"
-                        startIcon={<QuizIcon />}
-                        onClick={handleNewTestClick}>New test</Button>}
-                    {mode === LearningMode.WriteAParagraph && <TextField
-                        label="Speed"
-                        type="number"
-                        value={paragraphScrollSpeed}
-                        size="small"
-                        InputLabelProps={{ shrink: true }}
-                        sx={{ width: 80 }}
-                        onChange={handleSpeedChange}
-                    />}
-                </Grid>
-            </Grid>
+            </Stack>
+
             {!!words.length && <div style={{ marginTop: 16 }}>
                 {mode === LearningMode.AllWords && <AllWords words={words} />}
                 {mode === LearningMode.OneWord && <OneWord words={words} initialImageVisible={imageVisible} />}

@@ -154,7 +154,7 @@ function TextReader({ text }: { text: string }) {
 
     return (<div style={{ width: 300 }}>
         <Typography variant="subtitle1" color="gray">
-            Click the link below to open Natural Reader. Paste the text, which has already been copied to the clipboard, into it and press the play button to listen to.
+            Click the link below to open Natural Reader. Paste the text, which has already been copied to the clipboard, into it and press the play button to read the text.
         </Typography>
         <Link href="https://www.naturalreaders.com/online/"
             target="_blank"

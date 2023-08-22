@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { isBrowser } from "react-device-detect";
 
 type BingTranslateReaderProps = {
     text: string;
@@ -25,9 +26,11 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
         }
     }, [onClick]);
 
+    const size = isBrowser ? 42 : 34;
+
     return <div style={{
-        width: 42,
-        height: 42,
+        width: size,
+        height: size,
         borderRadius: "50%",
         position: "relative",
         overflow: "hidden"
@@ -35,11 +38,11 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
         <iframe ref={iframeRef}
             style={{
                 border: 0,
-                width: 300,
-                height: 430,
+                width: 800,
+                height: 600,
                 position: "absolute",
-                top: -269,
-                left: -19,
+                top: isBrowser ? - 269 : -186,
+                left: isBrowser ? -19 : -756,
             }}
             scrolling="no"
             src={bingUrl} />
@@ -50,8 +53,8 @@ export function FullBingTranslate({ text }: { text: string }) {
     const bingUrl = `https://www.bing.com/translator?from=en&text=${encodeURIComponent(text)}`;
 
     return <div style={{
-        width: 268,
-        height: 362,
+        width: isBrowser ? 268 : 252,
+        height: isBrowser ? 362 : 205,
         overflow: "hidden",
         position: "relative",
         borderWidth: 1,
@@ -61,11 +64,11 @@ export function FullBingTranslate({ text }: { text: string }) {
     }}>
         <iframe style={{
             border: 0,
-            width: 1024,
-            height: 800,
+            width: isBrowser ? 1024 : 268,
+            height: isBrowser ? 800 : 482,
             position: "absolute",
-            left: -30,
-            top: -240,
+            left: isBrowser ? -30 : 0,
+            top: isBrowser ? -240 : -120,
         }}
             src={bingUrl} />
     </div>

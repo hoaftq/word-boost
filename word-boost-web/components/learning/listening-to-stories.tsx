@@ -1,9 +1,9 @@
-import { useCallback, useMemo, MouseEvent, useState } from "react";
+import { useCallback, useMemo, MouseEvent, useState, useEffect } from "react";
 import { BingTranslateReader, FullBingTranslate } from "../common/bing-translate-reader";
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { Controller, useForm } from "react-hook-form";
-import { Box, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, IconButton, Link, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import { Navigator } from "../common/navigator";
@@ -80,7 +80,7 @@ export function ListenToTheWhole({ combinedSentences }: { combinedSentences: Com
 
     return (
         <Stack direction={{ xs: "column", md: "row" }} gap={{ xs: 3, md: 3 }}>
-            <FullBingTranslate text={allText.length > 3000 ? "The text is too long. Please copy and paste here" : allText} />
+            <TextReader text={allText} />
             <Stack direction={{ xs: "row", md: "column" }}
                 spacing={3}
                 marginBottom={3}
@@ -112,11 +112,51 @@ export function ListenToTheWhole({ combinedSentences }: { combinedSentences: Com
                         size="small"
                         sx={{ width: 80 }} />}
                 />
-                <IconButton onClick={handleCopyClick}>
-                    <CopyAllIcon />
-                </IconButton>
+                <Tooltip title="Copy story text to clipboard">
+                    <IconButton onClick={handleCopyClick}>
+                        <CopyAllIcon />
+                    </IconButton>
+                </Tooltip>
             </Stack>
         </Stack>
+    );
+}
+
+function TextReader({ text }: { text: string }) {
+
+    useEffect(() => {
+        if (text.length > 5000) {
+            navigator.clipboard.writeText(text);
+        }
+    }, [text]);
+
+    if (text.length <= 1000) {
+        return <div style={{ width: 300 }}>
+            <Typography variant="subtitle1" color="gray">Press the speaker icon to read the text.</Typography>
+            <FullBingTranslate text={text} />
+        </div>;
+    }
+
+    if (text.length <= 5000) {
+        return (<div style={{ width: 300 }}>
+            <Typography variant="subtitle1" color="gray">
+                Click the link below to open Google Translate with pre-filled text then press the speaker icon to read the text.
+            </Typography>
+            <Link href={`https://translate.google.com/?hl=en&sl=en&text=${encodeURIComponent(text)}`}
+                target="_blank"
+                variant="h6">Google Translate</Link>
+        </div>
+        );
+    }
+
+    return (<div style={{ width: 300 }}>
+        <Typography variant="subtitle1" color="gray">
+            Click the link below to open Natural Reader. Paste the text, which has already been copied to the clipboard, into it and press the play button to listen to.
+        </Typography>
+        <Link href="https://www.naturalreaders.com/online/"
+            target="_blank"
+            variant="h6">Natural Reader</Link>
+    </div>
     );
 }
 

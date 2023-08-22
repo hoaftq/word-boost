@@ -3,7 +3,7 @@ import { BingTranslateReader, FullBingTranslate } from "../common/bing-translate
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { Controller, useForm } from "react-hook-form";
-import { Box, IconButton, Link, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, FormControl, FormLabel, IconButton, Link, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import { Navigator } from "../common/navigator";
@@ -81,43 +81,46 @@ export function ListenToTheWhole({ combinedSentences }: { combinedSentences: Com
     return (
         <Stack direction={{ xs: "column", md: "row" }} gap={{ xs: 3, md: 3 }}>
             <TextReader text={allText} />
-            <Stack direction={{ xs: "row", md: "column" }}
-                spacing={3}
-                marginBottom={3}
-                alignItems={"start"}>
-                <Controller name="sentenceRepeat"
-                    control={control}
-                    render={({ field }) => <TextField {...field}
-                        type="number"
-                        label="Sentence"
-                        InputLabelProps={{ shrink: true }}
-                        size="small"
-                        sx={{ width: 80 }} />}
-                />
-                <Controller name="storyRepeat"
-                    control={control}
-                    render={({ field }) => <TextField {...field}
-                        type="number"
-                        label="Story"
-                        InputLabelProps={{ shrink: true }}
-                        size="small"
-                        sx={{ width: 80 }} />}
-                />
-                <Controller name="allRepeat"
-                    control={control}
-                    render={({ field }) => <TextField {...field}
-                        type="number"
-                        label="All"
-                        InputLabelProps={{ shrink: true }}
-                        size="small"
-                        sx={{ width: 80 }} />}
-                />
-                <Tooltip title="Copy story text to clipboard">
-                    <IconButton onClick={handleCopyClick}>
-                        <CopyAllIcon />
-                    </IconButton>
-                </Tooltip>
-            </Stack>
+            <FormControl component="fieldset" variant="standard">
+                <FormLabel component="legend" sx={{ paddingTop: 0.3, marginBottom: 1.5 }}>Repeat</FormLabel>
+                <Stack direction={{ xs: "row", md: "column" }}
+                    spacing={3}
+                    marginBottom={3}
+                    alignItems={"start"}>
+                    <Controller name="sentenceRepeat"
+                        control={control}
+                        render={({ field }) => <TextField {...field}
+                            type="number"
+                            label="Sentence"
+                            InputLabelProps={{ shrink: true }}
+                            size="small"
+                            sx={{ width: 80 }} />}
+                    />
+                    <Controller name="storyRepeat"
+                        control={control}
+                        render={({ field }) => <TextField {...field}
+                            type="number"
+                            label="Story"
+                            InputLabelProps={{ shrink: true }}
+                            size="small"
+                            sx={{ width: 80 }} />}
+                    />
+                    <Controller name="allRepeat"
+                        control={control}
+                        render={({ field }) => <TextField {...field}
+                            type="number"
+                            label="All"
+                            InputLabelProps={{ shrink: true }}
+                            size="small"
+                            sx={{ width: 80 }} />}
+                    />
+                    <Tooltip title="Copy story text to clipboard">
+                        <IconButton onClick={handleCopyClick}>
+                            <CopyAllIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            </FormControl>
         </Stack>
     );
 }

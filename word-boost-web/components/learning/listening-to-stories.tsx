@@ -3,7 +3,7 @@ import { BingTranslateReader, FullBingTranslate } from "../common/bing-translate
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { Controller, useForm } from "react-hook-form";
-import { Box, IconButton, Stack, Tab, Tabs, TextField } from "@mui/material";
+import { Box, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import { Navigator } from "../common/navigator";
@@ -120,7 +120,6 @@ export function ListenToTheWhole({ combinedSentences }: { combinedSentences: Com
     );
 }
 
-
 function ListenToEachSentence({ combinedSentences }: { combinedSentences: CombinedSentence[] }) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -129,24 +128,11 @@ function ListenToEachSentence({ combinedSentences }: { combinedSentences: Combin
 
     return (
         <>
-            <Stack key={currentSentence}
-                direction={"row-reverse"}
-                alignItems={"center"}
-                gap={1}
-                sx={{ marginBottom: 3 }}
-            >
-                <div><BingTranslateReader text={currentSentence} /></div>
-                {currentSentence}
-            </Stack>
-            <Stack key={nextSentence}
-                direction={"row-reverse"}
-                alignItems={"center"}
-                gap={1}
-                sx={{ marginBottom: 3 }}
-            >
-                {nextSentence && <div><BingTranslateReader text={nextSentence} onClick={() => setCurrentIndex(currentIndex + 1)} /></div>}
-                {nextSentence}
-            </Stack>
+            <SentenceReader key={currentSentence} sentence={currentSentence} />
+            {nextSentence && <SentenceReader key={nextSentence}
+                sentence={nextSentence}
+                onClick={() => setCurrentIndex(currentIndex + 1)} />}
+
             <Navigator index={currentIndex}
                 total={combinedSentences.length}
                 onNext={() => setCurrentIndex(currentIndex + 1)}
@@ -154,4 +140,28 @@ function ListenToEachSentence({ combinedSentences }: { combinedSentences: Combin
                 onRestart={() => setCurrentIndex(0)} />
         </>
     )
+}
+
+function SentenceReader({ sentence, onClick }: { sentence: string, onClick?: () => void }) {
+    return (
+        <Stack key={sentence}
+            direction={"row-reverse"}
+            alignItems={"center"}
+            gap={1}
+            sx={{ marginBottom: 3 }}
+        >
+            <div style={{
+                borderRadius: "50%",
+                border: "2px solid #f5f5f5",
+                minWidth: 80, width: 80,
+                height: 80,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+            }}>
+                <BingTranslateReader text={sentence} onClick={onClick} />
+            </div>
+            <Typography variant="h6">{sentence}</Typography>
+        </Stack>
+    );
 }

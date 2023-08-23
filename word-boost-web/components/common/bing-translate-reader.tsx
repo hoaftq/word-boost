@@ -26,7 +26,7 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
         }
     }, [onClick]);
 
-    const size = isBrowser ? 42 : 34;
+    const size = isBrowser ? 42 : 37;
 
     return <div style={{
         width: size,
@@ -41,8 +41,8 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
                 width: 800,
                 height: 600,
                 position: "absolute",
-                top: isBrowser ? - 269 : -186,
-                left: isBrowser ? -19 : -756,
+                top: isBrowser ? -269 : -207,
+                left: isBrowser ? -19 : -751,
             }}
             scrolling="no"
             src={bingUrl} />
@@ -53,7 +53,7 @@ export function FullBingTranslate({ text }: { text: string }) {
     const bingUrl = `https://www.bing.com/translator?from=en&text=${encodeURIComponent(text)}`;
 
     return <div style={{
-        width: isBrowser ? 268 : 252,
+        width: isBrowser ? 268 : 263,
         height: isBrowser ? 362 : 205,
         overflow: "hidden",
         position: "relative",
@@ -68,7 +68,7 @@ export function FullBingTranslate({ text }: { text: string }) {
             height: isBrowser ? 800 : 482,
             position: "absolute",
             left: isBrowser ? -30 : 0,
-            top: isBrowser ? -240 : -120,
+            top: isBrowser ? -240 : -124,
         }}
             src={bingUrl} />
     </div>

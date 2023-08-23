@@ -153,7 +153,7 @@ export function Main() {
 
     return (
         <>
-            <Stack direction={"row"} gap={1} paddingTop={1} borderTop={"solid #8abe53 3px"}>
+            <Stack direction={"row"} gap={1}>
                 <Box display={{ "xs": "none", "sm": "block" }}>
                     <Logo full={useFullLogo} />
                 </Box>

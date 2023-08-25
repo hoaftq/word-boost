@@ -13,6 +13,8 @@ import { SentenceTypography } from "./sentence-typography";
 import { BingTranslateReader } from "../common/bing-translate-reader";
 import { SentenceYoutubePlayer } from "../common/sentence-youtube-player";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
+import ImageIcon from '@mui/icons-material/Image';
+import VideoCameraBackIcon from '@mui/icons-material/VideoCameraBack';
 
 export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -85,66 +87,98 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
 }
 
 function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisible: boolean }) {
-    const [imageVisible, setImageVisible] = useState(initialImageVisible);
+    const [mediaVisible, setMediaVisible] = useState(initialImageVisible);
+    const [mediaType, setMediaType] = useState<"image" | "video">("image");
     const timer = useRef<ProgressTimerRef>(null);
+    const [prevWord, setPrevWord] = useState(word);
+
+    if (prevWord !== word) {
+        setPrevWord(word);
+
+        if (word.imageUrl && mediaType === "video") {
+            setMediaType("image");
+        }
+    }
+
+    if (!word.imageUrl && word.videoUrl && mediaType === "image") {
+        setMediaType("video");
+    }
 
     const handleWordClick = () => {
-        setImageVisible(!imageVisible);
+        setMediaVisible(!mediaVisible);
     }
 
     const handleTimeup = () => {
         setTimeout(() => {
-            setImageVisible(true);
+            setMediaVisible(true);
         });
     }
 
     useEffect(() => {
         timer.current?.resetTimer();
-        setImageVisible(initialImageVisible);
+        setMediaVisible(initialImageVisible);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [word]);
 
-    return (
-        <>
+    return <>
+        <div style={{
+            width: "100%",
+            height: 397,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            position: "relative"
+        }}>
+            {word?.imageUrl && <LoadingImage imageUrl={word?.imageUrl} visible={mediaVisible && mediaType === "image"} />}
+            {word?.videoUrl && <div style={{ display: mediaVisible && mediaType === "video" ? "block" : "none" }}>
+                <SentenceYoutubePlayer videoUrl={word?.videoUrl}
+                    width={636}
+                    height={358}
+                    controlPosition="start"
+                    play={mediaVisible && mediaType === "video"} />
+            </div>}
+            {!!word?.imageUrl && !!word?.videoUrl && mediaVisible && <IconButton
+                color="secondary"
+                sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    backgroundColor: "white"
+                }}
+                onClick={() => setMediaType(mediaType === "image" ? "video" : "image")}>
+                {mediaType === "image" && <VideoCameraBackIcon />}
+                {mediaType === "video" && <ImageIcon />}
+            </IconButton>}
+            {!mediaVisible && <ProgressTimer ref={timer}
+                mode="seconds"
+                maxValue={15}
+                onTimeup={handleTimeup} />}
+        </div>
+
+        <div style={{
+            display: "flex",
+            flexDirection: "row",
+            marginTop: 3,
+            marginBottom: 3,
+            paddingLeft: 45,
+        }}>
+            <Chip key={word?.id}
+                label={word?.value}
+                clickable
+                color="primary"
+                sx={{
+                    fontSize: 50,
+                    p: 4
+                }}
+                onClick={handleWordClick} />
             <div style={{
-                width: "100%",
-                height: 377,
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                alignSelf: "center",
+                marginLeft: 3
             }}>
-                <LoadingImage imageUrl={word?.imageUrl} visible={imageVisible} />
-                {!imageVisible && <ProgressTimer ref={timer}
-                    mode="seconds"
-                    maxValue={15}
-                    onTimeup={handleTimeup} />}
+                <BingTranslateReader text={word?.value} />
             </div>
-            <div style={{
-                display: "flex",
-                flexDirection: "row",
-                marginTop: 1,
-                marginBottom: 3,
-                paddingLeft: 45,
-            }}>
-                <Chip key={word?.id}
-                    label={word?.value}
-                    clickable
-                    color="primary"
-                    sx={{
-                        fontSize: 50,
-                        p: 4
-                    }}
-                    onClick={handleWordClick} />
-                <div style={{
-                    alignSelf: "center",
-                    marginLeft: 3
-                }}>
-                    <BingTranslateReader text={word?.value} />
-                </div>
-            </div>
-        </>
-    );
+        </div>
+    </>;
 }
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -183,7 +217,7 @@ function SentenceCard({ word }: { word: Word }) {
     const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
-        <div style={{ width: "100%", minHeight: 445 }}
+        <div style={{ width: "100%", minHeight: 467 }}
             onMouseUpCapture={onMouseUpCapture}>
             {word.sentences.map((s, i) => {
                 const isCardExpanded = expandedIndex === i;

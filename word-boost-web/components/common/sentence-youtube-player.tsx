@@ -1,4 +1,4 @@
-import { Tooltip, IconButton, FormControlLabel, Checkbox } from "@mui/material";
+import { Tooltip, IconButton, FormControlLabel, Checkbox, Stack } from "@mui/material";
 import dynamic from "next/dynamic";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
@@ -8,7 +8,15 @@ import { parseVideoUrl } from "./player-utils";
 
 const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
 
-export function SentenceYoutubePlayer({ videoUrl, play }: { videoUrl: string, play: boolean }) {
+type SentenceYoutubePlayerProps = {
+    videoUrl: string;
+    width: string | number;
+    height: string | number;
+    controlPosition: "start" | "center" | "end",
+    play: boolean;
+}
+
+export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition, play }: SentenceYoutubePlayerProps) {
     const playerRef = useRef<ReactPlayer>(null);
     const [isPlayingWholeVideo, setIsPlayingWholeVideo] = useState(false);
     const [hasControl, setHasControl] = useState(false);
@@ -60,12 +68,12 @@ export function SentenceYoutubePlayer({ videoUrl, play }: { videoUrl: string, pl
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <YoutubePlayer playerRef={playerRef}
                 key={hasControl ? "yp_1" : "yp_0"}
-                width="min(560px, 100vw - 4px)"
-                height="315px"
+                width={width}
+                height={height}
                 controls={hasControl}
                 url={urlInfo.url}
                 onCustomProgress={handleCustomProgress} />
-            <div>
+            <Stack direction={"row"} alignSelf={controlPosition}>
                 <Tooltip title="Replay with time range">
                     <IconButton sx={{ marginRight: 1 }} onClick={handleReplayClick}>
                         <ReplayCircleFilledIcon />
@@ -78,7 +86,13 @@ export function SentenceYoutubePlayer({ videoUrl, play }: { videoUrl: string, pl
                 </Tooltip>
                 <FormControlLabel label="Control"
                     control={<Checkbox checked={hasControl} onChange={handleHasControlChange} />} />
-            </div>
+            </Stack>
         </div>
     );
 }
+
+SentenceYoutubePlayer.defaultProps = {
+    width: "min(560px, 100vw - 4px)",
+    height: "315px",
+    controlPosition: "center"
+};

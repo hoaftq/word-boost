@@ -25,6 +25,7 @@ export interface Word {
     unit: string;
     course: string;
     imageUrl: string;
+    videoUrl: string;
     sentences: Sentence[]
 }
 

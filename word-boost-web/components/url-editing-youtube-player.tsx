@@ -122,7 +122,12 @@ export function UrlEditingYouTubePlayer({ onChange, rangeIndex }: UrlEditingYouT
     }, [rangeIndex, setValue, watch]);
 
     return (
-        <Stack direction={"column"} alignItems={"center"}>
+        <Stack direction={"column"}
+            alignItems={"center"}
+            border={1}
+            borderColor={"#c4c4c4"}
+            borderRadius={1}
+            padding={1}>
             <Controller control={control}
                 name="videoUrl"
                 render={({ field }) => <TextField {...field}

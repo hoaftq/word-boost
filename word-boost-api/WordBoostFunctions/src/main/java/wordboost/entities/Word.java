@@ -21,6 +21,8 @@ public class Word {
 
     private String imageUrl;
 
+    private String videoUrl;
+
     private long order;
 
     private List<Sentence> sentences;

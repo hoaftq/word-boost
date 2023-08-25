@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack";
 import { FocusEvent, useState } from "react";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { UrlEditingYouTubePlayer } from "@wb/components/url-editing-youtube-player";
 
 export interface Sentence {
     value: string;
@@ -17,6 +18,7 @@ interface WordForm {
     unit: string;
     course: string;
     imageUrl: string;
+    videoUrl: string;
     sentences: Sentence[]
 }
 
@@ -27,6 +29,7 @@ export default function AddWord() {
             unit: '',
             course: '',
             imageUrl: '',
+            videoUrl: '',
             sentences: [{
                 value: '',
                 mediaUrl: ''
@@ -36,6 +39,7 @@ export default function AddWord() {
     const { fields, append, remove } = useFieldArray({ control, name: "sentences" })
     const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
     const { enqueueSnackbar } = useSnackbar();
+    const [rangeIndex, setRangeIndex] = useState(0);
 
     const onSubmit = (data: WordForm) => {
         blockingFetch('add', {
@@ -45,6 +49,7 @@ export default function AddWord() {
                 unit: data.unit?.trim(),
                 course: data.course?.trim(),
                 imageUrl: data.imageUrl?.trim(),
+                videoUrl: data.videoUrl,
                 sentences: data.sentences
             })
         })
@@ -53,6 +58,7 @@ export default function AddWord() {
                 enqueueSnackbar(`Added a new word with id of ${wordId}`, { variant: 'success' });
                 resetField("value");
                 resetField("imageUrl");
+                setRangeIndex(rangeIndex + 1);
                 resetField("sentences");
                 setFocus("value");
             });
@@ -129,6 +135,12 @@ export default function AddWord() {
                             label="Image Url"
                             size="small"
                         />}
+                    />
+                    <Controller name="videoUrl"
+                        control={control}
+                        render={({ field: { onChange } }) => <UrlEditingYouTubePlayer
+                            onChange={onChange}
+                            rangeIndex={rangeIndex} />}
                     />
 
                     <Divider textAlign="left" >Example sentences</Divider>

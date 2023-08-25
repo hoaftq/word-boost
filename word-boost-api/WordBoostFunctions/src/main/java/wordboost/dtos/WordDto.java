@@ -20,5 +20,7 @@ public class WordDto {
 
     private String imageUrl;
 
+    private String videoUrl;
+
     private List<SentenceDto> sentences;
 }

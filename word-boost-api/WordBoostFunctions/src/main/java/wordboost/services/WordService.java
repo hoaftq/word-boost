@@ -77,6 +77,7 @@ public class WordService extends ServiceBase {
                 .with("unit", wordDto.getUnit())
                 .with("course", wordDto.getCourse())
                 .with("imageUrl", wordDto.getImageUrl())
+                .with("videoUrl", wordDto.getVideoUrl())
                 .with("order", new Date().getTime())
                 .with("sentences2", sentences)
         );
@@ -135,6 +136,7 @@ public class WordService extends ServiceBase {
                 .unit(item.get("unit").getS())
                 .course(item.get("course").getS())
                 .imageUrl(item.getOrDefault("imageUrl", new AttributeValue()).getS())
+                .videoUrl(item.getOrDefault("videoUrl", new AttributeValue()).getS())
                 .order(order)
                 .sentences(allSentences)
                 .build();

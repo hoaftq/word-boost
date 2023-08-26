@@ -23,7 +23,7 @@ interface WordForm {
 }
 
 export default function AddWord() {
-    const { control, formState: { errors }, handleSubmit, resetField, setFocus } = useForm({
+    const { control, formState: { errors }, handleSubmit, resetField, setFocus, setValue } = useForm({
         defaultValues: {
             value: '',
             unit: '',
@@ -59,7 +59,13 @@ export default function AddWord() {
                 resetField("value");
                 resetField("imageUrl");
                 setRangeIndex(rangeIndex + 1);
-                resetField("sentences");
+
+                // For flashcard that might have a lot of words without sentences
+                if (data.sentences.length == 0) {
+                    setValue("sentences", []);
+                } else {
+                    resetField("sentences");
+                }
                 setFocus("value");
             });
     }
@@ -149,10 +155,14 @@ export default function AddWord() {
                         <Grid item xs={12}>
                             <Controller name={`sentences.${i}.value`}
                                 control={control}
+                                rules={{ required: { value: true, message: "Sentence is required." } }}
                                 render={({ field }) => <TraditionalChangeTextField {...field}
                                     size="small"
                                     label="Sentence"
                                     fullWidth
+                                    required
+                                    error={!!errors?.value}
+                                    helperText={errors?.value?.message}
                                     onTraditionalChange={handleSentenceChange} />}
                             />
                         </Grid>

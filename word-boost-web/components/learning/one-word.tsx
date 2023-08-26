@@ -16,7 +16,7 @@ import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 import ImageIcon from '@mui/icons-material/Image';
 import VideoCameraBackIcon from '@mui/icons-material/VideoCameraBack';
 
-export function OneWord({ words, initialImageVisible }: { words: Word[], initialImageVisible: boolean }) {
+export function OneWord({ words, initialShowAll, mode }: { words: Word[], initialShowAll: boolean, mode: WordCardMode }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedTab, setSelectedTab] = useState(0);
 
@@ -50,8 +50,8 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
     }, [words]);
 
     return (
-        <Stack direction={"column"} alignItems={"center"}>
-            {selectedTab === 0 && <WordCard word={currentWord} initialImageVisible={initialImageVisible} />}
+        <Stack direction={"column"} alignItems={"center"} gap={1}>
+            {selectedTab === 0 && <WordCard word={currentWord} initialShowAll={initialShowAll} mode={mode} />}
             {selectedTab === 1 && <SentenceCard word={currentWord} />}
             <Tabs value={selectedTab}
                 TabIndicatorProps={{
@@ -86,8 +86,11 @@ export function OneWord({ words, initialImageVisible }: { words: Word[], initial
     );
 }
 
-function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisible: boolean }) {
-    const [mediaVisible, setMediaVisible] = useState(initialImageVisible);
+export type WordCardMode = "show_word" | "show_media";
+
+function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: boolean, mode: WordCardMode }) {
+    const [mediaVisible, setMediaVisible] = useState(initialShowAll);
+    const [wordVisible, setWordVisible] = useState(initialShowAll);
     const [mediaType, setMediaType] = useState<"image" | "video">("image");
     const timer = useRef<ProgressTimerRef>(null);
     const [prevWord, setPrevWord] = useState(word);
@@ -104,19 +107,34 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
         setMediaType("video");
     }
 
+    if (mode === "show_word" && !wordVisible) {
+        setWordVisible(true);
+    }
+
+    if (mode === "show_media" && !mediaVisible) {
+        setMediaVisible(true);
+    }
+
     const handleWordClick = () => {
-        setMediaVisible(!mediaVisible);
+        if (mode === "show_word") {
+            setMediaVisible(!mediaVisible);
+        }
     }
 
     const handleTimeup = () => {
         setTimeout(() => {
-            setMediaVisible(true);
+            if (mode === "show_word") {
+                setMediaVisible(true);
+            } else {
+                setWordVisible(true);
+            }
         });
     }
 
     useEffect(() => {
         timer.current?.resetTimer();
-        setMediaVisible(initialImageVisible);
+        setMediaVisible(initialShowAll);
+        setWordVisible(initialShowAll);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [word]);
 
@@ -130,25 +148,27 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
             flexDirection: "column",
             position: "relative"
         }}>
-            {word?.imageUrl && <LoadingImage imageUrl={word?.imageUrl} visible={mediaVisible && mediaType === "image"} />}
+            {word?.imageUrl && <LoadingImage imageUrl={word?.imageUrl}
+                visible={mediaVisible && mediaType === "image"} />}
             {word?.videoUrl && <div style={{ display: mediaVisible && mediaType === "video" ? "block" : "none" }}>
                 <SentenceYoutubePlayer videoUrl={word?.videoUrl}
                     width={636}
                     height={358}
                     controlPosition="start"
+                    initialMuted={mode === "show_media"}
                     play={mediaVisible && mediaType === "video"} />
             </div>}
+
             {!!word?.imageUrl && !!word?.videoUrl && mediaVisible && <IconButton
-                color="secondary"
                 sx={{
                     position: "absolute",
                     bottom: 0,
                     backgroundColor: "white"
                 }}
                 onClick={() => setMediaType(mediaType === "image" ? "video" : "image")}>
-                {mediaType === "image" && <VideoCameraBackIcon />}
-                {mediaType === "video" && <ImageIcon />}
+                {mediaType === "image" ? <VideoCameraBackIcon /> : <ImageIcon />}
             </IconButton>}
+
             {!mediaVisible && <ProgressTimer ref={timer}
                 mode="seconds"
                 maxValue={15}
@@ -157,26 +177,32 @@ function WordCard({ word, initialImageVisible }: { word: Word, initialImageVisib
 
         <div style={{
             display: "flex",
-            flexDirection: "row",
-            marginTop: 3,
-            marginBottom: 3,
-            paddingLeft: 45,
+            flexDirection: "row"
         }}>
-            <Chip key={word?.id}
-                label={word?.value}
-                clickable
-                color="primary"
-                sx={{
-                    fontSize: 50,
-                    p: 4
-                }}
-                onClick={handleWordClick} />
-            <div style={{
-                alignSelf: "center",
-                marginLeft: 3
-            }}>
-                <BingTranslateReader text={word?.value} />
-            </div>
+            {wordVisible ? <>
+                <Chip key={word?.id}
+                    label={word?.value}
+                    clickable
+                    color="primary"
+                    sx={{
+                        fontSize: 50,
+                        p: 4,
+                        marginLeft: 5.6
+                    }}
+                    onClick={handleWordClick} />
+                <div style={{
+                    alignSelf: "center",
+                    marginLeft: 3
+                }}>
+                    <BingTranslateReader text={word?.value} />
+                </div>
+            </> : (
+                <ProgressTimer ref={timer}
+                    mode="seconds"
+                    maxValue={15}
+                    onTimeup={handleTimeup}
+                    onDoubleClick={handleTimeup} />
+            )}
         </div>
     </>;
 }

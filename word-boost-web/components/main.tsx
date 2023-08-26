@@ -2,7 +2,7 @@ import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectCha
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { ChangeEvent, useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
-import { OneWord } from "@wb/components/learning/one-word";
+import { OneWord, WordCardMode } from "@wb/components/learning/one-word";
 import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
@@ -11,13 +11,14 @@ import { WritingSentences } from "./learning/writing-sentences";
 import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./multiple-select";
 import { Lesson } from "./learning/lesson";
 import { shuffleArray } from "@wb/utils/utils";
-import ImageIcon from '@mui/icons-material/Image';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
 import { ListeningToStories } from "./learning/listening-to-stories";
 import { Logo } from "./logo";
+import { TextMediaButton } from "./learning/flashcard/TextMediaButton";
 
 export interface Word {
     id: string;
@@ -56,8 +57,9 @@ export function Main() {
     const [groupOptions, setGroupOptions] = useState<GroupOptions[]>([]);
 
     const [mode, setMode] = useState<string>(LearningMode.OneWord);
-    const [imageVisible, setImageVisible] = useState(false);
+    const [showAll, setShowAll] = useState(false);
     const [isRandomOrder, setIsRandomeOrder] = useState(false);
+    const [wordCardMode, setWordCardMode] = useState<WordCardMode>("show_word");
 
     const [words, setWords] = useState([] as Word[]);
 
@@ -122,8 +124,8 @@ export function Main() {
         setMode(e.target.value);
     }
 
-    const handleImageVisibleChange = (_: React.MouseEvent<HTMLElement>, value: any) => {
-        setImageVisible(!imageVisible);
+    const handleShowAllChange = (_: React.MouseEvent<HTMLElement>, value: any) => {
+        setShowAll(!showAll);
     }
 
     const handleRandomOrderChange = (_: React.MouseEvent<HTMLElement>, value: any) => {
@@ -190,19 +192,6 @@ export function Main() {
                         </FormControl>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                        {mode === LearningMode.OneWord
-                            && <Tooltip title="Show images for next words">
-                                <ToggleButton
-                                    value="image"
-                                    selected={imageVisible}
-                                    color="secondary"
-                                    size="small"
-                                    sx={{ marginRight: 1 }}
-                                    onChange={handleImageVisibleChange}
-                                >
-                                    <ImageIcon />
-                                </ToggleButton>
-                            </Tooltip>}
                         {[LearningMode.WordsTest, LearningMode.WriteAParagraph, LearningMode.WriteFromAnAudio, LearningMode.ListeningToStories].indexOf(mode as LearningMode) < 0
                             && <Tooltip title="Random order (It can be toggled off if there are no words loaded, otherwise it will generate a new random)">
                                 <ToggleButton value="random"
@@ -226,13 +215,31 @@ export function Main() {
                             sx={{ width: 80 }}
                             onChange={handleSpeedChange}
                         />}
+                        {mode === LearningMode.OneWord &&
+                            <>
+                                <TextMediaButton isText={wordCardMode === "show_word"}
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={() => setWordCardMode(wordCardMode === "show_word" ? "show_media" : "show_word")} />
+                                <Tooltip title="Show everything">
+                                    <ToggleButton
+                                        value="image"
+                                        selected={showAll}
+                                        color="secondary"
+                                        size="small"
+                                        sx={{ marginLeft: 1 }}
+                                        onChange={handleShowAllChange}
+                                    >
+                                        <VisibilityIcon />
+                                    </ToggleButton>
+                                </Tooltip>
+                            </>}
                     </Grid>
                 </Grid>
             </Stack>
 
             {!!words.length && <div style={{ marginTop: 16 }}>
                 {mode === LearningMode.AllWords && <AllWords words={words} />}
-                {mode === LearningMode.OneWord && <OneWord words={words} initialImageVisible={imageVisible} />}
+                {mode === LearningMode.OneWord && <OneWord words={words} mode={wordCardMode} initialShowAll={showAll} />}
                 {mode === LearningMode.ReadSentences && <Sentences words={words} />}
                 {mode === LearningMode.WriteSentences && <WritingSentences words={words} />}
                 {mode === LearningMode.WriteAParagraph && <WritingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}

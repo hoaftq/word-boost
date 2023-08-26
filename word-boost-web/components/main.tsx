@@ -2,7 +2,7 @@ import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectCha
 import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import { ChangeEvent, useEffect, useId, useState } from "react";
 import { AllWords } from "@wb/components/learning/all-words";
-import { OneWord, WordCardMode } from "@wb/components/learning/one-word";
+import { FlashCard } from "@wb/components/learning/flashcard/flashcard";
 import { Sentence } from "@wb/pages/add-word"; // TODO
 import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
@@ -18,7 +18,8 @@ import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
 import { ListeningToStories } from "./learning/listening-to-stories";
 import { Logo } from "./logo";
-import { TextMediaButton } from "./learning/text-media-button";
+import { TextMediaButton } from "./learning/flashcard/text-media-button";
+import { WordCardMode } from "./learning/flashcard/word-card";
 
 export interface Word {
     id: string;
@@ -239,7 +240,7 @@ export function Main() {
 
             {!!words.length && <div style={{ marginTop: 16 }}>
                 {mode === LearningMode.AllWords && <AllWords words={words} />}
-                {mode === LearningMode.OneWord && <OneWord words={words} mode={wordCardMode} initialShowAll={showAll} />}
+                {mode === LearningMode.OneWord && <FlashCard words={words} mode={wordCardMode} initialShowAll={showAll} />}
                 {mode === LearningMode.ReadSentences && <Sentences words={words} />}
                 {mode === LearningMode.WriteSentences && <WritingSentences words={words} />}
                 {mode === LearningMode.WriteAParagraph && <WritingParagraph words={words} speed={paragraphScrollSpeed ?? 0} />}

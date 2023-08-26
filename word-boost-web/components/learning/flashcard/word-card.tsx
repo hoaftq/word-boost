@@ -69,7 +69,7 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
     let videoDuration = 15;
     if (word?.videoUrl) {
         const { start, end } = parseVideoUrl(word.videoUrl);
-        videoDuration = Math.max(15, end - start);
+        videoDuration = Math.max(15, Math.round(end - start));
     }
 
     return <>

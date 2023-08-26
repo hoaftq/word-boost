@@ -1,6 +1,6 @@
 import { Tooltip, IconButton, Stack, ToggleButton } from "@mui/material";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -8,6 +8,8 @@ import { parseVideoUrl } from "./player-utils";
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import SettingsIcon from '@mui/icons-material/Settings';
+import screenfull from "screenfull";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
 
@@ -41,8 +43,12 @@ export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition
 
     const urlInfo = parseVideoUrl(videoUrl);
 
-    const handleReplayClick = () => {
+    const replayWithTimeRange = (isMuted?: boolean) => {
         setIsPlayingWholeVideo(false);
+        if (isMuted !== undefined) {
+            setMuted(muted);
+        }
+
         playAt(urlInfo.start);
     }
 
@@ -75,6 +81,15 @@ export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition
         }
     }, [urlInfo.start, play]);
 
+    const setFullScreen = useCallback((fullScreen: boolean) => {
+        const playerWrapper = (playerRef.current as any).wrapper as any;
+        if (fullScreen) {
+            screenfull.request(playerWrapper);
+        } else {
+            screenfull.exit();
+        }
+    }, []);
+
     const playAt = (pos: number) => {
         playerRef.current?.seekTo(pos, "seconds");
         playerRef.current?.getInternalPlayer().playVideo();
@@ -106,11 +121,15 @@ export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition
                     {muted ? <VolumeOffIcon /> : <VolumeUpIcon />}
                 </IconButton>
                 <Tooltip title="Replay with time range">
-                    <IconButton onClick={handleReplayClick}>
+                    <IconButton onClick={() => replayWithTimeRange()}>
                         <ReplayCircleFilledIcon />
                     </IconButton>
                 </Tooltip>
-
+                <Tooltip title="Replay with time range and unmuting">
+                    <IconButton onClick={() => replayWithTimeRange(false)}>
+                        <PlayCircleOutlineIcon />
+                    </IconButton>
+                </Tooltip>
             </Stack>
         </div >
     );

@@ -18,7 +18,7 @@ import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
 import { ListeningToStories } from "./learning/listening-to-stories";
 import { Logo } from "./logo";
-import { TextMediaButton } from "./learning/flashcard/TextMediaButton";
+import { TextMediaButton } from "./learning/text-media-button";
 
 export interface Word {
     id: string;
@@ -26,7 +26,7 @@ export interface Word {
     unit: string;
     course: string;
     imageUrl: string;
-    videoUrl: string;
+    videoUrl?: string;
     sentences: Sentence[]
 }
 

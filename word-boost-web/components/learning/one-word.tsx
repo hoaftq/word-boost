@@ -15,6 +15,7 @@ import { SentenceYoutubePlayer } from "../common/sentence-youtube-player";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 import ImageIcon from '@mui/icons-material/Image';
 import VideoCameraBackIcon from '@mui/icons-material/VideoCameraBack';
+import { parseVideoUrl } from "../common/player-utils";
 
 export function OneWord({ words, initialShowAll, mode }: { words: Word[], initialShowAll: boolean, mode: WordCardMode }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -64,7 +65,7 @@ export function OneWord({ words, initialShowAll, mode }: { words: Word[], initia
                 <Tab icon={<AbcIcon />} disabled={!currentWord.value} />
                 <Tab icon={<FormatListBulletedIcon />} disabled={!currentWord.sentences.length} />
             </Tabs>
-            <div style={{ marginTop: 20, marginBottom: 10, fontWeight: 'bold' }}>
+            <div style={{ marginTop: 5, marginBottom: 5, fontWeight: 'bold' }}>
                 {currentIndex + 1}/{words.length}
             </div>
             <div>
@@ -101,6 +102,9 @@ function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: 
         if (word.imageUrl && mediaType === "video") {
             setMediaType("image");
         }
+
+        setMediaVisible(initialShowAll);
+        setWordVisible(initialShowAll);
     }
 
     if (!word.imageUrl && word.videoUrl && mediaType === "image") {
@@ -133,10 +137,14 @@ function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: 
 
     useEffect(() => {
         timer.current?.resetTimer();
-        setMediaVisible(initialShowAll);
-        setWordVisible(initialShowAll);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [word]);
+
+
+    let videoDuration = 15;
+    if (word?.videoUrl) {
+        const { start, end } = parseVideoUrl(word.videoUrl);
+        videoDuration = Math.max(15, end - start);
+    }
 
     return <>
         <div style={{
@@ -190,19 +198,21 @@ function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: 
                         marginLeft: 5.6
                     }}
                     onClick={handleWordClick} />
-                <div style={{
-                    alignSelf: "center",
-                    marginLeft: 3
-                }}>
-                    <BingTranslateReader text={word?.value} />
-                </div>
             </> : (
                 <ProgressTimer ref={timer}
                     mode="seconds"
-                    maxValue={15}
+                    maxValue={videoDuration}
                     onTimeup={handleTimeup}
                     onDoubleClick={handleTimeup} />
             )}
+
+            <div style={{
+                alignSelf: "center",
+                marginLeft: 3,
+                display: wordVisible ? "block" : "none"
+            }}>
+                <BingTranslateReader text={word?.value} />
+            </div>
         </div>
     </>;
 }

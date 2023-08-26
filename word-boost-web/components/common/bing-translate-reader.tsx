@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
-import { isBrowser } from "react-device-detect";
+import { isDesktop, isSmartTV } from "react-device-detect";
+
+const isDestopVersion = isDesktop || isSmartTV;
 
 type BingTranslateReaderProps = {
     text: string;
@@ -26,7 +28,7 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
         }
     }, [onClick]);
 
-    const size = isBrowser ? 42 : 37;
+    const size = isDestopVersion ? 42 : 37;
 
     return <div style={{
         width: size,
@@ -41,8 +43,8 @@ export function BingTranslateReader({ text, onClick }: BingTranslateReaderProps)
                 width: 800,
                 height: 600,
                 position: "absolute",
-                top: isBrowser ? -269 : -207,
-                left: isBrowser ? -19 : -751,
+                top: isDestopVersion ? -269 : -207,
+                left: isDestopVersion ? -19 : -751,
             }}
             scrolling="no"
             src={bingUrl} />
@@ -53,8 +55,8 @@ export function FullBingTranslate({ text }: { text: string }) {
     const bingUrl = `https://www.bing.com/translator?from=en&text=${encodeURIComponent(text)}`;
 
     return <div style={{
-        width: isBrowser ? 268 : 263,
-        height: isBrowser ? 362 : 205,
+        width: isDestopVersion ? 268 : 263,
+        height: isDestopVersion ? 362 : 205,
         overflow: "hidden",
         position: "relative",
         borderWidth: 1,
@@ -64,11 +66,11 @@ export function FullBingTranslate({ text }: { text: string }) {
     }}>
         <iframe style={{
             border: 0,
-            width: isBrowser ? 1024 : 268,
-            height: isBrowser ? 800 : 482,
+            width: isDestopVersion ? 1024 : 268,
+            height: isDestopVersion ? 800 : 482,
             position: "absolute",
-            left: isBrowser ? -30 : 0,
-            top: isBrowser ? -240 : -124,
+            left: isDestopVersion ? -30 : 0,
+            top: isDestopVersion ? -240 : -124,
         }}
             src={bingUrl} />
     </div>

@@ -46,7 +46,7 @@ export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition
     const replayWithTimeRange = (isMuted?: boolean) => {
         setIsPlayingWholeVideo(false);
         if (isMuted !== undefined) {
-            setMuted(muted);
+            setMuted(isMuted);
         }
 
         playAt(urlInfo.start);

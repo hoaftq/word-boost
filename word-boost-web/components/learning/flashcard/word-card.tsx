@@ -92,7 +92,7 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
                 position: isTeachingPlaying ? "fixed" : "static"
             }}>
                 <SentenceYoutubePlayer videoUrl={word?.videoUrl}
-                    width={isTeachingPlaying ? `${100 / scale}vw` : 636}
+                    width={isTeachingPlaying ? `${100 / scale}vw` : "min(636px, 100vw)"}
                     height={isTeachingPlaying ? `${100 / scale}vh` : 358}
                     controlPosition="start"
                     initialMuted={mode === "show_media"}
@@ -105,7 +105,7 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
             {!!word?.imageUrl && !!word?.videoUrl && mediaVisible && <IconButton
                 sx={{
                     position: "absolute",
-                    bottom: 0,
+                    bottom: 5,
                     backgroundColor: "white"
                 }}
                 onClick={() => setMediaType(mediaType === "image" ? "video" : "image")}>

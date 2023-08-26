@@ -11,12 +11,16 @@ import ImageIcon from '@mui/icons-material/Image';
 
 export type WordCardMode = "show_word" | "show_media";
 
+const scale = 1.5;
+
 export function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: boolean, mode: WordCardMode }) {
     const [mediaVisible, setMediaVisible] = useState(initialShowAll);
     const [wordVisible, setWordVisible] = useState(initialShowAll);
     const [mediaType, setMediaType] = useState<"image" | "video">("image");
     const timer = useRef<ProgressTimerRef>(null);
     const [prevWord, setPrevWord] = useState(word);
+
+    const [isTeachingPlaying, setIsTeachingPlaying] = useState(false);
 
     if (prevWord !== word) {
         setPrevWord(word);
@@ -80,13 +84,22 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
         }}>
             {word?.imageUrl && <LoadingImage imageUrl={word?.imageUrl}
                 visible={mediaVisible && mediaType === "image"} />}
-            {word?.videoUrl && <div style={{ display: mediaVisible && mediaType === "video" ? "block" : "none" }}>
+            {word?.videoUrl && <div style={{
+                display: mediaVisible && mediaType === "video" ? "block" : "none",
+                top: 0,
+                left: `${50 - 50 / scale}vw`,
+                zIndex: isTeachingPlaying ? 1 : 0,
+                position: isTeachingPlaying ? "fixed" : "static"
+            }}>
                 <SentenceYoutubePlayer videoUrl={word?.videoUrl}
-                    width={636}
-                    height={358}
+                    width={isTeachingPlaying ? `${100 / scale}vw` : 636}
+                    height={isTeachingPlaying ? `${100 / scale}vh` : 358}
                     controlPosition="start"
                     initialMuted={mode === "show_media"}
-                    play={mediaVisible && mediaType === "video"} />
+                    play={mediaVisible && mediaType === "video"}
+                    onMutedPlay={() => setIsTeachingPlaying(true)}
+                    onUnmutedPlay={() => setIsTeachingPlaying(true)}
+                    onPlayFinished={() => setIsTeachingPlaying(false)} />
             </div>}
 
             {!!word?.imageUrl && !!word?.videoUrl && mediaVisible && <IconButton

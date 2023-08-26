@@ -45,7 +45,7 @@ export function SentenceCard({ word }: { word: Word }) {
     const isYoutubeLink = (medialUrl: string) => medialUrl.startsWith("https://www.youtube.com/");
 
     return (
-        <div style={{ width: "100%", minHeight: 467 }}
+        <div style={{ width: "100%", minHeight: 469 }}
             onMouseUpCapture={onMouseUpCapture}>
             {word.sentences.map((s, i) => {
                 const isCardExpanded = expandedIndex === i;

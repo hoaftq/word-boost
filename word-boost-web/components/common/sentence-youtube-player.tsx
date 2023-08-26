@@ -77,7 +77,8 @@ export function SentenceYoutubePlayer({ videoUrl, width, height, controlPosition
                 clearTimeout(timerId);
             }
         } else {
-            playerRef.current?.getInternalPlayer().pauseVideo();
+            // Internal player can be null here
+            playerRef.current?.getInternalPlayer()?.pauseVideo();
         }
     }, [urlInfo.start, play]);
 

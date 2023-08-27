@@ -91,16 +91,17 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
                 <div style={{
                     display: mediaVisible && mediaType === "video" ? "block" : "none",
                     top: 0,
-                    left: `${50 - 50 / scale}vw`,
+                    left: `calc(${50 - 50 / scale}vw + 25px)`,
                     zIndex: isTeachingPlaying ? 1 : 0,
                     position: isTeachingPlaying ? "fixed" : "static"
                 }}>
                     <SentenceYoutubePlayer videoUrl={word?.videoUrl}
-                        width={isTeachingPlaying ? `${100 / scale}vw` : "min(636px, 100vw)"}
-                        height={isTeachingPlaying ? `${100 / scale}vh` : 358}
+                        width={isTeachingPlaying ? `calc(${100 / scale}vw - 50px)` : "min(636px, 100vw)"}
+                        height={isTeachingPlaying ? `calc(${100 / scale}vh - 72px)` : 358}
                         controlPosition="start"
                         initialMuted={mode === "show_media"}
                         play={mediaVisible && mediaType === "video"}
+                        onAutoPlay={() => setIsTeachingPlaying(true)}
                         onMutedPlay={() => setIsTeachingPlaying(true)}
                         onUnmutedPlay={() => setIsTeachingPlaying(true)}
                         onPlayFinished={() => setIsTeachingPlaying(false)} />

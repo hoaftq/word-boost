@@ -20,6 +20,7 @@ type SentenceYoutubePlayerProps = {
     controlPosition: "start" | "center" | "end",
     initialMuted: boolean,
     play: boolean;
+    onAutoPlay?: () => void,
     onUnmutedPlay?: () => void,
     onMutedPlay?: () => void,
     onPlayFinished?: () => void
@@ -32,6 +33,7 @@ export function SentenceYoutubePlayer({
     controlPosition,
     initialMuted,
     play,
+    onAutoPlay,
     onUnmutedPlay,
     onMutedPlay,
     onPlayFinished }: SentenceYoutubePlayerProps) {
@@ -95,6 +97,13 @@ export function SentenceYoutubePlayer({
         }
     }, [urlInfo.start, play]);
 
+    useEffect(() => {
+        if (play) {
+            onAutoPlay?.();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [play, videoUrl]);
+
     const setFullScreen = useCallback((fullScreen: boolean) => {
         const playerWrapper = (playerRef.current as any).wrapper as any;
         if (fullScreen) {
@@ -110,7 +119,12 @@ export function SentenceYoutubePlayer({
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "white"
+        }}>
             <YoutubePlayer playerRef={playerRef}
                 key={hasControl ? "yp_1" : "yp_0"}
                 width={width}
@@ -119,7 +133,10 @@ export function SentenceYoutubePlayer({
                 muted={muted}
                 url={urlInfo.url}
                 onCustomProgress={handleCustomProgress} />
-            <Stack direction={"row"} alignSelf={controlPosition} marginTop="2px" gap={1}>
+            <Stack direction={"row"}
+                alignSelf={controlPosition}
+                marginTop="2px"
+                gap={1}>
                 <Tooltip title="Play the whole video" sx={{ marginRight: 2 }}>
                     <IconButton onClick={handlePlayAllClick}>
                         <PlayCircleOutlineIcon />

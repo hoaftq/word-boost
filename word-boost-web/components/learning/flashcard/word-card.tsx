@@ -16,7 +16,7 @@ const scale = 1.5;
 export function WordCard({ word, initialShowAll, mode }: { word: Word, initialShowAll: boolean, mode: WordCardMode }) {
     const [mediaVisible, setMediaVisible] = useState(initialShowAll);
     const [wordVisible, setWordVisible] = useState(initialShowAll);
-    const [mediaType, setMediaType] = useState<"image" | "video">("image");
+    const [mediaType, setMediaType] = useState<"image" | "video">("video");
     const timer = useRef<ProgressTimerRef>(null);
     const [prevWord, setPrevWord] = useState(word);
 
@@ -25,16 +25,16 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
     if (prevWord !== word) {
         setPrevWord(word);
 
-        if (word.imageUrl && mediaType === "video") {
-            setMediaType("image");
+        if (word.videoUrl && mediaType === "image") {
+            setMediaType("video");
         }
 
         setMediaVisible(initialShowAll);
         setWordVisible(initialShowAll);
     }
 
-    if (!word.imageUrl && word.videoUrl && mediaType === "image") {
-        setMediaType("video");
+    if (!word.videoUrl && word.imageUrl && mediaType === "video") {
+        setMediaType("image");
     }
 
     if (mode === "show_word" && !wordVisible) {
@@ -82,35 +82,39 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
             flexDirection: "column",
             position: "relative"
         }}>
-            {word?.imageUrl && <LoadingImage imageUrl={word?.imageUrl}
-                visible={mediaVisible && mediaType === "image"} />}
-            {word?.videoUrl && <div style={{
-                display: mediaVisible && mediaType === "video" ? "block" : "none",
-                top: 0,
-                left: `${50 - 50 / scale}vw`,
-                zIndex: isTeachingPlaying ? 1 : 0,
-                position: isTeachingPlaying ? "fixed" : "static"
-            }}>
-                <SentenceYoutubePlayer videoUrl={word?.videoUrl}
-                    width={isTeachingPlaying ? `${100 / scale}vw` : "min(636px, 100vw)"}
-                    height={isTeachingPlaying ? `${100 / scale}vh` : 358}
-                    controlPosition="start"
-                    initialMuted={mode === "show_media"}
-                    play={mediaVisible && mediaType === "video"}
-                    onMutedPlay={() => setIsTeachingPlaying(true)}
-                    onUnmutedPlay={() => setIsTeachingPlaying(true)}
-                    onPlayFinished={() => setIsTeachingPlaying(false)} />
-            </div>}
+            {word?.imageUrl &&
+                <LoadingImage imageUrl={word?.imageUrl}
+                    visible={mediaVisible && mediaType === "image"}
+                    preload={mode === "show_word"}
+                />}
+            {word?.videoUrl &&
+                <div style={{
+                    display: mediaVisible && mediaType === "video" ? "block" : "none",
+                    top: 0,
+                    left: `${50 - 50 / scale}vw`,
+                    zIndex: isTeachingPlaying ? 1 : 0,
+                    position: isTeachingPlaying ? "fixed" : "static"
+                }}>
+                    <SentenceYoutubePlayer videoUrl={word?.videoUrl}
+                        width={isTeachingPlaying ? `${100 / scale}vw` : "min(636px, 100vw)"}
+                        height={isTeachingPlaying ? `${100 / scale}vh` : 358}
+                        controlPosition="start"
+                        initialMuted={mode === "show_media"}
+                        play={mediaVisible && mediaType === "video"}
+                        onMutedPlay={() => setIsTeachingPlaying(true)}
+                        onUnmutedPlay={() => setIsTeachingPlaying(true)}
+                        onPlayFinished={() => setIsTeachingPlaying(false)} />
+                </div>}
 
-            {!!word?.imageUrl && !!word?.videoUrl && mediaVisible && <IconButton
-                sx={{
+            {!!word?.imageUrl && !!word?.videoUrl && mediaVisible &&
+                <IconButton sx={{
                     position: "absolute",
                     bottom: 5,
                     backgroundColor: "white"
                 }}
-                onClick={() => setMediaType(mediaType === "image" ? "video" : "image")}>
-                {mediaType === "image" ? <VideoCameraBackIcon /> : <ImageIcon />}
-            </IconButton>}
+                    onClick={() => setMediaType(mediaType === "image" ? "video" : "image")}>
+                    {mediaType === "image" ? <VideoCameraBackIcon /> : <ImageIcon />}
+                </IconButton>}
 
             {!mediaVisible && <ProgressTimer ref={timer}
                 mode="seconds"
@@ -130,7 +134,7 @@ export function WordCard({ word, initialShowAll, mode }: { word: Word, initialSh
                     sx={{
                         fontSize: 50,
                         p: 4,
-                        marginLeft: 5.6
+                        ml: 5.6
                     }}
                     onClick={handleWordClick} />
             </> : (

@@ -2,7 +2,13 @@ import { Box, CircularProgress } from "@mui/material";
 import { useState } from "react";
 import Image from "next/image";
 
-export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible: boolean }) {
+type LoadingImageProps = {
+    imageUrl: string,
+    visible: boolean,
+    preload: boolean
+}
+
+export function LoadingImage({ imageUrl, visible, preload }: LoadingImageProps) {
     const [loading, setLoading] = useState(true);
     const [prevImageUrl, setPrevImageUrl] = useState<string | null>(null);
 
@@ -16,11 +22,6 @@ export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible:
     }
 
     return <>
-        <Image src={imageUrl}
-            alt=""
-            width={1}
-            height={1}
-            style={{ left: -10 }} />
         <Box sx={{
             position: "relative",
             display: visible ? "flex" : "none",
@@ -30,18 +31,19 @@ export function LoadingImage({ imageUrl, visible }: { imageUrl: string, visible:
             height: "100%"
         }}>
             {loading && <CircularProgress />}
-            <Image src={imageUrl}
+            {(preload || visible) && <Image src={imageUrl}
                 alt=""
                 style={{
                     objectFit: 'contain',
                     opacity: loading ? 0 : 1
                 }}
                 fill={true}
-                onLoadingComplete={() => setLoading(false)} />
+                onLoadingComplete={() => setLoading(false)} />}
         </Box>
     </>;
 }
 
 LoadingImage.defaultProps = {
-    visible: true
+    visible: true,
+    preload: false
 }

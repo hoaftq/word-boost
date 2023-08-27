@@ -1,14 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Word } from "../main";
 import { Badge, Card, CardContent, CardMedia, Grid, useTheme } from "@mui/material";
 import { useImmerReducer } from "use-immer";
 import { DroppableBlank, DroppableWordPool, DraggingWordLayer } from "./word-dnd-components";
-import { getRandomArray } from "@wb/utils/utils";
+import { getRandomArray, shuffleArray } from "@wb/utils/utils";
 import { initialState, testingReducer } from "./word-test-reducer";
 
 export function WordTest({ words }: { words: Word[] }) {
     const [state, dispatch] = useImmerReducer(testingReducer, initialState);
     const theme = useTheme();
+
+    const wordsForImages = useMemo(() => shuffleArray(state.words), [state.words]);
 
     const remainingWords = state.words.filter(w => state.blankWordIds.findIndex(wid => wid === w.id) < 0);
 
@@ -56,7 +58,7 @@ export function WordTest({ words }: { words: Word[] }) {
 
     return <>
         <Grid container spacing={2} marginBottom={2}>
-            {state.words.map((w, i) => <Grid key={w.id} item xs={4}>
+            {wordsForImages.map((w, i) => <Grid key={w.id} item xs={4}>
                 <Card sx={{
                     display: "flex",
                     flexDirection: "column",

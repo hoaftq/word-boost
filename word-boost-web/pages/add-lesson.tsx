@@ -1,7 +1,8 @@
 import { Button, Divider, FormControl, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { PlayCommand } from "@wb/components/learning/lesson";
+import { useBlockingFetch } from "@wb/utils/blocking-fetch";
 import dynamic from "next/dynamic";
-import { useId, useRef, useState } from "react";
+import { useId, useRef, useState, MouseEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import ReactPlayer from "react-player";
 
@@ -20,9 +21,12 @@ export default function AddLesson() {
             rate: 1,
             delay: 0,
             repeat: 1,
-            description: ""
+            description: "",
+            course: "",
+            unit: ""
         }
     });
+    const { blockingFetch, FetchingBackdrop } = useBlockingFetch();
 
     function handleUsePosition(position: Position) {
         setPositions([...positions, position]);
@@ -41,6 +45,20 @@ export default function AddLesson() {
         }]);
         resetField("label");
         resetField("description");
+    }
+
+    function handleAddClick(event: MouseEvent<HTMLButtonElement>) {
+        blockingFetch("add-lesson", {
+            method: "post",
+            body: JSON.stringify({
+                course: getValues("course"),
+                unit: getValues("unit"),
+                mediaLessons: {
+                    name: "",
+                    commands
+                }
+            })
+        });
     }
 
     return <>
@@ -96,12 +114,27 @@ export default function AddLesson() {
             />
 
             <Button variant="contained"
-                color="primary"
+                color="secondary"
                 style={{ alignSelf: "end" }}
                 onClick={handleAddCommandClick}>Add command</Button>
 
+            <Divider style={{ marginTop: 30, marginBottom: 30 }} />
+
             <TextField multiline rows={4} fullWidth value={JSON.stringify(commands)}></TextField>
+            <Controller control={control}
+                name="course"
+                render={({ field }) => <TextField {...field} label="Course" size="small" fullWidth />}
+            />
+            <Controller control={control}
+                name="unit"
+                render={({ field }) => <TextField {...field} label="Unit" size="small" fullWidth />}
+            />
+            <Button variant="contained"
+                color="primary"
+                style={{ alignSelf: "end" }}
+                onClick={handleAddClick}>Add</Button>
         </Stack>
+        <FetchingBackdrop />
     </>
 }
 
@@ -224,7 +257,7 @@ function GetPosition({ onUsePosition }: { onUsePosition: (position: Position) =>
             />
 
             <Button variant="contained"
-                color="primary"
+                color="secondary"
                 style={{ alignSelf: "end" }}
                 onClick={handleUsePositionClick}>Use position</Button>
         </Stack>

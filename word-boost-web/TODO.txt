@@ -1,0 +1,12 @@
+-sounds
+-enter each letter of a word (game) -> the whole sentence
+-extend word testing to sentence testing (with videos?)
+-highlight word forms like past, ving
+-check word level
+-video lessons: a player can stop at each sentence
+-learn random words
+-test random words
+
+- listen to video/audio and write
+- read a sentence and listen to it and compare and read again
+- combine the same words so that we've got a list of sentences

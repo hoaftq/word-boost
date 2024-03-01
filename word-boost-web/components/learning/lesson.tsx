@@ -35,16 +35,31 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
     const [currentCommand, setCurrentCommand] = useState({ index: 0, repeat: 0 });
     const delayedRef = useRef(DelayStatus.NotStarted);
     const playerRef = useRef<ReactPlayer>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
 
     const command = commands[currentCommand.index];
+
+    const playVideo = () => {
+        playerRef.current?.getInternalPlayer()?.playVideo();
+        setIsPlaying(true);
+    }
+
+    const pauseVideo = () => {
+        playerRef.current?.getInternalPlayer()?.pauseVideo();
+        setIsPlaying(false);
+    }
 
     const handleCustomProgress = (duration: number) => {
         if (delayedRef.current === DelayStatus.Started) {
             return;
         }
 
+        if (!isPlaying) {
+            return;
+        }
+
         if (duration >= command.end) {
-            playerRef.current?.getInternalPlayer()?.pauseVideo();
+            pauseVideo();
 
             // Check if needs to delay
             if (command.delay && delayedRef.current === DelayStatus.NotStarted) {
@@ -52,7 +67,7 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
 
                 setTimeout(() => {
                     delayedRef.current = DelayStatus.Done;
-                    playerRef.current?.getInternalPlayer()?.playVideo();
+                    playVideo();
                 }, command.delay * 1000);
                 return;
             }
@@ -75,15 +90,18 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
     useEffect(() => {
         const player = playerRef.current;
         player?.seekTo(command.start);
-        player?.getInternalPlayer()?.playVideo();
-        console.log(command.start);
+        playVideo();
+
+        return () => {
+            pauseVideo();
+        };
     }, [command, currentCommand]);
 
     return command
         ? <div style={{
             width: "100%",
             height: "100%",
-            marginTop: 1
+            marginTop: 3
         }}>
             <YoutubePlayer playerRef={playerRef}
                 onCustomProgress={handleCustomProgress}
@@ -105,7 +123,7 @@ export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
             <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography color="primary"
                     fontSize={40}
-                    fontWeight="bold">{"> "}{command.description}</Typography>
+                    fontWeight="bold">{"> "}{command.description}-{JSON.stringify(currentCommand)}</Typography>
                 <Button color="secondary"
                     onClick={onEnd}>End</Button>
             </div>

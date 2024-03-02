@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 import { FocusEvent, useState } from "react";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { UrlEditingYouTubePlayer } from "@wb/components/url-editing-youtube-player";
+import { UrlEditingYouTubePlayer } from "@wb/components/common/url-editing-youtube-player";
 
 export interface Sentence {
     value: string;

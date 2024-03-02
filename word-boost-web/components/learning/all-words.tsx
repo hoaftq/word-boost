@@ -1,8 +1,8 @@
 import { Box, Chip, Popover, Stack } from "@mui/material";
 import { Word } from "@wb/components/main";
 import { useState, MouseEvent } from "react";
-import { LoadingImage } from "../loading-image";
-import { BingTranslateReader } from "../common/bing-translate-reader";
+import { LoadingImage } from "../common/loading-image";
+import { BingTranslateReader } from "../shared/bing-translate-reader";
 
 export function AllWords({ words }: { words: Word[] }) {
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

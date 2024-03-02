@@ -11,7 +11,7 @@ import PlayDisabledIcon from '@mui/icons-material/PlayDisabled';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
-const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
+const YoutubePlayer = dynamic(() => import("../common/youtube-player"), { ssr: false });
 
 type SentenceYoutubePlayerProps = {
     videoUrl: string;

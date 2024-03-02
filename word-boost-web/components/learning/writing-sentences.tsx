@@ -2,10 +2,10 @@ import { Stack, useTheme } from "@mui/material";
 import { combineSentences } from "@wb/utils/utils";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Word } from "../main";
-import { ProgressTimer, ProgressTimerRef } from "../progress-timer";
+import { ProgressTimer, ProgressTimerRef } from "../common/progress-timer";
 import { TimeForALetterInSeconds, WritingSentenceWithOrigin } from "./writing-sentence";
-import { Navigator } from "../common/navigator";
-import { AudioPlayer } from "../common/sentence-audio-player";
+import { Navigator } from "../shared/navigator";
+import { AudioPlayer } from "../shared/sentence-audio-player";
 
 const NumberOfExpectedSentences = 5;
 

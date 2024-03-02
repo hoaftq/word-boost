@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import ReactPlayer from "react-player";
 
-const YoutubePlayer = dynamic(() => import("../../../components/youtube-player"), { ssr: false });
+const YoutubePlayer = dynamic(() => import("../../common/youtube-player"), { ssr: false });
 
 enum TestingStatus {
     NotStarted,

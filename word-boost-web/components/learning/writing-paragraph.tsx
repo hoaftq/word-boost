@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, UIEvent, useCallback } from "reac
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { WritingSentenceWithOrigin } from "./writing-sentence";
-import { AudioPlayer } from "../common/sentence-audio-player";
+import { AudioPlayer } from "../shared/sentence-audio-player";
 
 type WritingParagraphProps = {
     words: Word[];

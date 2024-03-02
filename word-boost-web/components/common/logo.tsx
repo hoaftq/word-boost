@@ -1,5 +1,5 @@
 import Image from "next/image";
-import logo from "../resources/logo.svg";
+import logo from "../../resources/logo.svg";
 import { CSSProperties } from "react";
 
 export function Logo({ full, style }: { full: boolean, style?: CSSProperties }) {

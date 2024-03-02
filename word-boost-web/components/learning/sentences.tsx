@@ -2,10 +2,10 @@ import { Paper, Stack } from "@mui/material";
 import { Word } from "../main";
 import { CombinedSentenceTypography } from "./sentence-typography";
 import { combineSentences } from "@wb/utils/utils";
-import { AudioPlayer } from "../common/sentence-audio-player";
+import { AudioPlayer } from "../shared/sentence-audio-player";
 import { useMemo, useState } from "react";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
-import { BingTranslateReader } from "../common/bing-translate-reader";
+import { BingTranslateReader } from "../shared/bing-translate-reader";
 
 export function Sentences({ words }: { words: Word[] }) {
     const combinedSentences = useMemo(() => combineSentences(words), [words]);

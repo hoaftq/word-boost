@@ -8,7 +8,7 @@ import { WordTest } from "./testing/word-test";
 import { Sentences } from "./learning/sentences";
 import { FillBlankTest } from "./testing/fill-blank-test";
 import { WritingSentences } from "./learning/writing-sentences";
-import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./multiple-select";
+import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./common/multiple-select";
 import { AutoLesson } from "./learning/lesson/auto-lesson";
 import { shuffleArray } from "@wb/utils/utils";
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -17,7 +17,7 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import { WritingParagraph } from "./learning/writing-paragraph";
 import { WritingFromAudio } from "./learning/writing-from-audio";
 import { ListeningToStories } from "./learning/listening-to-stories";
-import { Logo } from "./logo";
+import { Logo } from "./common/logo";
 import { TextMediaButton } from "./learning/flashcard/text-media-button";
 import { WordCardMode } from "./learning/flashcard/word-card";
 

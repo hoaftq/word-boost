@@ -1,10 +1,10 @@
 import { IconButton, Chip } from "@mui/material";
-import { BingTranslateReader } from "@wb/components/common/bing-translate-reader";
-import { parseVideoUrl } from "@wb/components/common/player-utils";
-import { SentenceYoutubePlayer } from "@wb/components/common/sentence-youtube-player";
-import { LoadingImage } from "@wb/components/loading-image";
+import { BingTranslateReader } from "@wb/components/shared/bing-translate-reader";
+import { parseVideoUrl } from "@wb/components/shared/player-utils";
+import { SentenceYoutubePlayer } from "@wb/components/shared/sentence-youtube-player";
+import { LoadingImage } from "@wb/components/common/loading-image";
 import { Word } from "@wb/components/main";
-import { ProgressTimerRef, ProgressTimer } from "@wb/components/progress-timer";
+import { ProgressTimerRef, ProgressTimer } from "@wb/components/common/progress-timer";
 import { useState, useRef, useEffect } from "react";
 import VideoCameraBackIcon from '@mui/icons-material/VideoCameraBack';
 import ImageIcon from '@mui/icons-material/Image';

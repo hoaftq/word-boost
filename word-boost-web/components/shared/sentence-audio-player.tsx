@@ -1,4 +1,4 @@
-import YoutubePlayer from "../youtube-player";
+import YoutubePlayer from "../common/youtube-player";
 import ReactPlayer from "react-player";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { parseVideoUrl } from "./player-utils";

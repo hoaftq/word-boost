@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { Button, Slider, Stack, Typography } from "@mui/material";
 
-const YoutubePlayer = dynamic(() => import("../../youtube-player"), { ssr: false });
+const YoutubePlayer = dynamic(() => import("../../common/youtube-player"), { ssr: false });
 
 type ManualLesson = {
     videoUrl: string;

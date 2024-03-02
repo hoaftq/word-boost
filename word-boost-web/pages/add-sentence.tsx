@@ -1,6 +1,6 @@
 import { FocusEvent, useState } from "react";
 import { Button, Divider, FormControl, Grid, IconButton, Stack, TextField } from "@mui/material";
-import { UrlEditingYouTubePlayer } from "@wb/components/url-editing-youtube-player";
+import { UrlEditingYouTubePlayer } from "@wb/components/common/url-editing-youtube-player";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';

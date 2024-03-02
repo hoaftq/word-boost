@@ -1,7 +1,7 @@
 import { IconButtonProps, IconButton, Card, CardActions, Stack, Collapse, styled } from "@mui/material";
-import { BingTranslateReader } from "@wb/components/common/bing-translate-reader";
-import { SentenceYoutubePlayer } from "@wb/components/common/sentence-youtube-player";
-import { LoadingImage } from "@wb/components/loading-image";
+import { BingTranslateReader } from "@wb/components/shared/bing-translate-reader";
+import { SentenceYoutubePlayer } from "@wb/components/shared/sentence-youtube-player";
+import { LoadingImage } from "@wb/components/common/loading-image";
 import { Word } from "@wb/components/main";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
 import { useState } from "react";

@@ -1,5 +1,5 @@
 import { Popover } from "@mui/material";
-import { BingTranslateReader } from "@wb/components/common/bing-translate-reader";
+import { BingTranslateReader } from "@wb/components/shared/bing-translate-reader";
 import { useState, MouseEvent, useCallback } from "react";
 
 export function useSelectionTranslator() {

@@ -1,12 +1,12 @@
 import { useCallback, useMemo, MouseEvent, useState, useEffect } from "react";
-import { BingTranslateReader, FullBingTranslate } from "../common/bing-translate-reader";
+import { BingTranslateReader, FullBingTranslate } from "../shared/bing-translate-reader";
 import { Word } from "../main";
 import { combineSentences } from "@wb/utils/utils";
 import { Controller, useForm } from "react-hook-form";
 import { Box, FormControl, FormLabel, IconButton, Link, Stack, Tab, Tabs, TextField, Tooltip, Typography } from "@mui/material";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import CopyAllIcon from '@mui/icons-material/CopyAll';
-import { Navigator } from "../common/navigator";
+import { Navigator } from "../shared/navigator";
 
 export function ListeningToStories({ words }: { words: Word[] }) {
     const combinedSentences = useMemo(() => combineSentences(words), [words]);

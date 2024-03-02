@@ -5,11 +5,11 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Sentence } from "@wb/pages/add-word";
 import InfoIcon from '@mui/icons-material/Info';
 import { Cheerleader, CheerleaderStatus } from "./cheerleader";
-import { AudioPlayer } from "../common/sentence-audio-player";
+import { AudioPlayer } from "../shared/sentence-audio-player";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
-import { Navigator } from "../common/navigator";
+import { Navigator } from "../shared/navigator";
 import { useSelectionTranslator } from "@wb/utils/use-selection-translator";
-import { BingTranslateReader } from "../common/bing-translate-reader";
+import { BingTranslateReader } from "../shared/bing-translate-reader";
 
 export type CombinedSentence = {
     sentence: Sentence;

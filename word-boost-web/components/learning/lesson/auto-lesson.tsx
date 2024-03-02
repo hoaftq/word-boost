@@ -2,7 +2,7 @@ import { Button, Typography } from "@mui/material";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-const YoutubePlayer = dynamic(() => import("../../youtube-player"), { ssr: false });
+const YoutubePlayer = dynamic(() => import("../../common/youtube-player"), { ssr: false });
 
 export type PlayCommand = {
     label: string;

@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Word } from "../main";
 import { CombinedSentence } from "../testing/fill-blank-test";
 import { combineSentences } from "@wb/utils/utils";
-import { AudioPlayer } from "../common/sentence-audio-player";
+import { AudioPlayer } from "../shared/sentence-audio-player";
 import { Typography, useTheme } from "@mui/material";
 import HeadphonesIcon from '@mui/icons-material/Headphones';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import { Navigator } from "../common/navigator";
+import { Navigator } from "../shared/navigator";
 
 const StartRate = 0.6;
 const EndRate = 1;

@@ -2,7 +2,7 @@ import { Button, Typography } from "@mui/material";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-const YoutubePlayer = dynamic(() => import("../youtube-player"), { ssr: false });
+const YoutubePlayer = dynamic(() => import("../../youtube-player"), { ssr: false });
 
 export type PlayCommand = {
     label: string;
@@ -15,7 +15,7 @@ export type PlayCommand = {
     description?: string;
 }
 
-export type Lesson = {
+export type AutoLesson = {
     name: string;
     commands: PlayCommand[]
 }
@@ -26,12 +26,12 @@ enum DelayStatus {
     Done
 }
 
-type LessonProps = {
-    lesson: Lesson;
+type AutoLessonProps = {
+    lesson: AutoLesson;
     onEnd: () => void;
 }
 
-export function Lesson({ lesson: { name, commands }, onEnd }: LessonProps) {
+export function AutoLesson({ lesson: { name, commands }, onEnd }: AutoLessonProps) {
     const [currentCommand, setCurrentCommand] = useState({ index: 0, repeat: 0 });
     const delayedRef = useRef(DelayStatus.NotStarted);
     const playerRef = useRef<ReactPlayer>(null);

@@ -1,13 +1,13 @@
-import { Lesson } from "@wb/components/learning/lesson";
+import { AutoLesson } from "@wb/components/learning/lesson/auto-lesson";
 import lessonData from "./lesson-data.json";
 import { Button, Dialog } from "@mui/material";
 import { useState } from "react";
 
 export default function Lessons() {
     const [open, setOpen] = useState(false);
-    const [lesson, setLesson] = useState<Lesson>();
+    const [lesson, setLesson] = useState<AutoLesson>();
 
-    const handleOpenDialogClick = (lesson: Lesson) => {
+    const handleOpenDialogClick = (lesson: AutoLesson) => {
         setLesson(lesson);
         setOpen(true);
     }
@@ -23,7 +23,7 @@ export default function Lessons() {
             onClick={() => handleOpenDialogClick(l)}>{`${i + 1}. ${l.name}`}</Button>)}
 
         {lesson && <Dialog open={open} fullScreen>
-            <Lesson lesson={lesson} onEnd={handleEndClick}></Lesson>
+            <AutoLesson lesson={lesson} onEnd={handleEndClick}></AutoLesson>
         </Dialog>}
     </>;
 }

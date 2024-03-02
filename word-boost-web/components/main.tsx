@@ -9,7 +9,7 @@ import { Sentences } from "./learning/sentences";
 import { FillBlankTest } from "./testing/fill-blank-test";
 import { WritingSentences } from "./learning/writing-sentences";
 import { GroupOptions, MultipleGroupedSelect, MultipleSelect, SelectionType } from "./multiple-select";
-import { Lesson } from "./learning/lesson";
+import { AutoLesson } from "./learning/lesson/auto-lesson";
 import { shuffleArray } from "@wb/utils/utils";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
@@ -33,7 +33,7 @@ export interface Word {
 
 interface LessonWords {
     words: Word[],
-    lesson: Lesson
+    lesson: AutoLesson
 }
 
 type UnitAndCourse = {
